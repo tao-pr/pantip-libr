@@ -18,4 +18,13 @@ thread. By changing this number, you simply access another topic.
 This is super simple.
 
 Pantip Librarian is a quick prototype of Q&A site crawler 
-which scrapes the content of the 
+which scrapes the content of a range of topics on Pantip site 
+and analyses the popularity factors over the scraped data.
+
+## Prerequisites
+
+Before running the tasks, these dependencies need to me met:
+
+[x] Python 3.4
+[x] Apache CouchDB
+

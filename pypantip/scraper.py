@@ -4,10 +4,12 @@ Pantip Scraper
 """
 
 from htmldom import htmldom
+from termcolor import colored
 
 def scrape(topic_id):
 	# Download the topic and create DOM over it
 	url  = 'http://www.pantip.com/topic/{0}'.format(topic_id)
+	print(colored('Fetching: ','green') + colored(url,'cyan'))
 	page = htmldom.HtmlDom(url).createDom()
 
 	# Extract the content out of the page
@@ -30,7 +32,6 @@ def scrape(topic_id):
 
 def parse_tags(tags):
 	if tags is None: return []
-	if len(tags)==0: return []
 	tags = [tag.text().strip() for tag in tags]
 	return tags
 

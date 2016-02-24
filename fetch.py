@@ -30,6 +30,6 @@ if __name__ == '__main__':
 		print(colored('Saving ...','yellow'))
 		couch.push(db,thread)
 
-	print(colored('=============================',cyan))
+	print(colored('=============================','cyan'))
 	print(colored('  {0} documents processed'.format(num),'cyan'))
-	print(colored('=============================',cyan))
+	print(colored('=============================','cyan'))

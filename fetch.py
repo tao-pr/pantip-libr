@@ -1,5 +1,8 @@
 """
-Librarian job
+Fetch Pantip topics in the specified range
+Extract key information for data mining
+and push them into CouchDB
+
 @starcolon projects
 """
 

@@ -12,6 +12,12 @@ def scrape(topic_id):
 	print(colored('Fetching: ','green') + colored(url,'cyan'))
 	page = htmldom.HtmlDom(url).createDom()
 
+	# Deleted topic?
+	if page.find('.callback-status') \
+	and 'กระทู้นี้ถูกลบเนื่องจาก' in page.find('.callback-status').text():
+		print(colored('DELETED TOPIC','red'))
+		return None
+
 	# Extract the content out of the page
 	title = page.find('h2.display-post-title').text()
 	topic = page.find('.display-post-story').text()
@@ -21,6 +27,7 @@ def scrape(topic_id):
 
 	# Formulate the scraped document
 	scrape = {
+		'topic_id': topic_id,
 		'title': title,
 		'topic': topic,
 		'tags': tags,

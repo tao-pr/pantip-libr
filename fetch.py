@@ -14,13 +14,19 @@ if __name__ == '__main__':
 	db = couch.connector('pantip')
 
 	# Fetch the threads in the specified range
-	for _id in range(34800000,34800100):
+	num = 0
+	for _id in range(34800000,34800350):
 		thread = scraper.scrape(_id)
 
+		if thread is None: continue
+
+		num = num + 1
 		print(thread)
 
 		# Save the scraped document
 		print(colored('Saving ...','yellow'))
 		couch.push(db,thread)
 
-
+	print(colored('=============================',cyan))
+	print(colored('  {0} documents processed'.format(num),'cyan'))
+	print(colored('=============================',cyan))

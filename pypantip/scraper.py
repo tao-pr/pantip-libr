@@ -1,0 +1,41 @@
+"""
+Pantip Scraper
+@starcolon projects
+"""
+
+from htmldom import htmldom
+
+def scrape(topic_id):
+	# Download the topic and create DOM over it
+	url  = 'http://www.pantip.com/topic/{0}'.format(topic_id)
+	page = htmldom.HtmlDom(url).createDom()
+
+	# Extract the content out of the page
+	title = page.find('h2.display-post-title').text()
+	topic = page.find('.display-post-story').text()
+	tags  = parse_tags(page.find('.display-post-tag-wrapper')[:])
+	vote  = int(page.find('.like-score').text())
+	emoti = extract_emotions(page.find('.emotion-vote-user').text())
+
+	# Formulate the scraped document
+	scrape = {
+		'title': title,
+		'topic': topic,
+		'tags': tags,
+		'vote': vote,
+		'emoti': emoti
+	}
+
+	return scrape
+
+def parse_tags(tags):
+	if tags is None: return []
+	if len(tags)==0: return []
+	tags = [tag.text().strip() for tag in tags]
+	return tags
+
+
+def extract_emotions(emoti_str):
+	__emotions = ['ขำกลิ้ง','สยอง','ถูกใจ']
+	emotions = [(e,emoti_str.count(e))  for e in __emotions]
+	return emotions

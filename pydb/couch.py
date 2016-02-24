@@ -7,9 +7,11 @@ from couchdb.client import Server
 
 def connector(collection):
 	# Make a server connection
-	srv = Server()
-	db  = srv.create(collection)
-	return db
+	svr = Server()
+	if collection not in svr:
+		return svr.create(collection)
+	else:
+		return svr[collection]
 
 def push(db,record):
 	_id, _rev = db.save(record)

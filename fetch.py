@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
 	# Fetch the threads in the specified range
 	num = 0
-	for _id in range(34800000,34800350):
+	for _id in range(34800000,34801050):
 		thread = scraper.scrape(_id)
 
 		if thread is None: continue

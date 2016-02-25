@@ -31,3 +31,9 @@ def push(db,record):
 
 	_id, _rev = db.save(record)
 	return (_id,_rev)
+
+# Apply functions on to the database
+def each_do(db,func):
+	for _id in db:
+		func(db.get(_id))
+		

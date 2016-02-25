@@ -22,7 +22,8 @@ def scrape(topic_id):
 	title = page.find('h2.display-post-title').text()
 	topic = page.find('.display-post-story').text()
 	tags  = parse_tags(page.find('.display-post-tag-wrapper')[:])
-	vote  = int(page.find('.like-score').text())
+	svote = page.find('.like-score').text()
+	vote  = int(svote) if svote else 0
 	emoti = extract_emotions(page.find('.emotion-vote-user').text())
 
 	# Formulate the scraped document
@@ -39,7 +40,8 @@ def scrape(topic_id):
 
 def parse_tags(tags):
 	if tags is None: return []
-	tags = [tag.text().strip() for tag in tags]
+	tags = tags.text().split('\n')
+	###tags = [tag.text().strip() for tag in tags]
 	return tags
 
 

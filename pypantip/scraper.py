@@ -40,8 +40,7 @@ def scrape(topic_id):
 
 def parse_tags(tags):
 	if tags is None: return []
-	tags = tags.text().split('\n')
-	###tags = [tag.text().strip() for tag in tags]
+	tags = tags.text().split('\n') # This will also include empty elements
 	return tags
 
 

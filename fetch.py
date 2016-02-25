@@ -12,23 +12,26 @@ from pprint import pprint
 from termcolor import colored
 import json
 
+def scrape_and_store(topic_id):
+	thread = scraper.scrape(_id)
+	if thread is None: return False # Skip if thread scraping failed
+
+	print(thread)
+
+	# Save the scraped document
+	print(colored('Saving ...','yellow'))
+	couch.push(db,thread)
+
+	return True
+
 if __name__ == '__main__':
 	# Prepare the database server connection
 	db = couch.connector('pantip')
 
 	# Fetch the threads in the specified range
 	num = 0
-	for _id in range(34800000,34801050):
-		thread = scraper.scrape(_id)
-
-		if thread is None: continue
-
-		num = num + 1
-		print(thread)
-
-		# Save the scraped document
-		print(colored('Saving ...','yellow'))
-		couch.push(db,thread)
+	for _id in range(34800000,34801800):
+		if scrape_and_store(_id): num += 1
 
 	print(colored('=============================','cyan'))
 	print(colored('  {0} documents processed'.format(num),'cyan'))

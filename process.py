@@ -6,7 +6,7 @@ Process the downloaded records in CouchDB
 from pydb import couch
 from pprint import pprint
 from termcolor import colored
-import pyspark
+from pypipe import pipe as Pipe
 import json
 
 # Push the record through the processing pipeline
@@ -27,4 +27,4 @@ if __name__ == '__main__':
 	pipe = []
 
 	# Iterate through each record and process
-	couch.each_do(db,make_data_row)
+	couch.each_do(db,make_data_row(pipe))

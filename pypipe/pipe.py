@@ -1,5 +1,5 @@
 """
-Record processing pipeline
+Generic record processing pipeline.
 
 @starcolon projects
 """
@@ -10,6 +10,7 @@ import pyspark
 def make(tasks):
 	pass
 
-# Execute the pipeline
+# Execute the pipeline and take
 def operate(pipe,input,callback):
 	pass
+

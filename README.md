@@ -29,6 +29,52 @@ Before running the tasks, these dependencies need to me met:
 [x] [Apache CouchDB](http://couchdb.apache.org/)
 [x] [Apache Spark](http://spark.apache.org/)
 
+## Prepare development environment
+
+Suppose you have all major dependencies as listed in the previous 
+section installed properly. Now you can simply run the script 
+to install all development dependencies:
+
+```bash
+$ bash dev-setup.sh
+```
+
+The script basically collects and installs all Python libraries you 
+need for running the library.
+
+## Try it
+
+`Pantip-Libr` is not a complex module so hopefully you can have a 
+speedy first step. Following is the list of common tasks you can 
+find.
+
+### 1. Download Pantip threads
+
+We have a script to fetch Pantip topics (in a specified range of IDs) 
+and store them in a certain format in `CrouchDB` on your local machine. 
+Simply run the following command:
+
+```
+$ python3 fetch.py
+```
+
+This would take some time to finish. The speed does depend on 
+the quality of your Internet connection.
+
+**Caveat**: Please accept my apology. The download script doesn't 
+guard against HTTP connection failures. If network glitch happens, 
+the script poorly ends execution.
+
+### 2. Process the downloaded threads
+
+This is still under development. By running the following command, 
+you will potentially create a processing pipeline and have the entire 
+downloaded thread data pushed into the processing queue.
+
+```
+$ python3 process.py
+```
+
 ## Licence
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">pantip-libr</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">starcolon</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

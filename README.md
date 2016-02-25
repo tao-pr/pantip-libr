@@ -25,9 +25,9 @@ and analyses the popularity factors over the scraped data.
 
 Before running the tasks, these dependencies need to me met:
 
-[x] [Python 3.4](https://www.python.org/download/releases/3.4.3/)
-[x] [Apache CouchDB](http://couchdb.apache.org/)
-[x] [Apache Spark](http://spark.apache.org/)
+- [x] [Python 3.4](https://www.python.org/download/releases/3.4.3/)
+- [x] [Apache CouchDB](http://couchdb.apache.org/)
+- [x] [Apache Spark](http://spark.apache.org/)
 
 ## Prepare development environment
 

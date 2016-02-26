@@ -22,15 +22,16 @@ def execute_background_services(commands):
 		workers.append(sp.pid)
 	return workers
 
-# Push the record through the processing pipeline
-def push_pipeline(pipe):
-	def go(rec):
-		print(rec['title'])
-		pass # TAOTODO: Trigger the pipe
-	return go
+def init_pipelines():
+	pass # TAOTODO: Return the processing pipelines
 
 def print_record(rec):
 	print([rec['title'],rec['tags']])
+
+def process(pipe):
+	def f(input):
+		pass # TAOTODO: Take the input to the pipe and process
+	return f
 
 if __name__ == '__main__':
 	# Prepare the database server connection
@@ -40,12 +41,12 @@ if __name__ == '__main__':
 	services = ['ruby tokenizer/tokenizer.rb']
 	workers  = execute_background_services(services)
 
-	# Prepare the processing pipeline
+	# Prepare the processing pipeline (order matters)
 	# TAOTODO:
-	pipe = []
+	pipe = init_pipelines()
 
 	# Iterate through each record and process
-	couch.each_do(db,push_pipeline(pipe))
+	couch.each_do(db,process(pipe))
 
 	# Kill all running background services before leaving
 	print(colored('Ending background services...','green'))

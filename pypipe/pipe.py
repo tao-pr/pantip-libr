@@ -5,14 +5,15 @@ Generic record processing pipeline.
 """
 
 import pyspark
+from termcolor import colored
 from functools import reduce
 
 class Pipe:
 	def __init__(self,title,tasks):
 		self.title = title
 		self.tasks = tasks[:]
-		self.callback = lambda whatever: 
-			print('{0} finished processing.'.format(title))
+		self.callback = lambda whatever: print(
+			'{0} finished processing.'.format(title))
 
 
 # Create a task pipeline
@@ -47,6 +48,7 @@ def operate(pipe,input0):
 	out = reduce(take,pipe.tasks,input0)
 
 	# Call the callback function
-	pipe.callback(out) if pipe.callback is not None
+	if pipe.callback is not None: 
+		pipe.callback(out)
 
 

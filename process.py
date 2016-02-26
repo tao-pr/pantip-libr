@@ -7,6 +7,7 @@ from pydb import couch
 from pprint import pprint
 from termcolor import colored
 from pypipe import pipe as Pipe
+from pypipe import tokenizerPipe
 import subprocess
 import signal
 import json
@@ -40,7 +41,7 @@ if __name__ == '__main__':
 	workers  = execute_background_services(services)
 
 	# Prepare the processing pipeline (order matters)
-	pipe = [] # TAOTODO: initialise the processing pipeline
+	pipe = tokenizerPipe.new('Word Breaker')
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe))

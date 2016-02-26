@@ -19,6 +19,7 @@ def make(title,tasks):
 
 # Execute the pipeline and take
 def operate(pipe,input0,callback):
+	print(colored('⏳ Executing {0}...'.format(pipe.title),'green'))
 	if pipe is None:
 		raise 'Pipe is not available'
 	# NOTE: null is allowed as input

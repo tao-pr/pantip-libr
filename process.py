@@ -8,14 +8,18 @@ from pprint import pprint
 from termcolor import colored
 from pypipe import pipe as Pipe
 import subprocess
+import signal
 import json
+import os
 
 def execute_background_services(commands):
 	workers = []
 	for cmd in commands:
 		print(colored('🚀 Executing...','green') + cmd)
-		sp = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-		workers.append(sp)
+		sp = subprocess.Popen(cmd, 
+			shell=True, stdout=subprocess.PIPE,
+			preexec_fn=os.setsid)
+		workers.append(sp.pid)
 	return workers
 
 # Push the record through the processing pipeline
@@ -43,6 +47,7 @@ if __name__ == '__main__':
 	# Iterate through each record and process
 	couch.each_do(db,push_pipeline(pipe))
 
-	# End of the process, terminate all background services
-	print(colored('Ending workers...','cyan'))
-	[w.kill() for w in workers]
+	# Kill all running background services before leaving
+	print(colored('Ending background services...','green'))
+	for pid in workers:
+		subprocess.Popen('kill {0}'.format(pid), shell=True, stdout=subprocess.PIPE)

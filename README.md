@@ -76,6 +76,12 @@ downloaded thread data pushed into the processing queue.
 $ python3 process.py
 ```
 
+## Significant 3rd parties
+
+These are our brilliant prerequisites.
+
+- [x] [Thailang4r](https://github.com/veer66/thailang4r)
+
 ## Licence
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">pantip-libr</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">starcolon</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

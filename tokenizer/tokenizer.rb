@@ -7,16 +7,17 @@ require 'thailang4r/word_breaker'
 require 'sinatra'
 require 'json'
 
-set :port, 9000
+set :port, 9861
 $word_breaker = ThaiLang::WordBreaker.new	
 
 puts "==========================="
 puts "  Work tokenizer server"
 puts "==========================="
 
-def break_me(str):
-	if $word_breaker.nil
+def break_me(str)
+	if $word_breaker.nil?
 		raise 'Word breaker is not alive.'
+	end
 	$word_breaker.break_into_words(str)
 end
 

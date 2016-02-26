@@ -81,6 +81,8 @@ $ python3 process.py
 These are our brilliant prerequisites.
 
 - [x] [Thailang4r](https://github.com/veer66/thailang4r)
+- [x] [Finch](https://github.com/jaimegildesagredo/finch) (Python REST consumer API)
+
 
 ## Licence
 

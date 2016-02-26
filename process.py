@@ -22,15 +22,13 @@ def execute_background_services(commands):
 		workers.append(sp.pid)
 	return workers
 
-def init_pipelines():
-	pass # TAOTODO: Return the processing pipelines
-
 def print_record(rec):
 	print([rec['title'],rec['tags']])
 
-def process(pipe):
-	def f(input):
-		pass # TAOTODO: Take the input to the pipe and process
+# Couple the processing pipe with the input
+def process_with(pipe):
+	def f(input0):
+		Pipe.operate(pipe,input0)
 	return f
 
 if __name__ == '__main__':
@@ -42,13 +40,13 @@ if __name__ == '__main__':
 	workers  = execute_background_services(services)
 
 	# Prepare the processing pipeline (order matters)
-	# TAOTODO:
-	pipe = init_pipelines()
+	pipe = [] # TAOTODO: initialise the processing pipeline
 
 	# Iterate through each record and process
-	couch.each_do(db,process(pipe))
+	couch.each_do(db,process_with(pipe))
 
 	# Kill all running background services before leaving
 	print(colored('Ending background services...','green'))
 	for pid in workers:
-		subprocess.Popen('kill {0}'.format(pid), shell=True, stdout=subprocess.PIPE)
+		subprocess.Popen('kill {0}'.format(pid), 
+			shell=True, stdout=subprocess.PIPE)

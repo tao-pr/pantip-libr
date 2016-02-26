@@ -6,4 +6,7 @@ pip3 install htmldom
 pip3 install couchdb
 pip3 install multiprocessing
 
+gem install thailang4r
+gem install sinatra
+
 echo "[Finished]"

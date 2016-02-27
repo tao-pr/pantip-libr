@@ -31,8 +31,14 @@ get '/version/' do
 end
 
 post '/break/' do
-	req = JSON.parse request.body.read
-	req['data'] = req['data'].map {|x| break_me x}
+	req = JSON.parse request.body.read.force_encoding("UTF-8")
+	resp = {'data' => req['data'].map {|x| break_me x}}
 
-	puts req.to_json
+	# TAODEBUG:
+	puts "RESULTS:"
+	puts resp
+	puts "PRETTY RESULTS:"
+	puts JSON.pretty_generate resp
+
+	return JSON.pretty_generate(resp)
 end

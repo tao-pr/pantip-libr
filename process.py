@@ -40,10 +40,10 @@ if __name__ == '__main__':
 
 	# Execute list of required background services
 	services = ['ruby tokenizer/tokenizer.rb']
-	workers  = execute_background_services(services)
+	###workers  = execute_background_services(services)
 
 	# Delayed start
-	time.sleep(5)
+	###time.sleep(2)
 
 	# Prepare the processing pipeline (order matters)
 	pipe = Pipe.new('preprocess',[])
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 	couch.each_do(db,process_with(pipe))
 
 	# Kill all running background services before leaving
-	print(colored('Ending background services...','green'))
-	for pid in workers:
-		subprocess.Popen('kill {0}'.format(pid), 
-			shell=True, stdout=subprocess.PIPE)
+	###print(colored('Ending background services...','green'))
+	###for pid in workers:
+	###	subprocess.Popen('kill {0}'.format(pid), 
+	###		shell=True, stdout=subprocess.PIPE)

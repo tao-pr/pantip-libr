@@ -4,6 +4,7 @@ Pantip thread record pre-processing pipe
 """
 
 from multiprocessing import Pool
+from termcolor import colored
 from . import tokenizer
 import json
 
@@ -12,6 +13,9 @@ def take(record):
 		'data':[record['title'],record['topic']]
 	}
 	results = tokenizer.tokenize(json.dumps(package,ensure_ascii=False))
+
+	# TAODEBUG:
+	print(colored('output: ' + str(results),'yellow'))
 
 	record['title'] = results['data'][0]
 	record['topic'] = results['data'][1]

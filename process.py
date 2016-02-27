@@ -48,10 +48,10 @@ if __name__ == '__main__':
 
 	# Execute list of required background services
 	services = ['ruby tokenizer/tokenizer.rb']
-	###workers  = execute_background_services(services)
+	workers  = execute_background_services(services)
 
 	# Delayed start
-	###time.sleep(2)
+	time.sleep(2)
 
 	# Prepare the processing pipeline (order matters)
 	mq = rabbit.create('localhost','pantipsrc')
@@ -67,5 +67,5 @@ if __name__ == '__main__':
 	rabbit.end(mq)
 
 	# End all background services
-	###terminate_background_services(worksers)
+	terminate_background_services(workers)
 

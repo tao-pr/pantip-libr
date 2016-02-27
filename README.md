@@ -68,13 +68,15 @@ the script poorly ends execution.
 
 ### 2. Process the downloaded threads
 
-This is still under development. By running the following command, 
-you will potentially create a processing pipeline and have the entire 
-downloaded thread data pushed into the processing queue.
+To process the downloaded threads, execute the following 
+command. (You may notice that `fetch.py` should implicitly 
+be triggered at least once before calling this.)
 
 ```
 $ python3 process.py
 ```
+
+**Note**: Processing all records take some time.
 
 ## Significant 3rd parties
 

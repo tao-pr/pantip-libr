@@ -8,20 +8,21 @@ import pyspark
 from termcolor import colored
 from functools import reduce
 
+
 class Pipe:
 	def __init__(self,title,tasks):
 		self.title = title
 		self.tasks = tasks[:]
-		self.callback = lambda whatever: print(
+		self.then = lambda whatever: print(
 			'{0} finished processing.'.format(title))
 
 
 # Create a task pipeline
-def make(title,tasks):
+def new(title,tasks):
 	return Pipe(title,tasks)
 
-def set_callback(pipe,callback):
-	pipe.callback = callback
+def then(pipe,callback):
+	pipe.then = callback
 	return pipe
 
 # Append a new task into the existing pipe
@@ -31,7 +32,7 @@ def push(pipe,task):
 
 # This will chain the next pipe via callback
 def chain(pipe,nextpipe):
-	pipe.callback = lambda final_out: operate(nextpipe, final_out)
+	pipe.then = lambda final_out: operate(nextpipe, final_out)
 	return pipe
 
 # Execute the pipeline and take
@@ -49,7 +50,9 @@ def operate(pipe,input0):
 	out = reduce(take,pipe.tasks,input0)
 
 	# Send the output via callback
-	if pipe.callback is not None: 
-		pipe.callback(out)
+	if pipe.then is not None: 
+		pipe.then(out)
+	else:
+		print('[Then] is not supplied.') # TAODEBUG:
 
 

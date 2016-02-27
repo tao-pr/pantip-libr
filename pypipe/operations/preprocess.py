@@ -11,8 +11,8 @@ def take(record):
 	topic = record['topic']
 
 	# Tokenise title & topic of the record
-	p = Pool(processes=2)
-	[title,topic] = p.map(tokenizer.tokenise,[title,topic])
+	pool = Pool(processes=2)
+	[title,topic] = pool.map(tokenizer.tokenize,[title,topic])
 
 	record['title'] = title
 	record['topic'] = topic

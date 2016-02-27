@@ -23,7 +23,7 @@ def __request(input0):
 	output = None
 	try:
 		print(colored('tokenising.. ','yellow') + input0)
-		req    = httpclient.HTTPRequest(tokeniser_serv,method='POST')
+		req    = httpclient.HTTPRequest(tokeniser_serv,method='POST',body=input0)
 		resp   = client.fetch(req)
 		output = resp.body
 	except httpclient.HTTPError as e:

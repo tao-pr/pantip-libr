@@ -7,10 +7,11 @@ from pydb import couch
 from pprint import pprint
 from termcolor import colored
 from pypipe import pipe as Pipe
-from pypipe import tokenizerPipe
+from pypipe.operations import preprocess
 import subprocess
 import signal
 import json
+import time
 import os
 
 def execute_background_services(commands):
@@ -41,9 +42,13 @@ if __name__ == '__main__':
 	services = ['ruby tokenizer/tokenizer.rb']
 	workers  = execute_background_services(services)
 
+	# Delayed start
+	time.sleep(5)
+
 	# Prepare the processing pipeline (order matters)
-	pipe = tokenizerPipe.new('Word Breaker')
-	Pipe.push(pipe,tokenizeContent)
+	pipe = Pipe.new('preprocess',[])
+	Pipe.push(pipe,preprocess.take)
+	Pipe.then(pipe,lambda out: print(colored('[DONE!]','blue')))
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe))

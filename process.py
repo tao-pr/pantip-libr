@@ -47,13 +47,17 @@ if __name__ == '__main__':
 	###time.sleep(2)
 
 	# Prepare the processing pipeline (order matters)
+	mq = rabbit.create('localhost','pantipsrc')
 	pipe = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
-	Pipe.push(pipe,rabbit.feed('localhost','pantipsrc'))
+	Pipe.push(pipe,rabbit.feed(mq))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','blue')))
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe),limit=3)
+
+	# End MQ
+	rabbit.end(mq)
 
 	# Kill all running background services before leaving
 	###print(colored('Ending background services...','green'))

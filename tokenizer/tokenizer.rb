@@ -33,5 +33,5 @@ end
 post '/break/' do
 	req = JSON.parse request.body.read.force_encoding("UTF-8")
 	resp = {'data' => req['data'].map {|x| break_me x}}
-	return resp
+	return resp.to_json
 end

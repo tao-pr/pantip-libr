@@ -4,6 +4,7 @@ String tokeniser operation
 """
 from tornado import httpclient
 from termcolor import colored
+import json
 
 tokeniser_serv = 'http://localhost:9861/break/'
 
@@ -26,6 +27,12 @@ def __request(input0):
 		req    = httpclient.HTTPRequest(tokeniser_serv,method='POST',body=input0)
 		resp   = client.fetch(req)
 		output = resp.body
+
+		# Decode bytes
+		output = output.decode('utf-8')
+		# Parse the JSON response to a hash object
+		output = json.loads(output)
+
 	except httpclient.HTTPError as e:
 		# HTTP error header
 		print(colored('HTTP Error : ' + str(e),'red'))

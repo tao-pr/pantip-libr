@@ -10,11 +10,13 @@ from termcolor import colored
 tokeniser_serv = 'http://localhost:9861/break/'
 
 def new(title):
+	p = pipe.make(title,[])
 	def action(input0):
 		output = tokenize(input0)
-		# TAOTODO: It should pass output through the pipe.callback
-		# How?? 
-	return pipe.make(title,[action])
+		if p.callback is not None: 
+			p.callback[output]
+	pipe.push(p,action)
+	return p
 
 # @input: String
 # @output: list of string
@@ -31,14 +33,14 @@ def __request(input0):
 	client = httpclient.HTTPClient()
 	output = None
 	try:
-		print('tokenising.. '.yellow + input0)
+		print(colored('tokenising.. ','yellow') + input0)
 		req    = httpclient.HTTPRequest(tokeniser_serv,method='POST')
 		resp   = client.fetch(req)
 		output = resp.body
 	except httpclient.HTTPError as e:
 		# HTTP error header
 		print(colored('HTTP Error : ' + str(e),'red'))
-	except e:
+	except Exception as e:
 		# Some unhandled error
 		print(colored('ERROR : ' + str(e), 'red'))
 

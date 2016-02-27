@@ -8,6 +8,7 @@ from pprint import pprint
 from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe.operations import preprocess
+from pypipe.operations import rabbit
 import subprocess
 import signal
 import json
@@ -48,10 +49,11 @@ if __name__ == '__main__':
 	# Prepare the processing pipeline (order matters)
 	pipe = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
+	Pipe.push(pipe,rabbit.feed('localhost','pantipsrc'))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','blue')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe))
+	couch.each_do(db,process_with(pipe),limit=3)
 
 	# Kill all running background services before leaving
 	###print(colored('Ending background services...','green'))

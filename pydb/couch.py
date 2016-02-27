@@ -33,7 +33,12 @@ def push(db,record):
 	return (_id,_rev)
 
 # Apply functions on to the database
-def each_do(db,func):
+def each_do(db,func,**kwargs):
+	n = 0
 	for _id in db:
 		func(db.get(_id))
+		n+=1
+		if 'limit' in kwargs and n>kwargs['limit']:
+			print('Limit of {0} records reached.'.format(kwargs['limit']))
+			break
 		

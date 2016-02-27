@@ -25,6 +25,13 @@ def execute_background_services(commands):
 		workers.append(sp.pid)
 	return workers
 
+def terminate_background_services(workser):
+	# Kill all running background services before leaving
+	print(colored('Ending background services...','green'))
+	for pid in workers:
+		subprocess.Popen('kill {0}'.format(pid), 
+			shell=True, stdout=subprocess.PIPE)
+
 def print_record(rec):
 	print([rec['title'],rec['tags']])
 
@@ -59,8 +66,6 @@ if __name__ == '__main__':
 	# End MQ
 	rabbit.end(mq)
 
-	# Kill all running background services before leaving
-	###print(colored('Ending background services...','green'))
-	###for pid in workers:
-	###	subprocess.Popen('kill {0}'.format(pid), 
-	###		shell=True, stdout=subprocess.PIPE)
+	# End all background services
+	###terminate_background_services(worksers)
+

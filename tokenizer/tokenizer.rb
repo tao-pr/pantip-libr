@@ -14,6 +14,11 @@ puts "==========================="
 puts "  Work tokenizer server"
 puts "==========================="
 
+before do
+	# The REST API always serves JSON response
+  headers "Content-Type" => "application/json; charset=utf8"
+end
+
 def break_me(str)
 	if $word_breaker.nil?
 		raise 'Word breaker is not alive.'
@@ -27,5 +32,7 @@ end
 
 post '/break/' do
 	req = JSON.parse request.body.read
-	puts break_me(req['word'])
+	req['data'] = req['data'].map {|x| break_me x}
+
+	puts req.to_json
 end

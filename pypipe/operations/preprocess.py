@@ -5,16 +5,15 @@ Pantip thread record pre-processing pipe
 
 from multiprocessing import Pool
 from . import tokenizer
+import json
 
 def take(record):
-	title = record['title']
-	topic = record['topic']
+	package = {
+		'data':[record['title'],record['topic']]
+	}
+	results = tokenizer.tokenize(json.dumps(package,ensure_ascii=False))
 
-	# Tokenise title & topic of the record
-	pool = Pool(processes=2)
-	[title,topic] = pool.map(tokenizer.tokenize,[title,topic])
-
-	record['title'] = title
-	record['topic'] = topic
+	record['title'] = results['data'][0]
+	record['topic'] = results['data'][1]
 
 	return record

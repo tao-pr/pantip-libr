@@ -29,6 +29,7 @@ def push(pipe,task):
 	pipe.tasks.append(task)
 	return pipe
 
+# This will chain the next pipe via callback
 def chain(pipe,nextpipe):
 	pipe.callback = lambda final_out: operate(nextpipe, final_out)
 	return pipe
@@ -47,7 +48,7 @@ def operate(pipe,input0):
 
 	out = reduce(take,pipe.tasks,input0)
 
-	# Call the callback function
+	# Send the output via callback
 	if pipe.callback is not None: 
 		pipe.callback(out)
 

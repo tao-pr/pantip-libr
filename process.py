@@ -32,6 +32,7 @@ def process_with(pipe):
 		Pipe.operate(pipe,input0)
 	return f
 
+
 if __name__ == '__main__':
 	# Prepare the database server connection
 	db = couch.connector('pantip')
@@ -42,6 +43,7 @@ if __name__ == '__main__':
 
 	# Prepare the processing pipeline (order matters)
 	pipe = tokenizerPipe.new('Word Breaker')
+	Pipe.push(pipe,tokenizeContent)
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe))

@@ -1,22 +1,11 @@
 """
-Word tokeniser pipe
+String tokeniser operation
 @starcolon projects
 """
-
-from . import pipe
 from tornado import httpclient
 from termcolor import colored
 
 tokeniser_serv = 'http://localhost:9861/break/'
-
-def new(title):
-	p = pipe.make(title,[])
-	def action(input0):
-		output = tokenize(input0)
-		if p.callback is not None: 
-			p.callback[output]
-	pipe.push(p,action)
-	return p
 
 # @input: String
 # @output: list of string

@@ -28,7 +28,11 @@ Before running the tasks, these dependencies need to me met:
 - [x] [Python 3.4+](https://www.python.org/download/releases/3.4.3/)
 - [x] [Apache CouchDB](http://couchdb.apache.org/)
 - [x] [Apache Spark](http://spark.apache.org/)
-- [x] [Ruby 2.1+](https://www.ruby-lang.org/en/news/2015/08/18/ruby-2-1-7-released/)
+- [x] [Ruby 2.1+](https://www.ruby-lang.org/en/news/2015/08/18/ruby-2-1-7-
+released/)
+- [x] [RabbitMQ](https://www.rabbitmq.com)
+
+Make sure you have all above prerequisites installed, up and running.
 
 ## Prepare development environment
 

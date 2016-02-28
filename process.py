@@ -1,5 +1,5 @@
 """
-Process the downloaded records in CouchDB
+Process the downloaded Pantip threads
 
 @starcolon projects
 """
@@ -58,12 +58,12 @@ if __name__ == '__main__':
 	pipe = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
 	Pipe.push(pipe,rabbit.feed(mq))
-	Pipe.then(pipe,lambda out: print(colored('[DONE!]','blue')))
+	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe),limit=3)
 
-	# End MQ
+	# Disconnect from the MQ
 	rabbit.end(mq)
 
 	# End all background services

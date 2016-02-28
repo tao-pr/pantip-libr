@@ -22,7 +22,7 @@ def feed(feeder):
 			exchange='',
 			routing_key=q,
 			body=data)
-		print(colored('record #{0} fed to rabbit'.format(topic_id),'blue'))
+		print(colored('record #{0} fed to rabbit'.format(topic_id),'cyan'))
 
 	return feed_message
 

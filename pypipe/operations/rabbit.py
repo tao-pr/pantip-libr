@@ -29,7 +29,7 @@ def feed(feeder):
 
 def pull(feeder):
 	def __callback(ch, method, properties, body):
-		pass
+		pass #TAOTODO:
 	conn,channel,q = feeder
 	channel.basic_consume(__callback,q,no_ack=True)
 

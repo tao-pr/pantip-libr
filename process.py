@@ -47,7 +47,10 @@ if __name__ == '__main__':
 	db = couch.connector('pantip')
 
 	# Execute list of required background services
-	services = ['ruby tokenizer/tokenizer.rb']
+	services = [
+		'ruby tokenizer/tokenizer.rb',
+		'python3 pyworker/textprocess.py'
+		]
 	workers  = execute_background_services(services)
 
 	# Delayed start
@@ -67,6 +70,9 @@ if __name__ == '__main__':
 
 	# Disconnect from the MQs
 	rabbit.end(mq)
+
+	# TAOTODO: End the process until we see the finishing signal
+	# from the child processes
 
 	# End all background services
 	terminate_background_services(workers)

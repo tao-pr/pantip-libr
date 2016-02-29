@@ -27,6 +27,16 @@ def feed(feeder):
 		return record
 	return feed_message
 
+def pull(feeder):
+	def __callback(ch, method, properties, body):
+		pass
+	conn,channel,q = feeder
+	channel.basic_consume(__callback,q,no_ack=True)
+
 def end(feeder):
 	conn,channel,q = feeder
 	conn.close()
+
+# Iterate through the feeder as an *iterator
+def iter(feeder):
+	pass

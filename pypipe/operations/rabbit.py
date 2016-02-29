@@ -4,9 +4,11 @@ RabbitMQ data relay
 """
 
 from termcolor import colored
+from Queue import Queue
 import pika
 import json
 
+# Iterable feeder
 class Feeder(object):
 	def __init__(self,conn,channel,q):
 		self.conn    = conn
@@ -17,8 +19,27 @@ class Feeder(object):
 		return (self.conn,self.channel,self.q)
 
 	def __iter__(self):
-		#TAOTODO: Pull the next message out of the queue
-		pass
+		return self
+
+	def next(self):
+		# Use process queue to force async sync
+		qtask = Queue(maxsize=1)
+		def __callback(channel,method,property,body):
+			#TAOTODO: Check for empty queue
+			qtask.put(body)
+			qtask.join() # Block until the previous item has been checked out 
+
+		self.channel.basic_consume(__callback,queue=self.q)
+		#TAOTODO: Start following loop in a background thread
+		#self.channel_start_consuming()
+
+		while True:
+			next_up = qtask.get(True)
+			if next_up is None:
+				raise StopIteration
+			else:
+				yield next_up
+				qtask.task_done() # Done!, signal the unblocking
 
 def create(server_addr,q):
 	conn = pika.BlockingConnection(pika.ConnectionParameters(server_addr))

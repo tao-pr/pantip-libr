@@ -3,8 +3,8 @@ Text processing worker
 @starcolon projects
 """
 from termcolor import colored
-from ..pypipe.operations import rabbit
-from ..pypipe.operations import hasher
+from pypipe.operations import rabbit
+from pypipe.operations import hasher
 
 TEXT_VECTORIZER_PATH	= '../data/transformer/00'
 

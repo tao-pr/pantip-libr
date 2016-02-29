@@ -32,6 +32,7 @@ if __name__ == '__main__':
 
 	# Initialise working MQs
 	mqsrc, mqdst = init_mqs()
+	mqsrc_iter   = rabbit.make_iterable(mqsrc)
 
 	# Initialise the vectoriser objects
 	vectorizer = init_vectorizer()

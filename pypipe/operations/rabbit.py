@@ -37,6 +37,6 @@ def end(feeder):
 	conn,channel,q = feeder
 	conn.close()
 
-# Iterate through the feeder as an *iterator
-def iter(feeder):
+# TAOTODO: Make an iterable over the MQ feeder
+def make_iterable(feeder):
 	pass

@@ -34,7 +34,7 @@ def save(transformer,path):
 		pickle.dump(transformer)
 
 def load(path):
-	with open(path,'rb') as f:
+	with open(path,'rb') as f: #TAOTODO: Should extract pipeline beforehand
 		return pickle.load(f)
 
 # Load the transformer pipeline object

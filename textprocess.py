@@ -6,7 +6,7 @@ from termcolor import colored
 from pypipe.operations import rabbit
 from pypipe.operations import hasher
 
-TEXT_VECTORIZER_PATH	= '../data/transformer/00'
+TEXT_VECTORIZER_PATH	= 'data/transformer/00'
 
 def init_mqs():
 	# Initialise rabbit MQ connectors
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	# TAOTODO: Process the workers	
 
 	# End all working MQs
-	end_mqs(mqsrc, mqdst)
+	end_mqs((mqsrc, mqdst))
 
 	# Save the vectoriser
 	save_vectorizer(vectorizer)

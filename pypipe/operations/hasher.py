@@ -45,14 +45,16 @@ def safe_load(path):
 	else: return new()
 
 # Train the vectorizer with the collection (iterable) of text data
+# @return {Tuple(a,b)} where a:transformer, b: transformation results
 def explore(collection):
 	def _explore_with(transformer):
-		transformer.fit(collection)
-		return transformer
+		# Fit the model and also returns the transformation results
+		collection_ = transformer.fit_transform(collection)
+		return (transformer,collection_)
 	return _explore_with
 
-# @return {Matrix} Term document matrix
-def vectorize(tokens):
+# @return {Matrix} Term document matrix with dimension reduction
+def vectorize(collection):
 	def _vectorize_with(transformer):
-		return transformer.fit_transform(tokens)
+		return transformer.transform(collection)
 	return _vectorize_with

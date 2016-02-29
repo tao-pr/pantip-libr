@@ -4,6 +4,7 @@ Text hashing vectoriser module
 """
 
 import numpy as np
+import os.path
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
@@ -36,11 +37,22 @@ def load(path):
 	with open(path,'rb') as f:
 		return pickle.load(f)
 
+# Load the transformer pipeline object
+# from the physical file,
+# or initialise a new object if the file doesn't exist
+def safe_load(path):
+	if os.path.isfile(path): return load(path)
+	else: return new()
+
 # Train the vectorizer with the collection (iterable) of text data
-def explore(transformer,collection):
-	transformer.fit(collection)
-	return transformer
+def explore(collection):
+	def _explore_with(transformer):
+		transformer.fit(collection)
+		return transformer
+	return _explore_with
 
 # @return {Matrix} Term document matrix
-def vectorize(transformer,tokens):
-	return transformer.fit_transform(tokens)
+def vectorize(tokens):
+	def _vectorize_with(transformer):
+		return transformer.fit_transform(tokens)
+	return _vectorize_with

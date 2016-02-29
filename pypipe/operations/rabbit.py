@@ -13,6 +13,7 @@ def create(server_addr,q):
 	channel.queue_declare(queue=q)
 	return (conn,channel,q)
 
+# @return {Record} it remains unchanged 
 def feed(feeder):
 	def feed_message(record):
 		conn,channel,q = feeder
@@ -22,8 +23,8 @@ def feed(feeder):
 			exchange='',
 			routing_key=q,
 			body=data)
-		print(colored('record #{0} fed to rabbit'.format(topic_id),'cyan'))
-
+		print(colored('record #{0} fed to rabbit'.format(topic_id),'cyan'))	
+		return record
 	return feed_message
 
 def end(feeder):

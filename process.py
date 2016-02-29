@@ -9,6 +9,7 @@ from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe.operations import preprocess
 from pypipe.operations import rabbit
+from pypipe.operations import hasher
 import subprocess
 import signal
 import json
@@ -53,18 +54,25 @@ if __name__ == '__main__':
 	# Delayed start
 	time.sleep(2)
 
+	# Prepare resources
+	mq_raw      = rabbit.create('localhost','pantipsrc')
+	mq_vector   = rabbit.create('localhost','pantipvec')
+	transformer = hasher.safe_load('./data/transformer/00')
+
 	# Prepare the processing pipeline (order matters)
-	mq = rabbit.create('localhost','pantipsrc')
-	pipe = Pipe.new('preprocess',[])
+	pipe      = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
-	Pipe.push(pipe,rabbit.feed(mq))
+	Pipe.push(pipe,rabbit.feed(mq_raw))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe),limit=3)
 
-	# Disconnect from the MQ
-	rabbit.end(mq)
+	# Save the transformer objects
+	hasher.save(transformer,'./data/transformer/00')
+
+	# Disconnect from the MQs
+	rabbit.end(mq_raw)
 
 	# End all background services
 	terminate_background_services(workers)

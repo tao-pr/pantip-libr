@@ -26,7 +26,7 @@ def new():
 	pca = PCA(n_components=64)
 
 	# Prepare two principal processes
-	transformer = make_pipeline(hasher,idf,pca)
+	transformer = [hasher,idf,pca] # Order matters
 	return transformer
 
 def save(transformer,path):
@@ -47,16 +47,20 @@ def safe_load(path):
 # Train the vectorizer with the collection (iterable) of text data
 # @return {Tuple(a,b)} where a:transformer, b: transformation results
 def train(transformer):
+	seq_opr = make_pipeline(transformer)
 	def _train_on(collection):
 		# Fit the model and also returns the transformation results
-		collection_ = transformer.fit_transform(collection)
+		collection_ = seq_opr.fit_transform(collection)
+		# TAOTODO: After pipeline processing, does each of the 
+		# collection gets updated??
 		return (transformer,collection_)
 	return _train_on
 
 # @return {Matrix} Term document matrix with dimension reduction
 def vectorize(transformer):
+	seq_opr = make_pipeline(transformer)
 	def _vectorize_on(collection):
-		return transformer.transform(collection)
+		return seq_opr.transform(collection)
 	return _vectorize_on
 
 

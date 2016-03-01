@@ -13,7 +13,7 @@ def take(record):
 		'data':[record['title'],record['topic']]
 	}
 	results = tokenizer.tokenize(json.dumps(package,ensure_ascii=False))
-	record['title'] = results['data'][0]
-	record['topic'] = results['data'][1]
+	record['title'] = ' '.join(results['data'][0])
+	record['topic'] = ' '.join(results['data'][1])
 
 	return record

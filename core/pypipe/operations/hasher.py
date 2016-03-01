@@ -46,15 +46,14 @@ def safe_load(path):
 
 # Train the vectorizer with the collection (iterable) of text data
 # @return {Tuple(a,b)} where a:transformer, b: transformation results
-def train(transformer):
+def train(transformer,collection):
 	seq_opr = make_pipeline(transformer)
-	def _train_on(collection):
-		# Fit the model and also returns the transformation results
-		collection_ = seq_opr.fit_transform(collection)
-		# TAOTODO: After pipeline processing, does each of the 
-		# collection gets updated??
-		return (transformer,collection_)
-	return _train_on
+	# Fit the model and also returns the transformation results
+	collection_ = seq_opr.fit_transform(collection)
+	# TAOTODO: After pipeline processing, does each of the 
+	# collection gets updated??
+	return (transformer,collection_)
+
 
 # @return {Matrix} Term document matrix with dimension reduction
 def vectorize(transformer):

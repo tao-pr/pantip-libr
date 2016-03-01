@@ -38,9 +38,10 @@ if __name__ == '__main__':
 
 	# Take the tokenised topic out of MQ
 	# and generate the feature vectors
-	#TAOTODO:
-	for s in rabbit.iter(mqsrc):
-		print(s) # TAODEBUG:
+	universe = hasher.train(vectorizer,rabbit.iter(mqsrc))
+
+	#TAODEBUG:
+	print(universe)
 
 	# End all working MQs
 	end_mqs((mqsrc, mqdst))

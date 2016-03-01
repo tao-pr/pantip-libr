@@ -31,7 +31,7 @@ def new():
 
 def save(transformer,path):
 	with open(path,'wb+') as f:
-		pickle.dump(transformer)
+		pickle.dump(transformer,f)
 
 def load(path):
 	with open(path,'rb') as f:

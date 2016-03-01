@@ -5,6 +5,7 @@ RabbitMQ data relay
 
 from termcolor import colored
 from queue import Queue
+import signal
 import time
 import pika
 import json
@@ -15,9 +16,6 @@ class Feeder(object):
 		self.conn    = conn
 		self.channel = channel
 		self.q       = q
-		# Use process queue to force async sync
-		self.qtask   = Queue(maxsize=1) 
-
 	def components(self):
 		return (self.conn,self.channel,self.q)
 
@@ -46,16 +44,26 @@ def feed(feeder):
 
 # Message generator
 def iter(feeder):
+	# Start the awaiting signal
+	try:
+		def __timeout(signum,frame):
+			raise StopIteration
 
-	for methodframe, prop, body in feeder.channel.consume(feeder.q):
-		try:
-			print('.')
+		signal.signal(signal.SIGALRM,__timeout)
+		signal.alarm(5)
+		for methodframe, prop, body in feeder.channel.consume(feeder.q):
+			signal.alarm(0)
 			msg = body.decode('utf-8')
 			yield msg
-		except StopIteration:
-			raise
-		except Exception as e:
-			print(colored('ERROR : {0}'.format(str(e)),'red'))
+			feeder.channel.basic_ack(methodframe.delivery_tag)
+			# Startover a new timer
+			signal.alarm(5)
+	except StopIteration as e:
+		signal.alarm(0) # Cancel the timer
+		raise
+	except Exception as e:
+		signal.alarm(0) 
+		raise
 
 def end(feeder):
 	conn,channel,q = feeder.components()

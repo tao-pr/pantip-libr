@@ -39,7 +39,8 @@ if __name__ == '__main__':
 	# Take the tokenised topic out of MQ
 	# and generate the feature vectors
 	#TAOTODO:
-	X = [s for s in mqsrc]
+	for s in mqsrc:
+		print(s) # TAODEBUG:
 
 	# End all working MQs
 	end_mqs((mqsrc, mqdst))

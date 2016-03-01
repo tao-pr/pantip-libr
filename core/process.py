@@ -57,10 +57,10 @@ if __name__ == '__main__':
 	time.sleep(2)
 
 	# Prepare resources
-	mq          = rabbit.create('localhost','pantipsrc')
+	mq = rabbit.create('localhost','pantipsrc')
 
 	# Prepare the processing pipeline (order matters)
-	pipe      = Pipe.new('preprocess',[])
+	pipe = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
 	Pipe.push(pipe,rabbit.feed(mq))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))

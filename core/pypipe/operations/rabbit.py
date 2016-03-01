@@ -14,27 +14,31 @@ class Feeder(object):
 		self.conn    = conn
 		self.channel = channel
 		self.q       = q
+		# Use process queue to force async sync
+		self.qtask   = Queue(maxsize=1) 
 
-	def get_params(self):
+	def components(self):
 		return (self.conn,self.channel,self.q)
 
 	def __iter__(self):
+		#TAODEBUG:
+		print(colored('iter()','green'))
 		return self
 
 	def __next__(self):
-		# Use process queue to force async sync
-		qtask = Queue(maxsize=1)
 		def __callback(channel,method,property,body):
 			#TAOTODO: Check for empty queue
-			qtask.put(body)
-			qtask.join() # Block until the previous item has been checked out 
+			self.qtask.put(body)
+			self.qtask.join() # Block until the previous item has been checked out 
 
 		self.channel.basic_consume(__callback,queue=self.q)
 		#TAOTODO: Start following loop in a background thread
 		#self.channel_start_consuming()
 
 		while True:
-			next_up = qtask.get(True)
+			#TAODEBUG:
+			print('@Waiting for message')
+			next_up = self.qtask.get(True)
 
 			#TAODEBUG:
 			print('@Iter retrieved: ',str(next_up))
@@ -43,7 +47,7 @@ class Feeder(object):
 				raise StopIteration
 			else:
 				yield next_up
-				qtask.task_done() # Done!, signal the unblocking
+				self.qtask.task_done() # Done!, signal the unblocking
 
 def create(server_addr,q):
 	conn = pika.BlockingConnection(pika.ConnectionParameters(server_addr))
@@ -55,7 +59,7 @@ def create(server_addr,q):
 # @return {Record} it remains unchanged 
 def feed(feeder):
 	def feed_message(record):
-		conn,channel,q = feeder.get_params()
+		conn,channel,q = feeder.components()
 		topic_id  = record['topic_id']
 		data = json.dumps(record,ensure_ascii=False)
 		channel.basic_publish(
@@ -67,7 +71,7 @@ def feed(feeder):
 	return feed_message
 
 def end(feeder):
-	conn,channel,q = feeder.get_params()
+	conn,channel,q = feeder.components()
 	conn.close()
 
 

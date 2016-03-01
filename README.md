@@ -60,7 +60,7 @@ and store them in a certain format in `CrouchDB` on your local machine.
 Simply run the following command:
 
 ```
-$ python3 fetch.py
+$ bash fetch.sh
 ```
 
 This would take some time to finish. The speed does depend on 
@@ -77,7 +77,7 @@ command. (You may notice that `fetch.py` should implicitly
 be triggered at least once before calling this.)
 
 ```
-$ python3 process.py
+$ bash process.sh
 ```
 
 **Note**: Processing all records take some time.

@@ -36,7 +36,10 @@ if __name__ == '__main__':
 	# Initialise the vectoriser objects
 	vectorizer = init_vectorizer()
 
-	# TAOTODO: Process the workers	
+	# Take the tokenised topic out of MQ
+	# and generate the feature vectors
+	#TAOTODO:
+	X = [s for s in mqsrc]
 
 	# End all working MQs
 	end_mqs((mqsrc, mqdst))

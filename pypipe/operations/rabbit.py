@@ -4,7 +4,7 @@ RabbitMQ data relay
 """
 
 from termcolor import colored
-from Queue import Queue
+from queue import Queue
 import pika
 import json
 
@@ -21,7 +21,7 @@ class Feeder(object):
 	def __iter__(self):
 		return self
 
-	def next(self):
+	def __next__(self):
 		# Use process queue to force async sync
 		qtask = Queue(maxsize=1)
 		def __callback(channel,method,property,body):
@@ -35,6 +35,10 @@ class Feeder(object):
 
 		while True:
 			next_up = qtask.get(True)
+
+			#TAODEBUG:
+			print('@Iter retrieved: ',str(next_up))
+
 			if next_up is None:
 				raise StopIteration
 			else:

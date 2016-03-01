@@ -53,11 +53,15 @@ def iter(feeder):
 		signal.alarm(5)
 		for methodframe, prop, body in feeder.channel.consume(feeder.q):
 			signal.alarm(0)
+			print(body.decode('utf-8')[:10])
+
 			msg = body.decode('utf-8')
 			yield msg
 			feeder.channel.basic_ack(methodframe.delivery_tag)
+			
 			# Startover a new timer
 			signal.alarm(5)
+	
 	except StopIteration as e:
 		signal.alarm(0) # Cancel the timer
 		raise

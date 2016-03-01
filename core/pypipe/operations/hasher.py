@@ -9,9 +9,11 @@ import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.decomposition import PCA
 from sklearn.linear_model import RidgeClassifier
+from sklearn.preprocessing import Normalizer
 from sklearn.pipeline import make_pipeline
+from sklearn.decomposition import PCA
+
 
 # Create a text process pipeline (vectorizer)
 def new():
@@ -24,9 +26,11 @@ def new():
 
 	# Prepare dimentionality reducer
 	pca = PCA(n_components=64)
+	# After PCA, it needs normalisation
+	normalizer = Normalizer(copy=False)
 
-	# Prepare two principal processes
-	transformer = [hasher,idf,pca] # Order matters
+	# Prepare task pipeline
+	transformer = [hasher,idf,pca,normalizer]
 	return transformer
 
 def save(transformer,path):

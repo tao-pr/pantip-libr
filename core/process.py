@@ -48,8 +48,8 @@ if __name__ == '__main__':
 
 	# Execute list of required background services
 	services = [
-		'ruby tokenizer/tokenizer.rb'
-		###'python3 textprocess.py' TAOTODO:Resurrect this script
+		'ruby core/tokenizer/tokenizer.rb'
+		###'python3 core/textprocess.py' TAOTODO:Resurrect this script
 		]
 	workers  = execute_background_services(services)
 

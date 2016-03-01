@@ -49,11 +49,9 @@ def iter(feeder):
 
 	for methodframe, prop, body in feeder.channel.consume(feeder.q):
 		try:
-			print(body.decode('utf-8'))
-			# TAODEBUG:
-			print(methodframe)
-			print('=================================')
-			yield body
+			print('.')
+			msg = body.decode('utf-8')
+			yield msg
 		except StopIteration:
 			raise
 		except Exception as e:

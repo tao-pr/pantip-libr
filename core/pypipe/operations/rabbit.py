@@ -5,6 +5,7 @@ RabbitMQ data relay
 
 from termcolor import colored
 from queue import Queue
+import time
 import pika
 import json
 
@@ -20,34 +21,7 @@ class Feeder(object):
 	def components(self):
 		return (self.conn,self.channel,self.q)
 
-	def __iter__(self):
-		#TAODEBUG:
-		print(colored('iter()','green'))
-		return self
-
-	def __next__(self):
-		def __callback(channel,method,property,body):
-			#TAOTODO: Check for empty queue
-			self.qtask.put(body)
-			self.qtask.join() # Block until the previous item has been checked out 
-
-		self.channel.basic_consume(__callback,queue=self.q)
-		#TAOTODO: Start following loop in a background thread
-		#self.channel_start_consuming()
-
-		while True:
-			#TAODEBUG:
-			print('@Waiting for message')
-			next_up = self.qtask.get(True)
-
-			#TAODEBUG:
-			print('@Iter retrieved: ',str(next_up))
-
-			if next_up is None:
-				raise StopIteration
-			else:
-				yield next_up
-				self.qtask.task_done() # Done!, signal the unblocking
+		
 
 def create(server_addr,q):
 	conn = pika.BlockingConnection(pika.ConnectionParameters(server_addr))
@@ -69,6 +43,21 @@ def feed(feeder):
 		print(colored('record #{0} fed to rabbit'.format(topic_id),'cyan'))	
 		return record
 	return feed_message
+
+# Message generator
+def iter(feeder):
+
+	for methodframe, prop, body in feeder.channel.consume(feeder.q):
+		try:
+			print(body.decode('utf-8'))
+			# TAODEBUG:
+			print(methodframe)
+			print('=================================')
+			yield body
+		except StopIteration:
+			raise
+		except Exception as e:
+			print(colored('ERROR : {0}'.format(str(e)),'red'))
 
 def end(feeder):
 	conn,channel,q = feeder.components()

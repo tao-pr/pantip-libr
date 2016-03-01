@@ -19,7 +19,7 @@ def push(db,record):
 
 # Apply functions on to the database
 def each_do(db,func,**kwargs):
-	n = 0
+	n = 1
 	for _id in db:
 		func(db.get(_id))
 		n+=1

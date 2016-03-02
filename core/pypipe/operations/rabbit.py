@@ -43,7 +43,7 @@ def feed(feeder):
 	return feed_message
 
 # Message generator
-def iter(feeder):
+def iter(feeder,transformation=lambda x:x):
 	TIMEOUT = 3 # seconds
 	# Start the awaiting signal
 	try:
@@ -54,9 +54,7 @@ def iter(feeder):
 		signal.alarm(TIMEOUT)
 		for methodframe, prop, body in feeder.channel.consume(feeder.q):
 			signal.alarm(0)
-			print(body.decode('utf-8')[:10])
-
-			msg = body.decode('utf-8')
+			msg = transformation(body.decode('utf-8'))
 			yield msg
 			feeder.channel.basic_ack(methodframe.delivery_tag)
 			
@@ -69,6 +67,7 @@ def iter(feeder):
 		raise
 	except Exception as e:
 		signal.alarm(0) 
+		print('--end of queue--')
 		raise
 
 def end(feeder):

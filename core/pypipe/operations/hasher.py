@@ -6,6 +6,7 @@ Text hashing vectoriser module
 import numpy as np
 import os.path
 import pickle
+import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
@@ -33,7 +34,6 @@ def new():
 	# Classifiers
 	ncentroid = NearestCentroid(metric='euclidean')
 
-
 	# Prepare task pipeline
 	vectorizer = [hasher,idf]
 	preprocess = [pca,normalizer]
@@ -54,6 +54,14 @@ def load(path):
 def safe_load(path):
 	if os.path.isfile(path): return load(path)
 	else: return new()
+
+def to_train_vector(rec):
+	_r = json.load(rec)
+	ys = [_r['emoti'],_r['vote']]
+	x  = _r['title'] + _r['topic']
+
+	return (ys,x)
+
 
 # Train the vectorizer with the collection (iterable) of text data
 # @return {Tuple(a,b)} where a:transformer, b: transformation results

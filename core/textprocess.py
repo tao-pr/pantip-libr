@@ -38,6 +38,7 @@ if __name__ == '__main__':
 
 	# Take the tokenised topic out of MQ
 	# and generate the feature vectors
+	print(colored('Training ...','cyan'))
 	universe = hasher.train(vectorizer,rabbit.iter(mqsrc))
 
 	#TAODEBUG:

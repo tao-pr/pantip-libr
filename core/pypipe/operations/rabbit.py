@@ -44,13 +44,14 @@ def feed(feeder):
 
 # Message generator
 def iter(feeder):
+	TIMEOUT = 3 # seconds
 	# Start the awaiting signal
 	try:
 		def __timeout(signum,frame):
 			raise StopIteration
 
 		signal.signal(signal.SIGALRM,__timeout)
-		signal.alarm(5)
+		signal.alarm(TIMEOUT)
 		for methodframe, prop, body in feeder.channel.consume(feeder.q):
 			signal.alarm(0)
 			print(body.decode('utf-8')[:10])
@@ -60,10 +61,11 @@ def iter(feeder):
 			feeder.channel.basic_ack(methodframe.delivery_tag)
 			
 			# Startover a new timer
-			signal.alarm(5)
+			signal.alarm(TIMEOUT)
 	
 	except StopIteration as e:
 		signal.alarm(0) # Cancel the timer
+		print('--end of queue--')
 		raise
 	except Exception as e:
 		signal.alarm(0) 

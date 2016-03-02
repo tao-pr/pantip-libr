@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.linear_model import RidgeClassifier
+from sklearn.neighbors import NearestCentroid
 from sklearn.preprocessing import Normalizer
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import PCA
@@ -29,9 +30,15 @@ def new():
 	# After PCA, it needs normalisation
 	normalizer = Normalizer(copy=False)
 
+	# Classifiers
+	ncentroid = NearestCentroid(metric='euclidean')
+
+
 	# Prepare task pipeline
-	transformer = [hasher,idf,pca,normalizer]
-	return transformer
+	vectorizer = [hasher,idf]
+	preprocess = [pca,normalizer]
+	classifier = [ncentroid]
+	return (vectorizer,preprocess,classifier)
 
 def save(transformer,path):
 	with open(path,'wb+') as f:
@@ -51,12 +58,19 @@ def safe_load(path):
 # Train the vectorizer with the collection (iterable) of text data
 # @return {Tuple(a,b)} where a:transformer, b: transformation results
 def train(transformer,collection):
-	seq_opr = make_pipeline(transformer)
-	# Fit the model and also returns the transformation results
-	collection_ = seq_opr.fit_transform(collection)
-	# TAOTODO: After pipeline processing, does each of the 
-	# collection gets updated??
-	return (transformer,collection_)
+	# Extract the transformation
+	(vectorizer,preprocess,classifier) = transformer
+	
+	X = collection
+	
+	# Vectorise
+	for v in vectorizer: X = v.fit_transform(X)
+	# Preprocess
+	for p in preprocess: X = p.fit_transform(X)
+	# Fit the model and classify
+	X = classifier[0].fit_transform(X)
+
+	return (transformer,X)
 
 
 # @return {Matrix} Term document matrix with dimension reduction

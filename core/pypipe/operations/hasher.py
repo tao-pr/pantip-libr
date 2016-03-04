@@ -7,6 +7,7 @@ import numpy as np
 import os.path
 import pickle
 import json
+from termcolor import colored
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
@@ -56,7 +57,8 @@ def safe_load(path):
 	else: return new()
 
 def to_train_vector(rec):
-	_r = json.load(rec)
+	_r = json.loads(rec)
+
 	ys = [_r['emoti'],_r['vote']]
 	x  = _r['title'] + _r['topic']
 
@@ -72,10 +74,13 @@ def train(transformer,collection):
 	X = collection
 	
 	# Vectorise
+	print(colored('[Vectorising]','cyan'))
 	for v in vectorizer: X = v.fit_transform(X)
 	# Preprocess
+	print(colored('[Preprocessing]','silver'))
 	for p in preprocess: X = p.fit_transform(X)
 	# Fit the model and classify
+	print(colored('[Fitting model]','silver'))
 	X = classifier[0].fit_transform(X)
 
 	return (transformer,X)

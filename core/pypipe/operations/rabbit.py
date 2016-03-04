@@ -51,10 +51,11 @@ def iter(feeder,transformation=lambda x:x):
 			raise StopIteration
 
 		signal.signal(signal.SIGALRM,__timeout)
-		signal.alarm(TIMEOUT)
+		signal.alarm(TIMEOUT) #TAOTODO: Place a timer here will break :(
 		for methodframe, prop, body in feeder.channel.consume(feeder.q):
 			signal.alarm(0)
 			msg = transformation(body.decode('utf-8'))
+			
 			yield msg
 			feeder.channel.basic_ack(methodframe.delivery_tag)
 			
@@ -63,11 +64,11 @@ def iter(feeder,transformation=lambda x:x):
 	
 	except StopIteration as e:
 		signal.alarm(0) # Cancel the timer
-		print('--end of queue--')
+		print('--Timeout, no further message--')
 		raise
 	except Exception as e:
 		signal.alarm(0) 
-		print('--end of queue--')
+		print('--Exception broke the iteration--')
 		raise
 
 def end(feeder):

@@ -56,32 +56,36 @@ def safe_load(path):
 	if os.path.isfile(path): return load(path)
 	else: return new()
 
+
+# @param {Object}
+def to_feature_vector(r):
+	title = r['title']
+	topic = r['topic']
+	tags = [tag.strip() for tag in r['tags'] if len(tag)>0]
+
+	feat = []
+	# TAOTODO: Make feature vector out of the input set
+
+	return feat
+
+
+# @param {String}
 def to_train_vector(rec):
 	_r = json.loads(rec)
 
-	ys = [_r['emoti'],_r['vote']]
-	x  = _r['title'] + _r['topic']
+	y = (_r['emoti'],_r['vote'])
+	x = to_feature_vector(_r)
 
-	return (ys,x)
+	return (y,x)
 
 
 # Train the vectorizer with the collection (iterable) of text data
 # @return {Tuple(a,b)} where a:transformer, b: transformation results
 def train(transformer,collection):
-	# Extract the transformation
-	(vectorizer,preprocess,classifier) = transformer
 	
 	X = collection
-	
-	# Vectorise
-	print(colored('[Vectorising]','cyan'))
-	for v in vectorizer: X = v.fit_transform(X)
-	# Preprocess
-	print(colored('[Preprocessing]','silver'))
-	for p in preprocess: X = p.fit_transform(X)
-	# Fit the model and classify
-	print(colored('[Fitting model]','silver'))
-	X = classifier[0].fit_transform(X)
+
+	# TAOTODO:
 
 	return (transformer,X)
 

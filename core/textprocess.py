@@ -42,9 +42,6 @@ if __name__ == '__main__':
 	universe = hasher.train(
 		vectorizer,rabbit.iter(mqsrc,hasher.to_train_vector))
 
-	#TAODEBUG:
-	print(universe)
-
 	# End all working MQs
 	end_mqs((mqsrc, mqdst))
 

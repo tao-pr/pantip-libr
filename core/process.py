@@ -25,7 +25,7 @@ def execute_background_services(commands):
 		workers.append(sp.pid)
 	return workers
 
-def terminate_background_services(workser):
+def terminate_background_services(workers):
 	# Kill all running background services before leaving
 	print(colored('Ending background services...','green'))
 	for pid in workers:

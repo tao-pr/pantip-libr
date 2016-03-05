@@ -89,9 +89,6 @@ if __name__ == '__main__':
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]
 
-	# TAOTODO: End the process until we see the finishing signal
-	# from the child processes
-
 	# Waiting for the background services
 	# and kill `em
 	terminate_background_services(workers)

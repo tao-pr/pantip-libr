@@ -56,7 +56,7 @@ find.
 ### 1. Download Pantip threads
 
 We have a script to fetch Pantip topics (in a specified range of IDs) 
-and store them in a certain format in `CrouchDB` on your local machine. 
+and store them in a certain format in `CouchDB` on your local machine. 
 Simply run the following command:
 
 ```
@@ -80,7 +80,13 @@ be triggered at least once before calling this.)
 $ ./process
 ```
 
-**Note**: Processing all records take some time.
+The script spawns several child processes to do the feature vectorisation, 
+classification, and other processing tasks. Basically, the entire 
+process will take some time to finish.
+
+**Hint**. The subprocesses leave its access logs in the root directory 
+of the repo.
+
 
 ## Significant 3rd parties
 

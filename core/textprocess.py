@@ -37,6 +37,7 @@ def train_centroid(mq,text_operations):
 	matrix = texthasher.hash(text_operations,learn=True)(source)
 
 	#TAODEBUG:
+	print(colored('[Output matrix]','yellow'))
 	print(matrix)
 
 	pass #TAOTODO:
@@ -49,7 +50,8 @@ if __name__ == '__main__':
 
 	# Initialise all text and feature hasher models
 	print(colored('Initialising text hasher...','cyan'))
-	text_operations = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
+	###TAOTODO:text_operations = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
+	text_operations = texthasher.new()
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))

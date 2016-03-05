@@ -15,23 +15,21 @@ from sklearn.linear_model import RidgeClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.preprocessing import Normalizer
 from sklearn.pipeline import make_pipeline
-from sklearn.decomposition import PCA
+from sklearn.decomposition import TruncatedSVD
+##from sklearn.decomposition import PCA
+
 
 
 # Create a text process pipeline (vectorizer)
 def new():
 	# Prepare vectoriser engines
-	hasher = HashingVectorizer(
-		n_features=512,
-		non_negative=True,
-		binary=False)
 	idf = TfidfVectorizer()
 
 	# Prepare dimentionality reducer
-	pca = PCA(n_components=64)
+	svd = TruncatedSVD(n_components=16)
 
 	# Prepare task pipeline (in order of operation)
-	operations = [idf,hasher,pca]
+	operations = [idf,svd]
 	return operations
 
 def save(operations,path):
@@ -54,9 +52,12 @@ def hash(operations,learn=False):
 	def hash_me(dataset):
 		x = dataset
 		if learn:
-			for i in range(len(operations)): x = operations[i].fit_transform(x)
+			for i in range(len(operations)): 
+				print('Processing ... #{0} : {1}'.format(i,type(operations[i])))
+				x = operations[i].fit_transform(x)
 		else:
-			for i in range(len(operations)): x = operations[i].transform(x)
+			for i in range(len(operations)): 
+				x = operations[i].transform(x)
 		return x
 	return hash_me
 

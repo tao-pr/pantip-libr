@@ -28,17 +28,20 @@ def create(server_addr,q):
 	feeder = Feeder(conn,channel,q)
 	return feeder
 
+# @param {list} of feeders
 # @return {Record} it remains unchanged 
-def feed(feeder):
+def feed(feeders):
 	def feed_message(record):
-		conn,channel,q = feeder.components()
-		topic_id  = record['topic_id']
-		data = json.dumps(record,ensure_ascii=False)
-		channel.basic_publish(
-			exchange='',
-			routing_key=q,
-			body=data)
-		print(colored('record #{0} fed to rabbit'.format(topic_id),'cyan'))	
+		for feeder in feeders:
+			conn,channel,q = feeder.components()
+			topic_id  = record['topic_id']
+			data = json.dumps(record,ensure_ascii=False)
+			channel.basic_publish(
+				exchange='',
+				routing_key=q,
+				body=data)
+			print(colored('record #{0} fed to MQ '.format(topic_id),'cyan'),
+				colored('#'+feeder.q,'white'))	
 		return record
 	return feed_message
 

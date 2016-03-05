@@ -29,17 +29,11 @@ def new():
 
 	# Prepare dimentionality reducer
 	pca = PCA(n_components=64)
-	# After PCA, it needs normalisation
-	normalizer = Normalizer(copy=False)
-
-	# Classifiers
-	ncentroid = NearestCentroid(metric='euclidean')
 
 	# Prepare task pipeline
-	vectorizer = [hasher,idf]
-	preprocess = [pca,normalizer]
-	classifier = [ncentroid]
-	return (vectorizer,preprocess,classifier)
+	vectorizer = [idf,hasher]
+	preprocess = [pca]
+	return (vectorizer,preprocess)
 
 def save(transformer,path):
 	with open(path,'wb+') as f:
@@ -56,45 +50,20 @@ def safe_load(path):
 	if os.path.isfile(path): return load(path)
 	else: return new()
 
+def hash(transformer,learn=False):
+	(vectorizer,preprocess) = transformer
+	def hash_me(text):
+		x = text
+		if learn:
+			for i in len(vectorizer):
+				x = vectorizer[i].fit_transform(x)
+			x = preprocess.fit_transform(x)
+		else:
+			for i in len(vectorizer):
+				x = vectorizer[i].transform(x)
+			x = preprocess.transform(x)
+		return x
+	return hash_me
 
-# @param {Object}
-def to_feature_vector(r):
-	title = r['title']
-	topic = r['topic']
-	tags = [tag.strip() for tag in r['tags'] if len(tag)>0]
-
-	feat = []
-	# TAOTODO: Make feature vector out of the input set
-
-	return feat
-
-
-# @param {String}
-def to_train_vector(rec):
-	_r = json.loads(rec)
-
-	y = (_r['emoti'],_r['vote'])
-	x = to_feature_vector(_r)
-
-	return (y,x)
-
-
-# Train the vectorizer with the collection (iterable) of text data
-# @return {Tuple(a,b)} where a:transformer, b: transformation results
-def train(transformer,collection):
-	
-	X = collection
-
-	# TAOTODO:
-
-	return (transformer,X)
-
-
-# @return {Matrix} Term document matrix with dimension reduction
-def vectorize(transformer):
-	seq_opr = make_pipeline(transformer)
-	def _vectorize_on(collection):
-		return seq_opr.transform(collection)
-	return _vectorize_on
 
 

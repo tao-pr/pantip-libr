@@ -33,7 +33,8 @@ def terminate_background_services(workers):
 			shell=True, stdout=subprocess.PIPE)
 
 def print_record(rec):
-	print([rec['title'],rec['tags']])
+	print(rec['tags'])
+	###print([rec['title'],rec['tags']])
 
 # Couple the processing pipe with the input
 def process_with(pipe):
@@ -56,20 +57,21 @@ if __name__ == '__main__':
 	# Delayed start
 	time.sleep(2)
 
-	# Prepare resources
-	mq = rabbit.create('localhost','pantipsrc')
+	# Prepare MQs for training sources
+	qs = ['pantip-centroid']
+	mqs = [rabbit.create('localhost',q) for q in qs]
 
 	# Prepare the processing pipeline (order matters)
 	pipe = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
-	Pipe.push(pipe,rabbit.feed(mq))
+	Pipe.push(pipe,rabbit.feed(mqs))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
 	couch.each_do(db,process_with(pipe),limit=3)
 
 	# Disconnect from the MQs
-	rabbit.end(mq)
+	[rabbit.end(mq) for mq in mqs]
 
 	# TAOTODO: End the process until we see the finishing signal
 	# from the child processes

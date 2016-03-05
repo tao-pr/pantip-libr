@@ -2,15 +2,17 @@
 Text processing worker
 @starcolon projects
 """
+
+import json
 from termcolor import colored
 from pypipe.operations import rabbit
 from pypipe.operations import hasher
 
-TEXT_VECTORIZER_PATH	= 'data/transformer/00'
+TEXT_TRANSFORMER_PATH	= 'data/transformer/00'
 
 def init_mqs():
 	# Initialise rabbit MQ connectors
-	mqsrc = rabbit.create('localhost','pantipsrc')
+	mqsrc = rabbit.create('localhost','pantip-centroid')
 	mqdst = rabbit.create('localhost','pantipvec')
 	return (mqsrc,mqdst)
 
@@ -19,13 +21,17 @@ def end_mqs(mqs):
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)
 
-def init_vectorizer():
-	print(colored('Loading text vectoriser...','green'))
-	return hasher.safe_load(TEXT_VECTORIZER_PATH)
+def init_transformer():
+	print(colored('Loading text transformer...','green'))
+	return hasher.safe_load(TEXT_TRANSFORMER_PATH)
 
-def save_vectorizer(vectorizer):
-	print(colored('Saving text vectoriser...','green'))
-	hasher.save(vectorizer,TEXT_VECTORIZER_PATH)
+def save_transformer(vectorizer):
+	print(colored('Saving text transformer...','green'))
+	hasher.save(vectorizer,TEXT_TRANSFORMER_PATH)
+
+# Train the centroid clustering
+def train_centroid(mq):
+	pass
 
 if __name__ == '__main__':
 	print(colored('[WORKER STARTED!]','cyan'))
@@ -33,20 +39,20 @@ if __name__ == '__main__':
 	# Initialise working MQs
 	mqsrc, mqdst = init_mqs()
 
-	# Initialise the vectoriser objects
-	vectorizer = init_vectorizer()
+	# Initialise the text transformer objects
+	transformer = init_transformer()
 
-	# Take the tokenised topic out of MQ
-	# and generate the feature vectors
-	print(colored('Training ...','cyan'))
-	universe = hasher.train(
-		vectorizer,rabbit.iter(mqsrc,hasher.to_train_vector))
+	# Start the training process
+	print(colored('Preparing lazy training set ...','cyan'))
+	train_centroid(mqsrc)
 
 	# End all working MQs
+	print(colored('Ending MQs','cyan'))
 	end_mqs((mqsrc, mqdst))
 
-	# Save the vectoriser
-	save_vectorizer(vectorizer)
+	# Save the trained text transformer 
+	print(colored('Saving transfomer','cyan'))
+	save_transformer(transformer)
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

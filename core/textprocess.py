@@ -7,10 +7,12 @@ import os
 import json
 from termcolor import colored
 from pypipe.operations import rabbit
+from pypipe.operations import hasher
 from pypipe.operations import texthasher
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
 TEXT_TRANSFORMER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
+CONTENT_CLUSTER_PATH = '{0}/data/cluster/00'.format(REPO_DIR)
 
 def init_mqs():
 	# Initialise rabbit MQ connectors
@@ -31,14 +33,15 @@ def take_x(record):
 	return x
 
 # Train the centroid clustering
-def train_centroid(mq,text_operations):
+def train_centroid(mq,text_operations,cluster_operations):
 	# Vectorise the input text
 	source = rabbit.iter(mq,take_x)
 	matrix = texthasher.hash(text_operations,learn=True)(source)
 
-	#TAODEBUG:
 	print(colored('[Output matrix]','yellow'))
 	print(matrix)
+
+	# Now we've got the input sparse matrix for classification
 
 	pass #TAOTODO:
 
@@ -50,12 +53,16 @@ if __name__ == '__main__':
 
 	# Initialise all text and feature hasher models
 	print(colored('Initialising text hasher...','cyan'))
-	###TAOTODO:text_operations = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
 	text_operations = texthasher.new()
+
+	print(colored('Initialising cluster operations...','cyan'))
+	cluster_operations = hasher.new()
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
-	train_centroid(mqsrc,text_operations)
+	output = train_centroid(mqsrc,text_operations,cluster_operations)
+	for v in output:
+		rabbit.feed([mqdst])(v)
 
 	# End all working MQs
 	print(colored('Ending MQs','cyan'))

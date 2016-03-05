@@ -15,6 +15,8 @@ import json
 import time
 import os
 
+REPO_DIR = os.getenv('PANTIPLIBR','.')
+
 def execute_background_services(commands):
 	workers = []
 	for cmd in commands:
@@ -49,8 +51,8 @@ if __name__ == '__main__':
 
 	# Execute list of required background services
 	services = [
-		'ruby core/tokenizer/tokenizer.rb'
-		###'python3 core/textprocess.py' TAOTODO:Resurrect this script
+		'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR),
+		'python3 {0}/core/textprocess.py > textprocess.log'.format(REPO_DIR)
 		]
 	workers  = execute_background_services(services)
 
@@ -68,7 +70,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe),limit=3)
+	couch.each_do(db,process_with(pipe),limit=8)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]

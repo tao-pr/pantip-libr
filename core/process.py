@@ -74,7 +74,7 @@ if __name__ == '__main__':
 	time.sleep(1)
 
 	# Prepare MQs for training sources
-	qs = ['pantip-centroid']
+	qs = ['pantip-centroidx','pantip-centroidy']
 	mqs = [rabbit.create('localhost',q) for q in qs]
 
 	# Prepare the processing pipeline (order matters)

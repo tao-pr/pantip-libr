@@ -6,7 +6,9 @@ Text processing worker
 import os
 import json
 from termcolor import colored
+from pypipe import pipe as Pipe
 from pypipe.operations import rabbit
+from pypipe.operations import tapper
 from pypipe.operations import hasher
 from pypipe.operations import texthasher
 
@@ -16,9 +18,9 @@ CONTENT_CLUSTER_PATH = '{0}/data/cluster/00'.format(REPO_DIR)
 
 def init_mqs():
 	# Initialise rabbit MQ connectors
-	mqsrc = rabbit.create('localhost','pantip-centroid')
-	mqdst = rabbit.create('localhost','pantipvec')
-	return (mqsrc,mqdst)
+	mqsrcx = rabbit.create('localhost','pantip-centroidx')
+	mqsrcy = rabbit.create('localhost','pantip-centroidy')
+	return (mqsrcx,mqsrcy)
 
 def end_mqs(mqs):
 	mqsrc, mqdst = mqs
@@ -32,26 +34,38 @@ def take_x(record):
 	print(x) #TAODEBUG:
 	return x
 
+def take_y(record):
+	data = json.loads(record)
+	y = data['vote'] + [e[1] for e in data['emoti']]
+	print(y) #TAODEBUG:
+	return y
+
 # Train the centroid clustering
-def train_centroid(mq,text_operations,cluster_operations):
-	# Vectorise the input text
-	source = rabbit.iter(mq,take_x)
-	matrix = texthasher.hash(text_operations,learn=True)(source)
+def train_centroid(mqx,mqy,text_operations,cluster_operations):
+	# Vectorise the input text X
+	source = rabbit.iter(mqx,take_x)
 
-	print(colored('[Output matrix]','yellow'))
-	print(matrix)
+	#TAODEBUG:
+	print('creating pipe')
 
-	# Now we've got the input sparse matrix for classification
-	# TAOTODO:
+	pipe = Pipe.new('centroid',[])
+	Pipe.push(pipe,texthasher.hash(text_operations,learn=True))
+	Pipe.push(pipe,tapper.printtext(colored('[Output matrix X]','yellow')))
+	Pipe.push(pipe,tapper.printdata)
 
-	return matrix
+	print('operating pipe!') #TAODEBUG:
+	X = Pipe.operate(pipe,source)
+	# Cluster training set X 
+	#TAOTODO:
+
+	return
 	
 
 if __name__ == '__main__':
 	print(colored('[WORKER STARTED!]','cyan'))
 
 	# Initialise working MQs
-	mqsrc, mqdst = init_mqs()
+	mqsrcx, mqsrcy = init_mqs()
 
 	# Initialise all text and feature hasher models
 	print(colored('Initialising text hasher...','cyan'))
@@ -62,11 +76,16 @@ if __name__ == '__main__':
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
-	output = train_centroid(mqsrc,text_operations,cluster_operations)
+	output = train_centroid(
+		mqsrcx,
+		mqsrcy,
+		text_operations,
+		cluster_operations
+		)
 
 	# End all working MQs
 	print(colored('Ending MQs','cyan'))
-	end_mqs((mqsrc, mqdst))
+	end_mqs((mqsrcx, mqsrcy))
 
 	# Save the trained text transformer 
 	print(colored('Saving text hasher','cyan'))

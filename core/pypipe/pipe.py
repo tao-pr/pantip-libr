@@ -36,7 +36,6 @@ def chain(pipe,nextpipe):
 	return pipe
 
 # Execute the pipeline and take
-# TAOTODO: This should be taken async
 def operate(pipe,input0):
 	print(colored('⏳ Executing {0}...'.format(pipe.title),'green'))
 	if pipe is None:

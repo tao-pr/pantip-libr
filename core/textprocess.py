@@ -42,8 +42,10 @@ def train_centroid(mq,text_operations,cluster_operations):
 	print(matrix)
 
 	# Now we've got the input sparse matrix for classification
+	# TAOTODO:
 
-	pass #TAOTODO:
+	return matrix
+	
 
 if __name__ == '__main__':
 	print(colored('[WORKER STARTED!]','cyan'))

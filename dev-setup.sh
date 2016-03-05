@@ -10,4 +10,6 @@ pip3 install pika
 gem install thailang4r
 gem install sinatra
 
+echo "export PANTIPLIBR=$(pwd)"
+
 echo "[Finished]"

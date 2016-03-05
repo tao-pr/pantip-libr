@@ -67,11 +67,11 @@ def iter(feeder,transformation=lambda x:x):
 	
 	except StopIteration as e:
 		signal.alarm(0) # Cancel the timer
-		print('--Timeout, no further message--')
+		print(colored('--Timeout, no further message--','magenta'))
 		raise
 	except Exception as e:
 		signal.alarm(0) 
-		print('--Exception broke the iteration--')
+		print(colored('--Exception broke the iteration--','magenta'))
 		raise
 
 def end(feeder):

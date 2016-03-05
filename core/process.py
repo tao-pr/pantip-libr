@@ -55,7 +55,7 @@ if __name__ == '__main__':
 	workers  = execute_background_services(services)
 
 	# Delayed start
-	time.sleep(2)
+	time.sleep(1)
 
 	# Prepare MQs for training sources
 	qs = ['pantip-centroid']

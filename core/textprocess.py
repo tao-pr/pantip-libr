@@ -3,12 +3,14 @@ Text processing worker
 @starcolon projects
 """
 
+import os
 import json
 from termcolor import colored
 from pypipe.operations import rabbit
-from pypipe.operations import hasher
+from pypipe.operations import texthasher
 
-TEXT_TRANSFORMER_PATH	= 'data/transformer/00'
+REPO_DIR = os.getenv('PANTIPLIBR','../..')
+TEXT_TRANSFORMER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
 
 def init_mqs():
 	# Initialise rabbit MQ connectors
@@ -21,17 +23,23 @@ def end_mqs(mqs):
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)
 
-def init_transformer():
-	print(colored('Loading text transformer...','green'))
-	return hasher.safe_load(TEXT_TRANSFORMER_PATH)
-
-def save_transformer(vectorizer):
-	print(colored('Saving text transformer...','green'))
-	hasher.save(vectorizer,TEXT_TRANSFORMER_PATH)
+# Convert the MQ record to an X vector (text only for hashing)
+def take_x(record):
+	data = json.loads(record)
+	x = str(data['title'] + data['topic']) #TAOTOREVIEW: Any better compositon?
+	print(x) #TAODEBUG:
+	return x
 
 # Train the centroid clustering
-def train_centroid(mq):
-	pass
+def train_centroid(mq,text_operations):
+	# Vectorise the input text
+	source = rabbit.iter(mq,take_x)
+	matrix = texthasher.hash(text_operations,learn=True)(source)
+
+	#TAODEBUG:
+	print(matrix)
+
+	pass #TAOTODO:
 
 if __name__ == '__main__':
 	print(colored('[WORKER STARTED!]','cyan'))
@@ -39,20 +47,21 @@ if __name__ == '__main__':
 	# Initialise working MQs
 	mqsrc, mqdst = init_mqs()
 
-	# Initialise the text transformer objects
-	transformer = init_transformer()
+	# Initialise all text and feature hasher models
+	print(colored('Initialising text hasher...','cyan'))
+	text_operations = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
 
 	# Start the training process
-	print(colored('Preparing lazy training set ...','cyan'))
-	train_centroid(mqsrc)
+	print(colored('Training centroid model ...','cyan'))
+	train_centroid(mqsrc,text_operations)
 
 	# End all working MQs
 	print(colored('Ending MQs','cyan'))
 	end_mqs((mqsrc, mqdst))
 
 	# Save the trained text transformer 
-	print(colored('Saving transfomer','cyan'))
-	save_transformer(transformer)
+	print(colored('Saving text hasher','cyan'))
+	texthasher.save(text_operations,TEXT_TRANSFORMER_PATH)
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

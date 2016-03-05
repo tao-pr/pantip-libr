@@ -45,6 +45,20 @@ def feed(feeders):
 		return record
 	return feed_message
 
+# Another version of @feed, but this feeds a vector (list) instead 
+def feed_vector(feeders):
+	def feed_v(vector):
+		for feeder in feeders:
+			conn,channel,q = feeder.components()
+			channel.basic_publish(
+				exchange='',
+				routing_key=q,
+				body=vector)
+			print(colored('record #{0} fed to MQ '.format(topic_id),'cyan'),
+				colored('#'+feeder.q,'white'))	
+		return vector
+	return feed_v
+
 # Message generator
 def iter(feeder,transformation=lambda x:x):
 	TIMEOUT = 3 # seconds

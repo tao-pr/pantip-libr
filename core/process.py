@@ -3,8 +3,10 @@ Process the downloaded Pantip threads
 
 @starcolon projects
 """
+
 from pydb import couch
 from pprint import pprint
+from queue import Queue
 from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe.operations import preprocess
@@ -28,11 +30,23 @@ def execute_background_services(commands):
 	return workers
 
 def terminate_background_services(workers):
-	# Kill all running background services before leaving
-	print(colored('Ending background services...','green'))
-	for pid in workers:
-		subprocess.Popen('kill {0}'.format(pid), 
-			shell=True, stdout=subprocess.PIPE)
+	print(colored('Waiting for background services...','green'))
+	q = Queue(maxsize=1)
+
+	def __timeout(signum,frame):
+		signal.alarm(0) # Cancel further timeout
+		print(colored('Ending background services...','green'))
+		for pid in workers:
+			subprocess.Popen('kill {0}'.format(pid), 
+				shell=True, stdout=subprocess.PIPE)
+		# All done, unlock the queue
+		q.task_done()
+
+	signal.signal(signal.SIGALRM,__timeout)
+	signal.alarm(5) # seconds
+	q.put('wait')
+	q.join() # Block until it timeouts
+	q.get()
 
 def print_record(rec):
 	print(rec['tags'])
@@ -78,6 +92,7 @@ if __name__ == '__main__':
 	# TAOTODO: End the process until we see the finishing signal
 	# from the child processes
 
-	# End all background services
+	# Waiting for the background services
+	# and kill `em
 	terminate_background_services(workers)
 

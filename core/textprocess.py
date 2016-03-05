@@ -63,8 +63,6 @@ if __name__ == '__main__':
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
 	output = train_centroid(mqsrc,text_operations,cluster_operations)
-	for v in output:
-		rabbit.feed([mqdst])(v)
 
 	# End all working MQs
 	print(colored('Ending MQs','cyan'))

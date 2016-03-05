@@ -25,6 +25,10 @@ def then(pipe,callback):
 	pipe.then = callback
 	return pipe
 
+def join(pipe1,pipe2):
+	pipe1.then = lambda output: operate(pipe2,output)
+	return pipe1
+
 # Append a new task into the existing pipe
 def push(pipe,task):
 	pipe.tasks.append(task)

@@ -5,9 +5,15 @@ Topic category classifier
 
 from sklearn.cluster import KMeans
 
-def new():
-	pass
-	
+def new(num_class):
+	kmean = KMeans(
+		n_clusters=num_class,
+		max_iter=64,
+		n_init=1
+		)
+
+	return [kmean]
+
 def save(operations,path):
 	with open(path,'wb+') as f:
 		pickle.dump(operations,f)
@@ -22,3 +28,13 @@ def load(path):
 def safe_load(path):
 	if os.path.isfile(path): return load(path)
 	else: return new()
+
+def analyze(operations,learn=False):
+	def _do(matrix):
+		m = matrix
+		for i in range(len(operations)):
+			if learn: m = operations[i].fit_transform(m) #TAOTODO: Kmean doesn't transform
+			else: m = operations[i].transform(m)
+			return m
+	return _do
+

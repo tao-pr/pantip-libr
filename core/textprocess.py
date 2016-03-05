@@ -8,8 +8,9 @@ import json
 from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe.operations import rabbit
-from pypipe.operations import tapper
+from pypipe.operations import tapper as T
 from pypipe.operations import hasher
+from pypipe.operations import cluster
 from pypipe.operations import texthasher
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
@@ -44,22 +45,22 @@ def take_y(record):
 def train_centroid(mqx,mqy,text_operations,cluster_operations):
 	# Vectorise the input text X
 	source = rabbit.iter(mqx,take_x)
-
-	#TAODEBUG:
-	print('creating pipe')
-
 	pipe = Pipe.new('centroid',[])
+
+	# Vectorisation of X
 	Pipe.push(pipe,texthasher.hash(text_operations,learn=True))
-	Pipe.push(pipe,tapper.printtext(colored('[Output matrix X]','yellow')))
-	Pipe.push(pipe,tapper.printdata)
+	Pipe.push(pipe,T.printtext(colored('[Output matrix X]','yellow')))
+	Pipe.push(pipe,T.printdata)
 
-	print('operating pipe!') #TAODEBUG:
-	X = Pipe.operate(pipe,source)
-	# Cluster training set X 
-	#TAOTODO:
+	# Clustering
+	Pipe.push(pipe.T.printtext(colored('Clustering...','green')))
+	Pipe.push(pipe,cluster.analyze(cluster_operations,learn=True))
+	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
+	Pipe.push(pipe,T.printdata)
 
-	return
-	
+	# Execute the training
+	Pipe.operate(pipe,source)
+
 
 if __name__ == '__main__':
 	print(colored('[WORKER STARTED!]','cyan'))
@@ -72,7 +73,7 @@ if __name__ == '__main__':
 	text_operations = texthasher.new()
 
 	print(colored('Initialising cluster operations...','cyan'))
-	cluster_operations = hasher.new()
+	cluster_operations = cluster.new()
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))

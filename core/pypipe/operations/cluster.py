@@ -35,11 +35,13 @@ def safe_load(path):
 	if os.path.isfile(path): return load(path)
 	else: return new()
 
+# @return {matrix} if {labels} is supplied
+# @return {list} of classification, otherwise
 def analyze(clf,labels=None):
 	def _do(matrix):
 		if labels:  # Learning mode
 			clf.fit(matrix,labels)
-			return clf
+			return matrix
 		else: # Classification mode
 			y = clf.predict(matrix)
 			return y

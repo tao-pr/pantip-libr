@@ -55,7 +55,7 @@ def take_y(record):
 	if vote < 100:
 		return 101 # Moderate attention (negative)
 	if positives>negatives or negatives==0:
-		return 500: # Massively impressive
+		return 500 # Massively impressive
 	else:
 		return 501 # Massively disgusting
 

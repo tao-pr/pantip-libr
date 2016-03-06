@@ -59,6 +59,23 @@ def take_y(record):
 	else:
 		return 501 # Massively disgusting
 
+def validate(predicted,truth):
+	is_correct = predicted == truth
+	if is_correct:
+		print(colored('✔ {0}'.format(truth),'green'))
+	else:
+		print(colored('❌ {0} -- should be {1}'.format(predicted,truth),'red'))
+
+	return is_correct
+
+# @param {list} of boolean
+def conclude_validation(results):
+	num = len(results)
+	pos = len([i for i in results if i])
+	print(colored('=================','cyan'))
+	print(colored('   ✱ {0} records'.format(num),'cyan'))
+	print(colored('   ✱ {0}% correct'.format(100*pos/num),'cyan'))
+	print(colored('=================','cyan'))
 
 # Train the centroid clustering
 def train_centroid(mqx,mqy,text_operations,clf):
@@ -87,6 +104,8 @@ def train_centroid(mqx,mqy,text_operations,clf):
 	Pipe.push(pipe,predict)
 	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
 	Pipe.push(pipe,T.printdata)
+	Pipe.push(pipe,T.zip_with(validate,labels,lazy=False))
+	Pipe.push(pipe,conclude_validation)
 
 	# Execute the training
 	Pipe.operate(pipe,source)

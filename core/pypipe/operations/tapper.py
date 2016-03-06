@@ -14,7 +14,8 @@ def printdata(data):
 	return data
 
 # This only works if the data is a {list}
-def zip_with(zipper):
+def zip_with(zipper,another,lazy=True):
 	def zip_(data):
-		return [zipper(a,b) for a in data]
+		if lazy: return map(zipper,data,another)
+		else: return list(map(zipper,data,another))
 	return zip_

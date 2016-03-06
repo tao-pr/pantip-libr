@@ -3,6 +3,7 @@ Topic category classifier
 @starcolon projects
 """
 
+import pickle
 from sklearn.cluster import KMeans
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 

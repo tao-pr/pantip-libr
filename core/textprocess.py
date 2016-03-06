@@ -32,13 +32,11 @@ def end_mqs(mqs):
 def take_x(record):
 	data = json.loads(record)
 	x = str(data['title'] + data['topic']) #TAOTOREVIEW: Any better compositon?
-	print(x) #TAODEBUG:
 	return x
 
 def take_y(record):
 	data = json.loads(record)
 	y = data['vote']
-	print(y) #TAODEBUG:
 	return y
 
 
@@ -54,9 +52,11 @@ def train_centroid(mqx,mqy,text_operations,clf):
 	Pipe.push(pipe,T.printdata)
 
 	# Clustering
-	labels = rabbit.iter(mqy,take_y) #TAOTODO: Seems like iterable won't work
+	labels = [y for y in rabbit.iter(mqy,take_y)]
+
 	clf = cluster.analyze(clf,labels)
 	Pipe.push(pipe,T.printtext(colored('Clustering...','green')))
+	Pipe.push(pipe,T.printtext('labels : {0}'.format(str(labels))))
 	Pipe.push(pipe,clf)
 	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
 	Pipe.push(pipe,T.printdata)

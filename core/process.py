@@ -84,7 +84,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe),limit=80)
+	couch.each_do(db,process_with(pipe),limit=300)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]

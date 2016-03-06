@@ -45,6 +45,6 @@ def parse_tags(tags):
 
 
 def extract_emotions(emoti_str):
-	__emotions = ['ขำกลิ้ง','สยอง','ถูกใจ','ทึ่ง']
+	__emotions = ['ขำกลิ้ง','สยอง','ถูกใจ','ทึ่ง','หลงรัก']
 	emotions = [(e,emoti_str.count(e))  for e in __emotions]
 	return emotions

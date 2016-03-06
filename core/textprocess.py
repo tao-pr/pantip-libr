@@ -37,12 +37,13 @@ def take_x(record):
 
 def take_y(record):
 	data = json.loads(record)
-	y = data['vote'] + [e[1] for e in data['emoti']]
+	y = data['vote']
 	print(y) #TAODEBUG:
 	return y
 
+
 # Train the centroid clustering
-def train_centroid(mqx,mqy,text_operations,cluster_operations):
+def train_centroid(mqx,mqy,text_operations,clf):
 	# Vectorise the input text X
 	source = rabbit.iter(mqx,take_x)
 	pipe = Pipe.new('centroid',[])
@@ -53,8 +54,10 @@ def train_centroid(mqx,mqy,text_operations,cluster_operations):
 	Pipe.push(pipe,T.printdata)
 
 	# Clustering
-	Pipe.push(pipe.T.printtext(colored('Clustering...','green')))
-	Pipe.push(pipe,cluster.analyze(cluster_operations,learn=True))
+	labels = rabbit.iter(mqy,take_y) #TAOTODO: Seems like iterable won't work
+	clf = cluster.analyze(clf,labels)
+	Pipe.push(pipe,T.printtext(colored('Clustering...','green')))
+	Pipe.push(pipe,clf)
 	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
 	Pipe.push(pipe,T.printdata)
 
@@ -73,7 +76,7 @@ if __name__ == '__main__':
 	text_operations = texthasher.new()
 
 	print(colored('Initialising cluster operations...','cyan'))
-	cluster_operations = cluster.new()
+	clf = cluster.new()
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
@@ -81,7 +84,7 @@ if __name__ == '__main__':
 		mqsrcx,
 		mqsrcy,
 		text_operations,
-		cluster_operations
+		clf
 		)
 
 	# End all working MQs
@@ -91,6 +94,10 @@ if __name__ == '__main__':
 	# Save the trained text transformer 
 	print(colored('Saving text hasher','cyan'))
 	texthasher.save(text_operations,TEXT_TRANSFORMER_PATH)
+
+	# Save the trained classifier
+	print(colored('Saving classifier','cyan'))
+	cluster.save(clf,CONTENT_CLUSTER_PATH)
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

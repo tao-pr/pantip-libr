@@ -4,15 +4,20 @@ Topic category classifier
 """
 
 from sklearn.cluster import KMeans
+from sklearn.neighbors.nearest_centroid import NearestCentroid
 
-def new(num_class):
-	kmean = KMeans(
-		n_clusters=num_class,
-		max_iter=64,
-		n_init=1
-		)
+def new():
+	# kmean = KMeans(
+	# 	n_clusters=num_class,
+	# 	max_iter=64,
+	# 	n_init=1
+	# 	)
+	nc = NearestCentroid(
+		metric='euclidean',
+		shrink_threshold=None
+	)
 
-	return [kmean]
+	return nc
 
 def save(operations,path):
 	with open(path,'wb+') as f:
@@ -29,12 +34,13 @@ def safe_load(path):
 	if os.path.isfile(path): return load(path)
 	else: return new()
 
-def analyze(operations,learn=False):
+def analyze(clf,labels=None):
 	def _do(matrix):
-		m = matrix
-		for i in range(len(operations)):
-			if learn: m = operations[i].fit_transform(m) #TAOTODO: Kmean doesn't transform
-			else: m = operations[i].transform(m)
-			return m
+		if labels:  # Learning mode
+			clf.fit(matrix,labels)
+			return clf
+		else: # Classification mode
+			y = clf.predict(matrix)
+			return y
 	return _do
 

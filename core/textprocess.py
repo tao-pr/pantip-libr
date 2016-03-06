@@ -54,10 +54,17 @@ def train_centroid(mqx,mqy,text_operations,clf):
 	# Clustering
 	labels = [y for y in rabbit.iter(mqy,take_y)]
 
-	clf = cluster.analyze(clf,labels)
+	train_cluster = cluster.analyze(clf,labels)
 	Pipe.push(pipe,T.printtext(colored('Clustering...','green')))
 	Pipe.push(pipe,T.printtext('labels : {0}'.format(str(labels))))
-	Pipe.push(pipe,clf)
+	Pipe.push(pipe,train_cluster)
+	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
+	Pipe.push(pipe,T.printdata) #TAOTODO: Should visualise the plane
+
+	# Self validation
+	predict = cluster.analyze(clf)
+	Pipe.push(pipe,T.printtext(colored('Validating...','green')))
+	Pipe.push(pipe,predict)
 	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
 	Pipe.push(pipe,T.printdata)
 

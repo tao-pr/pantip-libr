@@ -2,6 +2,8 @@
 
 Pantip librarian!
 
+---
+
 ## What is Pantip?
 
 [Pantip](http://www.pantip.com) is the biggest online Q&A community 
@@ -9,6 +11,8 @@ in Thailand founded in 1996. Pantip stores a very large
 user-generated questions and answers in numberous topics, 
 e.g., lifestyle, health, tradings, technologies, sciences, 
 sports, movies, and lots of others. 
+
+---
 
 ## Why Pantip Librarian?
 
@@ -20,6 +24,8 @@ This is super simple.
 Pantip Librarian is a quick prototype of Q&A site crawler 
 which scrapes the content of a range of topics on Pantip site 
 and analyses the popularity factors over the scraped data.
+
+---
 
 ## Prerequisites
 
@@ -34,6 +40,8 @@ released/)
 
 Make sure you have all above prerequisites installed, up and running.
 
+---
+
 ## Prepare development environment
 
 Suppose you have all major dependencies as listed in the previous 
@@ -47,11 +55,15 @@ $ bash dev-setup.sh
 The script basically collects and installs all Python libraries you 
 need for running the library.
 
+---
+
 ## Try it
 
 `Pantip-Libr` is not a complex module so hopefully you can have a 
 speedy first step. Following is the list of common tasks you can 
 find.
+
+---
 
 ### 1. Download Pantip threads
 
@@ -63,12 +75,14 @@ Simply run the following command:
 $ ./fetch
 ```
 
-This would take some time to finish. The speed does depend on 
-the quality of your Internet connection.
+The script will download series of Pantip threads in the 
+specified range of topic IDs and store them in the `CouchDB`.
 
 **Caveat**: Please accept my apology. The download script doesn't 
 guard against HTTP connection failures. If network glitch happens, 
 the script poorly ends execution.
+
+---
 
 ### 2. Process the downloaded threads
 
@@ -87,6 +101,16 @@ process will take some time to finish.
 **Hint**. The subprocesses leave its access logs in the root directory 
 of the repo.
 
+**Steps of operation**
+
+| #step | script | role |
+|----|----|----|
+| 1 | core/process.py | Tokenise the downloaded records and push to MQ
+| 2 | core/textprocess.py | Takes the dataset out of MQ and runs machine learning
+
+
+---
+
 
 ## Significant 3rd parties
 
@@ -94,7 +118,7 @@ These are our brilliant prerequisites.
 
 - [x] [Thailang4r](https://github.com/veer66/thailang4r)
 
-
+---
 
 ## Licence
 

@@ -87,7 +87,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe),limit=4)
+	couch.each_do(db,process_with(pipe),limit=300)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]
@@ -98,5 +98,5 @@ if __name__ == '__main__':
 
 	# Report the collected word bag
 	print(colored('[Word bag]','green'))
-	pprint(sorted(bag.items(),key=lambda b: -b[1]))
+	pprint(sorted(bag.items(),key=lambda b: -b[1])[:20])
 

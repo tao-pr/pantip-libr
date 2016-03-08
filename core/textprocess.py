@@ -50,24 +50,19 @@ def take_y(record):
 	positives = sum([v[1] for v in data['emoti'] if v[0] not in ['สยอง']])
 	negatives = sum([v[1] for v in data['emoti'] if v[0] in ['สยอง']])
 
-	# Classify the degree of reaction
+	# Classify by degree of attention & sentiments
 	if vote + positives + negatives == 0:
-		return 0 # No attention
-	if vote + positives + negatives < 5:
-		return 1 # Very little attention
-	if vote < 25 and (positives > negatives or negatives==0):
-		return 10 # Low attention (positive)
-	if vote < 25:
-		return 11 # Low attention (negative)
-	if vote < 100 and (positives > negatives or negatives==0):
-		return 100 # Moderate attention (positive)
-	if vote < 100:
-		return 101 # Moderate attention (negative)
-	if positives>negatives or negatives==0:
-		return 500 # Massively impressive
+		return 0 # Nobody cares
+	if negatives > positives*0.67: # Negative
+		return -1 # People dislike this
+	if vote < 20: # Some people like it
+		return 1
+	if vote < 100: # may people love it
+		return 5
 	else:
-		return 501 # Massively disgusting
+		return 10 # Awesome post
 
+	
 def validate(predicted,truth):
 	is_correct = predicted == truth
 	if is_correct:

@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
 	# Report the collected word bag
 	print(colored('[Word bag]','green'))
-	words = sorted(bag.items(),key=lambda b: -b[1])[:20]
+	words = sorted(bag.items(),key=lambda b: -b[1])[:50]
 	pprint(words)
 	# Print most recurring words to file
 	with open(WORD_BAG_DIR,'w+') as txt:

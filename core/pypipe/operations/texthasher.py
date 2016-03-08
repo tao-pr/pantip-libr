@@ -29,7 +29,7 @@ def new(stop_words=[]):
 	)
 
 	# Prepare dimentionality reducer
-	svd = TruncatedSVD(n_components=16)
+	svd = TruncatedSVD(n_components=128)
 
 	# Prepare task pipeline (in order of operation)
 	operations = [idf,svd]

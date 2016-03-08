@@ -10,6 +10,7 @@ from queue import Queue
 from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe.operations import preprocess
+from pypipe.operations import wordbag
 from pypipe.operations import rabbit
 import subprocess
 import signal
@@ -50,7 +51,6 @@ def terminate_background_services(workers):
 
 def print_record(rec):
 	print(rec['tags'])
-	###print([rec['title'],rec['tags']])
 
 # Couple the processing pipe with the input
 def process_with(pipe):
@@ -58,10 +58,12 @@ def process_with(pipe):
 		Pipe.operate(pipe,input0)
 	return f
 
-
 if __name__ == '__main__':
 	# Prepare the database server connection
 	db = couch.connector('pantip')
+
+	# Prepare word bag
+	bag = wordbag.new()
 
 	# Execute list of required background services
 	services = [
@@ -81,10 +83,11 @@ if __name__ == '__main__':
 	pipe = Pipe.new('preprocess',[])
 	Pipe.push(pipe,preprocess.take)
 	Pipe.push(pipe,rabbit.feed(mqs))
+	Pipe.push(pipe,wordbag.feed(bag))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe)) ###,limit=1000)
+	couch.each_do(db,process_with(pipe),limit=4)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]
@@ -92,4 +95,8 @@ if __name__ == '__main__':
 	# Waiting for the background services
 	# and kill `em
 	terminate_background_services(workers)
+
+	# Report the collected word bag
+	print(colored('[Word bag]','green'))
+	pprint(sorted(bag.items(),key=lambda b: -b[1]))
 

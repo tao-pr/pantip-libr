@@ -21,11 +21,11 @@ from sklearn.decomposition import TruncatedSVD
 
 
 # Create a text process pipeline (vectorizer)
-def new():
+def new(stop_words=[]):
 	# Prepare vectoriser engines
 	idf = TfidfVectorizer(
 		ngram_range=(1,3), #Unigram,bigram,& trigram
-		stop_words=[] #TAOTODO: Supply list of stop words here
+		stop_words=stop_words
 	)
 
 	# Prepare dimentionality reducer

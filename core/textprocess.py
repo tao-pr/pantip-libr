@@ -16,6 +16,7 @@ from pypipe.operations import texthasher
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
 TEXT_TRANSFORMER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
 CONTENT_CLUSTER_PATH = '{0}/data/cluster/00'.format(REPO_DIR)
+STOPWORDS_PATH = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
 
 def init_mqs():
 	# Initialise rabbit MQ connectors
@@ -27,6 +28,14 @@ def end_mqs(mqs):
 	mqsrc, mqdst = mqs
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)
+
+def load_stopwords():
+	if (os.path.isfile(STOPWORDS_PATH)):
+		with open(STOPWORDS_PATH,'r') as txt:
+			return [w for w in txt.readlines() if len(w) > 0]
+	else:
+		print(colored('No stopwords definition file','red'))
+		return []
 
 # Convert the MQ record to an X vector (text only for hashing)
 def take_x(record):
@@ -117,9 +126,12 @@ if __name__ == '__main__':
 	# Initialise working MQs
 	mqsrcx, mqsrcy = init_mqs()
 
+	# Load stop words from text file
+	stopwords = load_stopwords()
+
 	# Initialise all text and feature hasher models
 	print(colored('Initialising text hasher...','cyan'))
-	text_operations = texthasher.new()
+	text_operations = texthasher.new(stopwords)
 
 	print(colored('Initialising cluster operations...','cyan'))
 	clf = cluster.new()

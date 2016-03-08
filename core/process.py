@@ -19,6 +19,7 @@ import time
 import os
 
 REPO_DIR = os.getenv('PANTIPLIBR','.')
+WORD_BAG_DIR = '{0}/data/words/freq.txt'.format(REPO_DIR)
 
 def execute_background_services(commands):
 	workers = []
@@ -87,7 +88,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe),limit=300)
+	couch.each_do(db,process_with(pipe),limit=5)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]
@@ -98,5 +99,9 @@ if __name__ == '__main__':
 
 	# Report the collected word bag
 	print(colored('[Word bag]','green'))
-	pprint(sorted(bag.items(),key=lambda b: -b[1])[:20])
+	words = sorted(bag.items(),key=lambda b: -b[1])[:20]
+	pprint(words)
+	# Print most recurring words to file
+	with open(WORD_BAG_DIR,'w+') as txt:
+		txt.writelines([w[0] + "\n" for w in words])
 

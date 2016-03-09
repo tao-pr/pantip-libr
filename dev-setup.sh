@@ -10,6 +10,9 @@ pip3 install pika
 gem install thailang4r
 gem install sinatra
 
+mkdir -p data/hasher/
+mkdir -p data/cluster/
+
 echo "export PANTIPLIBR=$(pwd)"
 
 echo "[Finished]"

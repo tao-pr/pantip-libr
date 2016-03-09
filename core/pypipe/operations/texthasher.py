@@ -29,10 +29,13 @@ def new(stop_words=[]):
 	)
 
 	# Prepare dimentionality reducer
-	svd = TruncatedSVD(n_components=128)
+	svd = TruncatedSVD(n_components=256)
+
+	# Prepare normaliser
+	norm = Normalizer(norm='l2') # Cosine similarity 
 
 	# Prepare task pipeline (in order of operation)
-	operations = [idf,svd]
+	operations = [idf,svd,norm]
 	return operations
 
 def save(operations,path):

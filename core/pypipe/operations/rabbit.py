@@ -40,9 +40,6 @@ def feed(feeders):
 			# Make sure the data type is compatible
 			if isinstance(record,str):
 				data = record
-			elif type(record).__module__ == 'numpy':
-				# A numpy array needs to be converted back to a list
-				data = str(list(record))
 			else:
 				data = json.dumps(record,ensure_ascii=False)
 

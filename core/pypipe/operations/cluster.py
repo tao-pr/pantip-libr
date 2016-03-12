@@ -45,7 +45,7 @@ def analyze(clf,labels=None):
 			return matrix
 		else: # Classification mode
 			y = clf.predict(matrix)
-			return y
+			return iter(y)
 	return _do
 
 

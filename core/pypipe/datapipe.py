@@ -3,6 +3,8 @@ Data Processing Pipeline
 @starcolon projects
 """
 
+import json
+import numpy as np
 from .pipe import Pipe
 from termcolor import colored
 from .operations import rabbit
@@ -21,24 +23,10 @@ def pipe(src,dests,transform=lambda d:d,title=''):
 		_src = rabbit.iter(src)
 	else:
 		_src = src
+	
 	# Transform the input at once
 	outcome = transform(_src)
-
-	feed = rabbit.feed(dests)
-
-	# Feed the outcome to destination MQs
-	try:
-		# Check if @outcome is iterable?
-		iter_outcome = iter(outcome)
-	except TypeError:
-		# @outcome is not iterable
-		feed(json.dumps(outcome))
-	else:
-		# @outcome is iterable
-		if isinstance(outcome,str):
-			feed(outcome)
-		else:
-			[feed(r) for r in iter_outcome]
+	safe_feed(dests,outcome)
 
 	print(colored(title,'cyan'), colored(' [DONE]','green'))
 
@@ -55,15 +43,52 @@ def pipe_each(src,dests,transform=lambda d:d,title=''):
 	else:
 		_src = src
 
-	feed = rabbit.feed(dests)
-
 	n = 0
 	# Transform the input one-by-one
 	for s in _src:
 		outcome = transformer(s)
 		# Feed the record
-		feed(outcome)
+		safe_feed(dests,outcome)
 
 	print(colored(title,'cyan'), colored(' [DONE]','green'))	
 
 	
+# Safely dump a data to the destination MQs
+# @param {list} of rabbit.Feeder
+# @param {Any} list, iterable, numpy.array, object, etc.
+def safe_feed(mqs,data):
+	def feed(v):
+		#TAODEBUG:
+		print(colored('Feeding: ','magenta'),v)
+		rabbit.feed(mqs)(v)
+
+	def to_str(el):
+		if isinstance(el,np.ndarray):
+			# Numpy array
+			return json.dumps(list(el))
+		elif type(data).__module__ == 'numpy':
+			# Any numeric numpy types
+			return str(el)
+		else:
+			return json.dumps(el)
+
+	try:
+		iterdata = iter(data)
+	except TypeError:
+		# @data is not iterable
+		if type(data).__module__ == 'numpy':
+			# It could be any numeric numpy types
+			feed(str(data))
+		else:
+			# It could be any primitive / instance of any class
+			feed(json.dumps(data))
+	else:
+		# @data is iterable
+		if isinstance(data,str):
+			# String does not need any conversion
+			feed(data)
+		else:
+			# Elements of iterable type
+			# will be fed individually
+			[feed(to_str(r)) for r in iterdata]
+

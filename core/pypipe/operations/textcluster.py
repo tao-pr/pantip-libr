@@ -26,12 +26,12 @@ def load(path):
 # Load the hasher pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path):
+def safe_load(path,n_labels):
 	if os.path.isfile(path): return load(path)
-	else: return new()
+	else: return new(n_labels)
 
 def classify(clf,learn=True):
 	def _do(matrix):
-		if learn: return clf.fit_predict(matrix)
-		else: return clf.predict(matrix)
+		if learn: return iter(clf.fit_predict(matrix))
+		else: return iter(clf.predict(matrix))
 	return _do

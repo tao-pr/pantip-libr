@@ -86,7 +86,7 @@ def hash(operations,learn=False):
 			for i in range(len(operations)): 
 				x = operations[i].transform(x)
 
-		return x
+		return iter(x)
 	return hash_me
 
 

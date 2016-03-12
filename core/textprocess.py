@@ -5,6 +5,7 @@ Text processing worker
 
 import os
 import json
+import numpy as np
 from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe import datapipe as DP
@@ -111,21 +112,23 @@ def train_centroid(stopwords):
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)
 
-	# TAOTODO:
-	return
-
 	# Cluster the vectorised records with unsupervised clf
 	mqsrc = rabbit.create('localhost','pantip-x2')
 	mqdst = [
 		rabbit.create('localhost','pantip-x3'),
 		rabbit.create('localhost','pantip-y1')
 	]
-	tc = textcluster.safe_load(CONTENT_CLUSTER_PATH)
+	tc = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=5)
 	clusterMe = textcluster.classify(tc,learn=True)
 
 	# Classification doesn't accept a generator,
 	# So we need to roll the matrix out of the MQ
-	srcmatrix = [x for x in rabbit.iter(mqsrc)]
+	srcmatrix = [np.array(json.loads(x)) for x in rabbit.iter(mqsrc)]
+
+	#TAODEBUG:
+	print(colored('SRC','magenta'))
+	print(srcmatrix)
+
 	DP.pipe(srcmatrix,mqdst,clusterMe,title='Clustering')
 
 	rabbit.end(mqsrc)

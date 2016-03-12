@@ -56,11 +56,12 @@ def pipe_each(src,dests,transform=lambda d:d,title=''):
 # Safely dump a data to the destination MQs
 # @param {list} of rabbit.Feeder
 # @param {Any} list, iterable, numpy.array, object, etc.
+#
+# if @data is `iterable` ---> Feed each record per transaction
+# otherwise, feed the bulk data once as a single transaction.
+#
 def safe_feed(mqs,data):
-	def feed(v):
-		#TAODEBUG:
-		print(colored('Feeding: ','magenta'),v)
-		rabbit.feed(mqs)(v)
+	feed = rabbit.feed(mqs)
 
 	def to_str(el):
 		if isinstance(el,np.ndarray):

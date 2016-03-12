@@ -34,7 +34,6 @@ def new(stop_words=[],compress=True):
 		svd = TruncatedSVD(n_components=8)
 
 		# Prepare normaliser
-		# TAOTODO: Use binary normalizer
 		norm = Normalizer(norm='l2') # Cosine similarity 
 
 		# Prepare task pipeline (in order of operation)

@@ -37,7 +37,7 @@ def take_x1(record):
 
 def take_tags(record):
 	data = json.loads(record)
-	x = data['tags']
+	x = data['tags'] #TAOTODO: Also remove unmeaningful tags from the list
 	return x
 
 def take_sentiment_score(record):
@@ -105,11 +105,11 @@ def train_centroid(stopwords):
 		rabbit.create('localhost','pantip-vector1'),
 		rabbit.create('localhost','pantip-y1')
 	]
-	hasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
-	hashMe = texthasher.hash(hasher,learn=True)
+	topicHasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
+	hashMe      = texthasher.hash(hasher,learn=True)
 
 	print(colored('#STEP-1 started ...','cyan'))
-	print('hasher : {0}'.format(hasher))
+	print('hasher : {0}'.format(topicHasher))
 	DP.pipe(
 		rabbit.iter(mqsrc,take_x1),
 		mqdst,
@@ -123,17 +123,12 @@ def train_centroid(stopwords):
 	# Cluster the vectorised records with unsupervised clf
 	mqsrc = rabbit.create('localhost','pantip-vector1')
 	mqdst = [rabbit.create('localhost','pantip-cluster')]
-	tc = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=5)
-	clusterMe = textcluster.classify(tc,learn=True)
+	contentClf = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=5)
+	clusterMe  = textcluster.classify(contentClf,learn=True)
 
 	# Classification doesn't accept a generator,
 	# So we need to roll the matrix out of the MQ
 	srcmatrix = [np.array(json.loads(x)) for x in rabbit.iter(mqsrc)]
-
-	#TAODEBUG:
-	print(colored('SRC','magenta'))
-	print(srcmatrix)
-
 	DP.pipe(
 		srcmatrix,
 		mqdst,
@@ -156,7 +151,11 @@ def train_centroid(stopwords):
 
 	tags     = rabbit.iter(mqtags,take_tags)
 	clusters = rabbit.iter(mqcluster)
-	matX     = rabbit.iter(mqsrc)
+	matV     = rabbit.iter(mqsrc)
+
+	#TAOTODO: Decomposite @matV with SVD
+	#TAOTODO: Convert tags into a numeric vector
+	
 
 
 	rabbit.end_multiple([mqtags,mqcluster,mqsrc])

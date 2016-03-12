@@ -35,6 +35,11 @@ def take_x1(record):
 	x = str(data['title'] + data['topic']) #TAOTOREVIEW: Any better compositon?
 	return x
 
+def take_tags(record):
+	data = json.loads(record)
+	x = data['tags']
+	return x
+
 def take_sentiment_score(record):
 	data = json.loads(record)
 	vote = data['vote']
@@ -96,7 +101,10 @@ def train_centroid(stopwords):
 	#------------------------------------
 	# Vectorise the input topic (text only) 
 	mqsrc  = rabbit.create('localhost','pantip-x1')
-	mqdst  = rabbit.create('localhost','pantip-x2')
+	mqdst  = [
+		rabbit.create('localhost','pantip-vector1'),
+		rabbit.create('localhost','pantip-y1')
+	]
 	hasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
 	hashMe = texthasher.hash(hasher,learn=True)
 
@@ -104,20 +112,17 @@ def train_centroid(stopwords):
 	print('hasher : {0}'.format(hasher))
 	DP.pipe(
 		rabbit.iter(mqsrc,take_x1),
-		[mqdst],
+		mqdst,
 		hashMe,
 		title='Vectorisation'
 	)
 
 	rabbit.end(mqsrc)
-	rabbit.end(mqdst)
+	rabbit.end_multiple(mqdst)
 
 	# Cluster the vectorised records with unsupervised clf
-	mqsrc = rabbit.create('localhost','pantip-x2')
-	mqdst = [
-		rabbit.create('localhost','pantip-x3'),
-		rabbit.create('localhost','pantip-y1')
-	]
+	mqsrc = rabbit.create('localhost','pantip-vector1')
+	mqdst = [rabbit.create('localhost','pantip-cluster')]
 	tc = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=5)
 	clusterMe = textcluster.classify(tc,learn=True)
 
@@ -129,7 +134,12 @@ def train_centroid(stopwords):
 	print(colored('SRC','magenta'))
 	print(srcmatrix)
 
-	DP.pipe(srcmatrix,mqdst,clusterMe,title='Clustering')
+	DP.pipe(
+		srcmatrix,
+		mqdst,
+		clusterMe,
+		title='Clustering'
+	)
 
 	rabbit.end(mqsrc)
 	rabbit.end_multiple(mqdst)
@@ -139,8 +149,17 @@ def train_centroid(stopwords):
 	# TAOTODO:
 	# STEP#2
 	# ---------------------------------------------
-	# Assembly traning vector and sentiment labels
+	# Assembly training vector and sentiment labels
+	mqtags    = rabbit.create('localhost','pantip-x2') # User tags
+	mqcluster = rabbit.create('localhost','pantip-cluster') # Cluster results
+	mqsrc     = rabbit.create('localhost','pantip-vector1') # Hash matrix
 
+	tags     = rabbit.iter(mqtags,take_tags)
+	clusters = rabbit.iter(mqcluster)
+	matX     = rabbit.iter(mqsrc)
+
+
+	rabbit.end_multiple([mqtags,mqcluster,mqsrc])
 
 	pass
 

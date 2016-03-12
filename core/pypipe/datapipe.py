@@ -61,7 +61,10 @@ def pipe_each(src,dests,transform=lambda d:d,title=''):
 # otherwise, feed the bulk data once as a single transaction.
 #
 def safe_feed(mqs,data):
-	feed = rabbit.feed(mqs)
+	##feed = rabbit.feed(mqs)
+	def feed(a):
+		print(colored('Feeding: ','magenta'),a)
+		rabbit.feed(mqs)(a)
 
 	def to_str(el):
 		if isinstance(el,np.ndarray):

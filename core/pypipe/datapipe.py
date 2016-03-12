@@ -15,11 +15,12 @@ from .operations import tapper
 # @param {Function} trasnformer function
 # @param {String} title of this pipe (optional)
 def pipe(src,dests,transformer=lambda d:d,title=''):
-	feed = rabbit.feed(dests)
+	feed = rabbit.feed_vector(dests)
+
+	print(colored('  pipe @{0} started'.format(title),'yellow'))
 
 	# If @source is a rabbit feeder,
-	# iter over it,
-	# otherwise, treat it as is
+	# make sure we iterate over it
 	_src = rabbit.iter(src) if isinstance(src,rabbit.Feeder) else src
 
 	n = 0

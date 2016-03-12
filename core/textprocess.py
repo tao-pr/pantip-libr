@@ -98,12 +98,16 @@ def train_centroid(stopwords):
 		rabbit.create('localhost','pantip-x1'),
 		take_x1
 	)
-	mqdst = rabbit.create('localhost','pantip-x2')
+	mqdst  = rabbit.create('localhost','pantip-x2')
 	hasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
 	hashMe = texthasher.hash(hasher,learn=True)
 
 	print(colored('#STEP-1 started ...','cyan'))
-	DP.pipe(mqsrc,[mqdst],hashMe,title='Vectorisation')
+	###DP.pipe(mqsrc,[mqdst],hashMe,title='Vectorisation')
+
+	#TAODEBUG:
+	printMe = lambda a: print('x = {0}'.format(str(a)))
+	DP.pipe(mqsrc,[mqdst],printMe,title='X1 test')
 	
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)

@@ -77,6 +77,7 @@ def hash(operations,learn=False):
 	# @param {iterable} of string
 	def hash_me(dataset):
 		x = dataset
+
 		if learn:
 			for i in range(len(operations)): 
 				print('Processing ... #{0} : {1}'.format(i,type(operations[i])))
@@ -84,6 +85,7 @@ def hash(operations,learn=False):
 		else:
 			for i in range(len(operations)): 
 				x = operations[i].transform(x)
+
 		return x
 	return hash_me
 

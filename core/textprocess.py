@@ -106,7 +106,7 @@ def train_centroid(stopwords):
 		rabbit.create('localhost','pantip-y1')
 	]
 	topicHasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
-	hashMe      = texthasher.hash(hasher,learn=True)
+	hashMe      = texthasher.hash(topicHasher,learn=True)
 
 	print(colored('#STEP-1 started ...','cyan'))
 	print('hasher : {0}'.format(topicHasher))

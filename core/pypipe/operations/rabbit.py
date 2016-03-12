@@ -42,7 +42,7 @@ def feed(feeders):
 				data = record
 			elif type(record).__module__ == 'numpy':
 				# A numpy array needs to be converted back to a list
-				data = list(record)
+				data = str(list(record))
 			else:
 				data = json.dumps(record,ensure_ascii=False)
 

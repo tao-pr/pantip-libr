@@ -111,6 +111,9 @@ def train_centroid(stopwords):
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)
 
+	# TAOTODO:
+	return
+
 	# Cluster the vectorised records with unsupervised clf
 	mqsrc = rabbit.create('localhost','pantip-x2')
 	mqdst = [
@@ -119,7 +122,11 @@ def train_centroid(stopwords):
 	]
 	tc = textcluster.safe_load(CONTENT_CLUSTER_PATH)
 	clusterMe = textcluster.classify(tc,learn=True)
-	DP.pipe(mqsrc,mqdst,clusterMe,title='Clustering')
+
+	# Classification doesn't accept a generator,
+	# So we need to roll the matrix out of the MQ
+	srcmatrix = [x for x in rabbit.iter(mqsrc)]
+	DP.pipe(srcmatrix,mqdst,clusterMe,title='Clustering')
 
 	rabbit.end(mqsrc)
 	rabbit.end_multiple(mqdst)

@@ -34,29 +34,19 @@ def feed(feeders):
 	def feed_message(record):
 		for feeder in feeders:
 			conn,channel,q = feeder.components()
-			topic_id  = record['topic_id']
-			data = json.dumps(record,ensure_ascii=False)
+			
+			if isinstance(record,str):
+				data = record
+			else:
+				data = json.dumps(record,ensure_ascii=False)
+
 			channel.basic_publish(
 				exchange='',
 				routing_key=q,
 				body=data)
-			print(colored('record #{0} fed to MQ '.format(topic_id),'cyan'),
-				colored('#'+feeder.q,'white'))	
 		return record
 	return feed_message
 
-# Another version of @feed, but this feeds a vector (list) instead 
-def feed_str(feeders):
-	def feed_v(vector):
-		for feeder in feeders:
-			conn,channel,q = feeder.components()
-			channel.basic_publish(
-				exchange='',
-				routing_key=q,
-				body=vector
-
-		return vector
-	return feed_v
 
 # Message generator
 def iter(feeder,transformation=lambda x:x):
@@ -67,7 +57,7 @@ def iter(feeder,transformation=lambda x:x):
 			raise StopIteration
 
 		signal.signal(signal.SIGALRM,__timeout)
-		signal.alarm(TIMEOUT) #TAOTODO: Place a timer here will break :(
+		signal.alarm(TIMEOUT)
 		for methodframe, prop, body in feeder.channel.consume(feeder.q):
 			signal.alarm(0)
 			msg = transformation(body.decode('utf-8'))
@@ -90,5 +80,8 @@ def iter(feeder,transformation=lambda x:x):
 def end(feeder):
 	conn,channel,q = feeder.components()
 	conn.close()
+
+def end_multiple(feeders):
+	[end(f) for f in feeders]
 
 

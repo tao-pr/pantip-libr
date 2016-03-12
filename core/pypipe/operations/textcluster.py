@@ -3,6 +3,7 @@ Unsupervised topic classification
 @starcolon projects
 """
 
+import os
 import pickle
 from sklearn.cluster import KMeans
 

@@ -32,6 +32,9 @@ def load_stopwords():
 def take_x1(record):
 	data = json.loads(record)
 	x = str(data['title'] + data['topic']) #TAOTOREVIEW: Any better compositon?
+
+	#TAODEBUG:	
+	print(x)
 	return x
 
 def take_sentiment_score(record):
@@ -48,7 +51,7 @@ def take_sentiment_score(record):
 		return -1 # People dislike this
 	if vote < 20: # Some people like it
 		return 1
-	if vote < 100: # may people love it
+	if vote < 100: # Many people love it
 		return 5
 	else:
 		return 10 # Awesome post
@@ -94,21 +97,20 @@ def train_centroid(stopwords):
 	# STEP#1
 	#------------------------------------
 	# Vectorise the input topic (text only) 
-	mqsrc = rabbit.iter(
-		rabbit.create('localhost','pantip-x1'),
-		take_x1
-	)
+	mqsrc  = rabbit.create('localhost','pantip-x1')
 	mqdst  = rabbit.create('localhost','pantip-x2')
 	hasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
 	hashMe = texthasher.hash(hasher,learn=True)
 
 	print(colored('#STEP-1 started ...','cyan'))
-	###DP.pipe(mqsrc,[mqdst],hashMe,title='Vectorisation')
+	print('hasher : {0}'.format(hasher))
+	DP.pipe(
+		rabbit.iter(mqsrc,take_x1),
+		[mqdst],
+		hashMe,
+		title='Vectorisation'
+	)
 
-	#TAODEBUG:
-	printMe = lambda a: print('x = {0}'.format(str(a)))
-	DP.pipe(mqsrc,[mqdst],printMe,title='X1 test')
-	
 	rabbit.end(mqsrc)
 	rabbit.end(mqdst)
 
@@ -118,12 +120,12 @@ def train_centroid(stopwords):
 		rabbit.create('localhost','pantip-x3'),
 		rabbit.create('localhost','pantip-y1')
 	]
-	clus = cluster.safe_load(CONTENT_CLUSTER_PATH)
-	clusterMe = cluster.classify(clus,learn=True)
+	tc = textcluster.safe_load(CONTENT_CLUSTER_PATH)
+	clusterMe = textcluster.classify(tc,learn=True)
 	DP.pipe(mqsrc,mqdst,clusterMe,title='Clustering')
 
 	rabbit.end(mqsrc)
-	[rabbit.end(mq) for mq in mqdst]
+	rabbit.end_multiple(mqdst)
 
 	print(colored('#STEP-1 finished ...','cyan'))
 

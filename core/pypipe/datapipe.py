@@ -10,35 +10,57 @@ from .operations import tapper
 
 # Pipe input to the destination MQ with
 # particular transformation
-# @param {Iterable} input MQ or any iterable
+# @param {Any} input
 # @param {list} destination mq(s) to feed
 # @param {Function} trasnformer function
 # @param {String} title of this pipe (optional)
-def pipe(src,dests,transformer=lambda d:d,title=''):
-	feed = rabbit.feed_vector(dests)
-
+def pipe(src,dests,transform=lambda d:d,title=''):
 	print(colored('  pipe @{0} started'.format(title),'yellow'))
 
-	# If @source is a rabbit feeder,
-	# make sure we iterate over it
-	_src = rabbit.iter(src) if isinstance(src,rabbit.Feeder) else src
+	if isinstance(src,rabbit.Feeder):
+		_src = rabbit.iter(src)
+	else:
+		_src = src
+	# Transform the input at once
+	outcome = transform(_src)
+
+	feed = rabbit.feed(dests)
+
+	# Feed the outcome to destination MQs
+	try:
+		# Check if @outcome is iterable?
+		iter_outcome = iter(outcome)
+	except TypeError:
+		# @outcome is not iterable
+		feed(outcome)
+	else:
+		# @outcome is iterable
+		[feed(r) for r in iter_outcome]
+
+	print(colored(title,'cyan'), colored(' [DONE]','green'))
+
+# Pipe the list of input, one-by-one to the processing
+# @param {Iterable} src
+# @param {list} destination mq(s) to feed
+# @param {Function} transformer function
+# @param {String} title of this pipe (optional)
+def pipe_each(src,dests,transform=lambda d:d,title=''):
+	print(colored('  pipe @{0} started'.format(title),'yellow'))
+
+	if isinstance(src,rabbit.Feeder):
+		_src = rabbit.iter(src)
+	else:
+		_src = src
+
+	feed = rabbit.feed(dests)
 
 	n = 0
-	for v in _src:
-		feed(transformer(v))
-		n += 1
-	print(colored(title,'cyan'), colored(' [DONE]','green'))
-	return n
+	# Transform the input one-by-one
+	for s in _src:
+		outcome = transformer(s)
+		# Feed the record
+		feed(outcome)
 
-# Zip two inputs together, transform with a 
-# particular transformation and pump them
-# into MQs
-# @param {Iterable} input iterable #1
-# @param {Iterable} input iterable #2
-# @param {list} of destination MQs
-# @param {String} title of this pipe (optional)
-def pipezip(src1,src2,dests,transformer=lambda a,b:(a,b),title=''):
-	def transform(tup):
-		a,b = tup
-		return transformer(a,b)
-	return pipe(zip(src1,scr2),dests,transform,title)
+	print(colored(title,'cyan'), colored(' [DONE]','green'))	
+
+	

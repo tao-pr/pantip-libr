@@ -3,8 +3,10 @@ RabbitMQ data relay
 @starcolon projects
 """
 
+
 from termcolor import colored
 from queue import Queue
+import numpy as np
 import signal
 import time
 import pika
@@ -35,8 +37,12 @@ def feed(feeders):
 		for feeder in feeders:
 			conn,channel,q = feeder.components()
 			
+			# Make sure the data type is compatible
 			if isinstance(record,str):
 				data = record
+			elif type(record).__module__ == 'numpy':
+				# A numpy array needs to be converted back to a list
+				data = list(record)
 			else:
 				data = json.dumps(record,ensure_ascii=False)
 

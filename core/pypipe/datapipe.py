@@ -69,8 +69,15 @@ def safe_feed(mqs,data):
 		elif type(data).__module__ == 'numpy':
 			# Any numeric numpy types
 			return str(el)
+		elif isinstance(data,float) or isinstance(data,int):
+			return str(el)
 		else:
-			return json.dumps(el)
+			try:
+				return json.dumps(el)
+			except TypeError:
+				return str(el)
+			else:
+				return str(el)
 
 	try:
 		iterdata = iter(data)
@@ -78,6 +85,8 @@ def safe_feed(mqs,data):
 		# @data is not iterable
 		if type(data).__module__ == 'numpy':
 			# It could be any numeric numpy types
+			feed(str(data))
+		elif isinstance(data,float) or isinstance(data,int):
 			feed(str(data))
 		else:
 			# It could be any primitive / instance of any class

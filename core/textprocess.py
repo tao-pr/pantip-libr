@@ -32,9 +32,6 @@ def load_stopwords():
 def take_x1(record):
 	data = json.loads(record)
 	x = str(data['title'] + data['topic']) #TAOTOREVIEW: Any better compositon?
-
-	#TAODEBUG:	
-	print(x)
 	return x
 
 def take_sentiment_score(record):

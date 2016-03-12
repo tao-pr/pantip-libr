@@ -32,10 +32,13 @@ def pipe(src,dests,transform=lambda d:d,title=''):
 		iter_outcome = iter(outcome)
 	except TypeError:
 		# @outcome is not iterable
-		feed(outcome)
+		feed(json.dumps(outcome))
 	else:
 		# @outcome is iterable
-		[feed(r) for r in iter_outcome]
+		if isinstance(outcome,str):
+			feed(outcome)
+		else:
+			[feed(r) for r in iter_outcome]
 
 	print(colored(title,'cyan'), colored(' [DONE]','green'))
 

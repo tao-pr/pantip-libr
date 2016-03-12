@@ -4,7 +4,6 @@ Generic record processing pipeline.
 @starcolon projects
 """
 
-# TAOTODO: DEPRECATE this module
 import pyspark
 from termcolor import colored
 from functools import reduce

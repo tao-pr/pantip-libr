@@ -4,6 +4,7 @@ Generic record processing pipeline.
 @starcolon projects
 """
 
+# TAOTODO: DEPRECATE this module
 import pyspark
 from termcolor import colored
 from functools import reduce
@@ -54,6 +55,7 @@ def operate(pipe,input0):
 
 	# Send the output via callback
 	if pipe.then is not None: 
+		pipe.result = out # Memorise the latest output for chaining purpose
 		pipe.then(out)
 	else:
 		print('[Then] is not supplied.') # TAODEBUG:

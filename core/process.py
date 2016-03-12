@@ -1,5 +1,9 @@
 """
 Process the downloaded Pantip threads
+------------------------------------
+The script tokenises each of the records 
+in CouchDB, and pass it as a series of input 
+to train the classificier(s).
 
 @starcolon projects
 """
@@ -77,8 +81,10 @@ if __name__ == '__main__':
 	time.sleep(1)
 
 	# Prepare MQs for training sources
-	qs = ['pantip-centroidx','pantip-centroidy']
+	qs = ['pantip-x1']
 	mqs = [rabbit.create('localhost',q) for q in qs]
+
+	#TAOTODO: Empty the MQs before starting
 
 	# Prepare the processing pipeline (order matters)
 	pipe = Pipe.new('preprocess',[])
@@ -88,7 +94,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe)) #limit=100
+	couch.each_do(db,process_with(pipe),limit=20)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]

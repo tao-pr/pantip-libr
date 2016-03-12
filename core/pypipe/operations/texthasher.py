@@ -21,22 +21,42 @@ from sklearn.decomposition import TruncatedSVD
 
 
 # Create a text process pipeline (vectorizer)
-def new(stop_words=[]):
-	# Prepare vectoriser engines
-	idf = TfidfVectorizer(
-		ngram_range=(1,3), #Unigram,bigram,& trigram
-		stop_words=stop_words
-	)
+def new(stop_words=[],compress=True):
 
-	# Prepare dimentionality reducer
-	svd = TruncatedSVD(n_components=256)
+	if compress:
+		# Prepare vectoriser engines
+		idf = TfidfVectorizer(
+			ngram_range=(1,3), #Unigram,bigram,& trigram
+			stop_words=stop_words
+		)
 
-	# Prepare normaliser
-	norm = Normalizer(norm='l2') # Cosine similarity 
+		# Prepare dimentionality reducer
+		svd = TruncatedSVD(n_components=8)
 
-	# Prepare task pipeline (in order of operation)
-	operations = [idf,svd,norm]
-	return operations
+		# Prepare normaliser
+		# TAOTODO: Use binary normalizer
+		norm = Normalizer(norm='l2') # Cosine similarity 
+
+		# Prepare task pipeline (in order of operation)
+		operations = [idf,svd,norm]
+		return operations
+
+	else:		
+		# Prepare vectoriser engines
+		idf = TfidfVectorizer(
+			ngram_range=(1,3), #Unigram,bigram,& trigram
+			stop_words=stop_words
+		)
+
+		# Prepare dimentionality reducer
+		svd = TruncatedSVD(n_components=256)
+
+		# Prepare normaliser
+		norm = Normalizer(norm='l2') # Cosine similarity 
+
+		# Prepare task pipeline (in order of operation)
+		operations = [idf,svd,norm]
+		return operations
 
 def save(operations,path):
 	with open(path,'wb+') as f:

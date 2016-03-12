@@ -7,27 +7,18 @@ import os
 import json
 from termcolor import colored
 from pypipe import pipe as Pipe
+from pypipe import datapipe as DP
 from pypipe.operations import rabbit
 from pypipe.operations import tapper as T
-from pypipe.operations import hasher
 from pypipe.operations import cluster
+from pypipe.operations import textcluster
 from pypipe.operations import texthasher
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
 TEXT_TRANSFORMER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
-CONTENT_CLUSTER_PATH = '{0}/data/cluster/00'.format(REPO_DIR)
+TEXT_CLUSTER_PATH = '{0}/data/cluster/00'.format(REPO_DIR)
+CONTENT_CLUSTER_PATH = '{0}/data/cluster/22'.format(REPO_DIR)
 STOPWORDS_PATH = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
-
-def init_mqs():
-	# Initialise rabbit MQ connectors
-	mqsrcx = rabbit.create('localhost','pantip-centroidx')
-	mqsrcy = rabbit.create('localhost','pantip-centroidy')
-	return (mqsrcx,mqsrcy)
-
-def end_mqs(mqs):
-	mqsrc, mqdst = mqs
-	rabbit.end(mqsrc)
-	rabbit.end(mqdst)
 
 def load_stopwords():
 	if (os.path.isfile(STOPWORDS_PATH)):
@@ -38,12 +29,12 @@ def load_stopwords():
 		return []
 
 # Convert the MQ record to an X vector (text only for hashing)
-def take_x(record):
+def take_x1(record):
 	data = json.loads(record)
 	x = str(data['title'] + data['topic']) #TAOTOREVIEW: Any better compositon?
 	return x
 
-def take_y(record):
+def take_sentiment_score(record):
 	data = json.loads(record)
 	vote = data['vote']
 	#['ขำกลิ้ง','สยอง','ถูกใจ','ทึ่ง','หลงรัก']
@@ -82,75 +73,75 @@ def conclude_validation(results):
 	print(colored('=================','cyan'))
 
 # Train the centroid clustering
-def train_centroid(mqx,mqy,text_operations,clf):
-	# Vectorise the input text X
-	source = rabbit.iter(mqx,take_x)
-	pipe = Pipe.new('centroid',[])
+def train_centroid(stopwords):
 
-	# Vectorisation of X
-	Pipe.push(pipe,texthasher.hash(text_operations,learn=True))
-	Pipe.push(pipe,T.printtext(colored('[Output matrix X]','yellow')))
-	Pipe.push(pipe,T.printdata)
+	"""
+	STEP#1 :: Cluster topic with unsupervised classification
 
-	# Clustering
-	labels = [y for y in rabbit.iter(mqy,take_y)]
+		X1 text ---> [@cluster] ----> (y1 group, X1 text)
 
-	train_cluster = cluster.analyze(clf,labels)
-	Pipe.push(pipe,T.printtext(colored('Clustering...','green')))
-	Pipe.push(pipe,T.printtext('labels : {0}'.format(str(labels))))
-	Pipe.push(pipe,train_cluster)
-	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
-	Pipe.push(pipe,T.printdata) #TAOTODO: Should visualise the plane
+	STEP#2 :: Combine topic, tags, and group to make feature vector
 
-	# Self validation
-	predict = cluster.analyze(clf)
-	Pipe.push(pipe,T.printtext(colored('Validating...','green')))
-	Pipe.push(pipe,predict)
-	Pipe.push(pipe,T.printtext(colored('[Output clusters]','yellow')))
-	Pipe.push(pipe,T.printdata)
-	Pipe.push(pipe,T.zip_with(validate,labels,lazy=False))
-	Pipe.push(pipe,conclude_validation)
+		X2 <--  [tags, y1, SVD(X1)]
+		Y2 <--  Sentiment score
 
-	# Execute the training
-	Pipe.operate(pipe,source)
+	STEP#3 :: Train the classification
+
+		(Y2,X2) -----> [@classification] ----> @model
+
+	"""
+
+	# STEP#1
+	#------------------------------------
+	# Vectorise the input topic (text only) 
+	mqsrc = rabbit.iter(
+		rabbit.create('localhost','pantip-x1'),
+		take_x1
+	)
+	mqdst = rabbit.create('localhost','pantip-x2')
+	hasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
+	hashMe = texthasher.hash(hasher,learn=True)
+
+	print(colored('#STEP-1 started ...','cyan'))
+	DP.pipe(mqsrc,[mqdst],hashMe,title='Vectorisation')
+	
+	rabbit.end(mqsrc)
+	rabbit.end(mqdst)
+
+	# Cluster the vectorised records with unsupervised clf
+	mqsrc = rabbit.create('localhost','pantip-x2')
+	mqdst = [
+		rabbit.create('localhost','pantip-x3'),
+		rabbit.create('localhost','pantip-y1')
+	]
+	clus = cluster.safe_load(CONTENT_CLUSTER_PATH)
+	clusterMe = cluster.classify(clus,learn=True)
+	DP.pipe(mqsrc,mqdst,clusterMe,title='Clustering')
+
+	rabbit.end(mqsrc)
+	[rabbit.end(mq) for mq in mqdst]
+
+	print(colored('#STEP-1 finished ...','cyan'))
+
+	# TAOTODO:
+	# STEP#2
+	# ---------------------------------------------
+	# Assembly traning vector and sentiment labels
+
+
+	pass
+
 
 
 if __name__ == '__main__':
 	print(colored('[WORKER STARTED!]','cyan'))
 
-	# Initialise working MQs
-	mqsrcx, mqsrcy = init_mqs()
-
 	# Load stop words from text file
 	stopwords = load_stopwords()
 
-	# Initialise all text and feature hasher models
-	print(colored('Initialising text hasher...','cyan'))
-	text_operations = texthasher.new(stopwords)
-
-	print(colored('Initialising cluster operations...','cyan'))
-	clf = cluster.new()
-
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
-	output = train_centroid(
-		mqsrcx,
-		mqsrcy,
-		text_operations,
-		clf
-		)
-
-	# End all working MQs
-	print(colored('Ending MQs','cyan'))
-	end_mqs((mqsrcx, mqsrcy))
-
-	# Save the trained text transformer 
-	print(colored('Saving text hasher','cyan'))
-	texthasher.save(text_operations,TEXT_TRANSFORMER_PATH)
-
-	# Save the trained classifier
-	print(colored('Saving classifier','cyan'))
-	cluster.save(clf,CONTENT_CLUSTER_PATH)
+	output = train_centroid(stopwords)
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

@@ -54,23 +54,9 @@ def terminate_background_services(workers):
 	subprocess.Popen('kill {0}'.format(workers[0].pid),
 		shell=True, stdout=subprocess.PIPE)
 
-	# Wait for all child processes to finish
-	# (apart from the ruby server #1st elem)
-	wait_list = deque([p.pid for p in workers[1:]])
-
-	print('    {0} subprocess to wait for ...'.format(len(wait_list)))
-	print('    \n'.join([str(p) for p in wait_list]))
-	while len(wait_list)>0:
-		pid = wait_list.pop()
-		try:
-			os.kill(pid,0) #This won't force termination if still running
-		except OSError:
-			# @p has already finished and died
-			print('    1 down!')
-			pass
-		else:
-			# @p is still running
-			wait_list.appendleft(pid)
+	# Wait for the rest
+	wait_list  = workers[1:]
+	exit_codes = [subp.wait() for subp in wait_list]
 
 
 	print(colored('All subprocesses finished! Bye','green'))

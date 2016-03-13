@@ -209,6 +209,7 @@ def train_centroid(stopwords):
 		rabbit.iter(mqx_cluster),
 		rabbit.iter(mqx_vec)
 	)
+	X = iter([a+b+c for a,b,c in X]) # Concatenate vectors
 
 	# Train!
 	print(colored('Training process started...','cyan'))

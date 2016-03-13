@@ -204,19 +204,21 @@ def train_centroid(stopwords):
 	mqx_cluster = rabbit.create('localhost','pantip-cluster')
 	mqx_vec     = rabbit.create('localhost','pantip-veccontent')
 	mqx_tag     = rabbit.create('localhost','pantip-vectag')
-	X = zip(
+	XS = zip(
 		rabbit.iter(mqx_tag),
 		rabbit.iter(mqx_cluster),
 		rabbit.iter(mqx_vec)
 	)
-	X = iter([a+b+c for a,b,c in X]) # Concatenate vectors
+	X = [json.loads(a) + [int(b)] + json.loads(c)
+			for a,b,c in XS] # Concatenate vectors
+
+	print(colored('[X]','yellow'))
+	for x in X:
+		print('x[{0}] : '.format(len(x)), x[:6], '...')
 
 	# Train!
 	print(colored('Training process started...','cyan'))
 
-	#TAODEBUG:
-	print('Y:')
-	print(Y)
 
 	clf     = cluster.safe_load(CLF_PATH)
 	trainMe = cluster.analyze(clf,labels=Y)
@@ -226,11 +228,10 @@ def train_centroid(stopwords):
 	rabbit.end_multiple([mqy,mqx_cluster,mqx_vec,mqx_tag])
 
 	# Self-validation
-
-	#TAODEBUG:
-	print(colored('========= OUTPUT ========','magenta'))
-	print(Y_)
-
+	print(colored('====== TRAINING LABELS =====','magenta'))
+	print(Y)
+	print(colored('========= PREDICTED ========','magenta'))
+	print(list(Y_))
 
 	
 

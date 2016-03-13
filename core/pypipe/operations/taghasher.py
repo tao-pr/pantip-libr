@@ -12,15 +12,15 @@ from termcolor import colored
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import TruncatedSVD
 
-def new():
+def new(n_feature=128):
 	vectorizer = CountVectorizer(
 		encoding='utf-8',
-		ngram_range=(1,1),
-		max_features=128,
+		ngram_range=(1,1), # Unigram only
+		max_features=n_feature,
 		binary=True
 	)
-	
-	return vectorizer
+	#TAOTODO: Binary normaliser?
+	return [vectorizer]
 
 
 def save(operations,path):
@@ -34,9 +34,20 @@ def load(path):
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path):
+def safe_load(path,n_feature):
 	if os.path.isfile(path): return load(path)
-	else: return new()
+	else: return new(n_feature)
 
 def hash(operations,learn=False):
-	pass #TAOTODO:
+	def _hashMe(dataset):
+		x= dataset
+
+		if learn:
+			for i in range(len(operations)):
+				print('Processing #{0} : {1}'.format(i,type(operations[i])))
+				x = operations[i].fit_transform(x)
+		else:
+			for i in range(len(operations)): 
+				x = operations[i].transform(x)
+		return iter(x)
+	return _hashMe

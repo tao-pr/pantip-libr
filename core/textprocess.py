@@ -12,6 +12,7 @@ from pypipe import datapipe as DP
 from pypipe.operations import rabbit
 from pypipe.operations import tapper as T
 from pypipe.operations import cluster
+from pypipe.operations import taghasher
 from pypipe.operations import texthasher
 from pypipe.operations import compressor
 from pypipe.operations import textcluster
@@ -20,6 +21,7 @@ from pypipe.operations import textcluster
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
 TEXT_VECTORIZER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
 VECT_COMPRESSOR_PATH  = '{0}/data/hasher/22'.format(REPO_DIR)
+TAG_HASHER_PATH       = '{0}/data/hasher/33'.format(REPO_DIR)
 TEXT_CLUSTER_PATH     = '{0}/data/cluster/00'.format(REPO_DIR)
 CONTENT_CLUSTER_PATH  = '{0}/data/cluster/22'.format(REPO_DIR)
 STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
@@ -41,7 +43,7 @@ def take_x1(record):
 
 def take_tags(record):
 	data = json.loads(record)
-	x = data['tags'] #TAOTODO: Also remove unmeaningful tags from the list
+	x = ' '.join([tag for tag in data['tags'] if len(tag)>1])
 	return x
 
 def take_sentiment_score(record):
@@ -159,7 +161,7 @@ def train_centroid(stopwords):
 
 	tags     = rabbit.iter(mqtags,take_tags)
 	clusters = rabbit.iter(mqcluster)
-	matV     = rabbit.iter(mqsrc)
+	matV     = np.array([json.loads(v) for v in rabbit.iter(mqsrc)])
 
 	# Decompose @matV with SVD
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
@@ -170,21 +172,35 @@ def train_centroid(stopwords):
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
 		matV,
-		mqveccontent,	
+		[mqveccontent],	
 		compressMe,
 		title='Compressing Text'
 	)
 	
-	#TAOTODO: Convert tags into a numeric vector
+	# Convert tags into a numeric vector
+	mqvectag  = rabbit.create('localhost','pantip-vectag')
+	tagHasher = taghasher.safe_load(
+		TAG_HASHER_PATH,
+		n_feature=128
+	)
+	hashtagMe = taghasher.hash(tagHasher,learn=True)
+	DP.pipe(
+		tags,
+		[mqvectag],
+		hashtagMe,
+		title='Vectorising Tags'
+	)
 
-
+	#TAOTODO:
 	rabbit.end_multiple([mqtags,mqcluster,mqsrc])
+	rabbit.end_multiple([mqvectag,mqveccontent])
 
 
 	#TAOTODO: Save trained models / vectoriser / classifiers
 	#topicHasher
 	#contentClf
 	#topicCompressor	
+	#tagHasher
 
 	pass
 

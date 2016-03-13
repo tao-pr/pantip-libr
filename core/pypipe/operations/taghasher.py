@@ -11,16 +11,24 @@ import json
 from termcolor import colored
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import MaxAbsScaler
+from sklearn.decomposition import NMF
 
 def new(n_feature=128):
 	vectorizer = CountVectorizer(
 		encoding='utf-8',
 		ngram_range=(1,1), # Unigram only
-		max_features=n_feature,
+		max_features=n_feature,	
 		binary=True
 	)
-	#TAOTODO: Binary normaliser?
-	return [vectorizer]
+
+	smoother = NMF(n_components=n_feature)
+
+	# Scaler which scales the feature values by abs max
+	scaler = MaxAbsScaler(copy=True) #Avoid in-place update
+
+	return [vectorizer,smoother,scaler]
 
 
 def save(operations,path):
@@ -49,5 +57,6 @@ def hash(operations,learn=False):
 		else:
 			for i in range(len(operations)): 
 				x = operations[i].transform(x)
+
 		return iter(x)
 	return _hashMe

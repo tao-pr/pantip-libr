@@ -188,7 +188,7 @@ def train_centroid(stopwords):
 		tags,
 		[mqvectag],
 		hashtagMe,
-		title='Vectorising Tags'
+		title='Tag Vectorising'
 	)
 
 	#TAOTODO:
@@ -207,6 +207,10 @@ def train_centroid(stopwords):
 
 
 if __name__ == '__main__':
+
+	# Write a lock file
+	#TAOTODO:
+
 	print(colored('[WORKER STARTED!]','cyan'))
 
 	# Load stop words from text file

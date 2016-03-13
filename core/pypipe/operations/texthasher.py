@@ -8,16 +8,16 @@ import os.path
 import pickle
 import json
 from termcolor import colored
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.linear_model import RidgeClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.preprocessing import Normalizer
+from sklearn.decomposition import NMF
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
-##from sklearn.decomposition import PCA
-
 
 
 # Create a text process pipeline (vectorizer)
@@ -29,6 +29,9 @@ def new(n_components=8,stop_words=[]):
 		stop_words=stop_words
 	)
 
+	# Non-negative matrix factorisation (smoother)
+	smoother = NMF(n_components*2,init='random')
+
 	# Prepare dimentionality reducer
 	svd = TruncatedSVD(n_components)
 
@@ -36,7 +39,12 @@ def new(n_components=8,stop_words=[]):
 	norm = Normalizer(norm='l2') # Cosine similarity 
 
 	# Prepare task pipeline (in order of operation)
-	operations = [idf,svd,norm]
+	operations = [
+		idf,
+		smoother,
+		svd,
+		norm
+	]
 	return operations
 
 def save(operations,path):

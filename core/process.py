@@ -12,6 +12,7 @@ from pydb import couch
 from pprint import pprint
 from queue import Queue
 from termcolor import colored
+from collections import dequeue
 from pypipe import pipe as Pipe
 from pypipe.operations import preprocess
 from pypipe.operations import wordbag
@@ -32,27 +33,46 @@ def execute_background_services(commands):
 		sp = subprocess.Popen(cmd, 
 			shell=True, stdout=subprocess.PIPE,
 			preexec_fn=os.setsid)
-		workers.append(sp.pid)
+		workers.append(sp)
 	return workers
 
 def terminate_background_services(workers):
 	print(colored('Waiting for background services...','green'))
 	q = Queue(maxsize=1)
 
+	# DEPRECATED:
 	def __timeout(signum,frame):
 		signal.alarm(0) # Cancel further timeout
 		print(colored('Ending background services...','green'))
-		for pid in workers:
-			subprocess.Popen('kill {0}'.format(pid), 
+		for p in workers:
+			subprocess.Popen('kill {0}'.format(p.pid), 
 				shell=True, stdout=subprocess.PIPE)
 		# All done, unlock the queue
 		q.task_done()
 
-	signal.signal(signal.SIGALRM,__timeout)
-	signal.alarm(5) # seconds
-	q.put('wait')
-	q.join() # Block until it timeouts
-	q.get()
+	# Wait for child processes (apart from the ruby server)
+	# to finish
+	wait_list = workers[1:] # The 1st is server, skip it
+
+	while len(wait_list)>0:
+		p = wait_list.pop()
+		try:
+			os.kill(p.pid,0) #This won't force termination if still running
+		except OSError:
+			# @p has already finished and died
+			pass
+		else:
+			# @p is still running
+			wait_list.appendleft(p)
+
+
+	print(colored('All subprocesses finished! Bye','green'))
+
+	# signal.signal(signal.SIGALRM,__timeout)
+	# signal.alarm(10) # seconds
+	# q.put('wait')
+	# q.join() # Block until it timeouts
+	# q.get()
 
 def print_record(rec):
 	print(rec['tags'])

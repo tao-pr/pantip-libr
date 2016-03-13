@@ -205,14 +205,14 @@ def train_centroid(stopwords):
 	mqx_vec     = rabbit.create('localhost','pantip-veccontent')
 	mqx_tag     = rabbit.create('localhost','pantip-vectag')
 	XS = zip(
-		rabbit.iter(mqx_tag),
-		rabbit.iter(mqx_cluster),
-		rabbit.iter(mqx_vec)
+		[x for x in rabbit.iter(mqx_tag)],
+		[x for x in rabbit.iter(mqx_cluster)],
+		[x for x in rabbit.iter(mqx_vec)]
 	)
 	X = [json.loads(a) + [int(b)] + json.loads(c)
 			for a,b,c in XS] # Concatenate vectors
 
-	print(colored('[X]','yellow'))
+	print(colored('[X] ','yellow'),len(X),' samples')
 	for x in X:
 		print('x[{0}] : '.format(len(x)), x[:6], '...')
 

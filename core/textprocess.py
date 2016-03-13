@@ -228,10 +228,23 @@ def train_centroid(stopwords):
 	rabbit.end_multiple([mqy,mqx_cluster,mqx_vec,mqx_tag])
 
 	# Self-validation
+	num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])
+	predict_rate = 100*float(num_correct)/float(len(Y))
 	print(colored('====== TRAINING LABELS =====','magenta'))
 	print(Y)
 	print(colored('========= PREDICTED ========','magenta'))
 	print(list(Y_))
+	print(colored('=========== RESULTS ========','magenta'))
+	print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
+
+	# Report accuracy by each of the labels
+	labels = list(set(Y_))
+	for lbl in labels:
+		samples = [(y,y0) for y,y0 in zip(Y_,Y) if y0==lbl]
+		num_correct = len([1 for y,y0 in samples if y==y0])
+		num_all     = len(samples)
+		accuracy    = 100*float(num_correct)/float(num_all)
+		print('    accuracy class #{0} :    {0:.2f} %'.format(accuracy))
 
 	
 

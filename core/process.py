@@ -12,7 +12,7 @@ from pydb import couch
 from pprint import pprint
 from queue import Queue
 from termcolor import colored
-from collections import dequeue
+from collections import deque
 from pypipe import pipe as Pipe
 from pypipe.operations import preprocess
 from pypipe.operations import wordbag
@@ -50,16 +50,22 @@ def terminate_background_services(workers):
 		# All done, unlock the queue
 		q.task_done()
 
-	# Wait for child processes (apart from the ruby server)
-	# to finish
-	wait_list = workers[1:] # The 1st is server, skip it
+	# Terminate the first subprocess (ruby server)
+	subprocess.Popen('kill {0}'.format(workers[0].pid),
+		shell=True, stdout=subprocess.PIPE)
 
+	# Wait for all child processes to finish
+	# (apart from the ruby server #1st elem)
+	wait_list = deque(workers[1:])
+
+	print('    {0} subprocess to wait for ...'.format(len(wait_list)))
 	while len(wait_list)>0:
 		p = wait_list.pop()
 		try:
 			os.kill(p.pid,0) #This won't force termination if still running
 		except OSError:
 			# @p has already finished and died
+			print('    1 down!')
 			pass
 		else:
 			# @p is still running

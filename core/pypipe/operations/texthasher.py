@@ -29,11 +29,12 @@ def new(n_components=8,stop_words=[]):
 		stop_words=stop_words
 	)
 
-	# Non-negative matrix factorisation (smoother)
-	smoother = NMF(n_components*2,init='random')
-
 	# Prepare dimentionality reducer
 	svd = TruncatedSVD(n_components)
+
+	# Non-negative matrix factorisation (smoother)
+	smoother = NMF(init='random')
+
 
 	# Prepare normaliser
 	norm = Normalizer(norm='l2') # Cosine similarity 
@@ -41,7 +42,7 @@ def new(n_components=8,stop_words=[]):
 	# Prepare task pipeline (in order of operation)
 	operations = [
 		idf,
-		smoother,
+		##smoother, TAODEBUG: This causes suspension
 		svd,
 		norm
 	]

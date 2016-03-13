@@ -56,6 +56,8 @@ def terminate_background_services(workers):
 
 	# Wait for the rest
 	wait_list  = workers[1:]
+	pids       = [str(p.pid) for p in wait_list]
+	print('waiting for : {0}'.format(','.join(pids)))
 	exit_codes = [subp.wait() for subp in wait_list]
 
 
@@ -87,7 +89,7 @@ if __name__ == '__main__':
 	# Execute list of required background services
 	services = [
 		'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR),
-		'python3 {0}/core/textprocess.py > textprocess.log'.format(REPO_DIR)
+		##TAODEBUG:'python3 {0}/core/textprocess.py > textprocess.log'.format(REPO_DIR)
 		]
 	workers  = execute_background_services(services)
 

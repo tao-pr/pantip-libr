@@ -42,7 +42,6 @@ def __request(input0):
 
 	client.close()
 
-	# TAODEBUG:
 	print(colored('{Tokenizer received:}','white'))
 	print(colored(output,'white'))
 

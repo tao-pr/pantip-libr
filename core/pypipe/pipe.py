@@ -57,6 +57,6 @@ def operate(pipe,input0):
 		pipe.result = out # Memorise the latest output for chaining purpose
 		pipe.then(out)
 	else:
-		print('[Then] is not supplied.') # TAODEBUG:
+		print('[Then] is not supplied.')
 
 

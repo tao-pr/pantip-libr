@@ -115,7 +115,7 @@ def train_centroid(stopwords):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=512,
+		n_components=720,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -135,7 +135,10 @@ def train_centroid(stopwords):
 	# Cluster the vectorised records with unsupervised clf
 	mqsrc = rabbit.create('localhost','pantip-vector1')
 	mqdst = [rabbit.create('localhost','pantip-cluster')]
-	contentClf = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=5)
+	contentClf = textcluster.safe_load(
+		CONTENT_CLUSTER_PATH,
+		n_labels=8
+	)
 	clusterMe  = textcluster.classify(contentClf,learn=True)
 
 	# Classification doesn't accept a generator,
@@ -169,7 +172,7 @@ def train_centroid(stopwords):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=8 #TAOTODO: Change to 64 for larger space
+		n_components=100
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
@@ -183,7 +186,7 @@ def train_centroid(stopwords):
 	mqvectag  = rabbit.create('localhost','pantip-vectag')
 	tagHasher = taghasher.safe_load(
 		TAG_HASHER_PATH,
-		n_feature=32
+		n_feature=30
 	)
 	hashtagMe = taghasher.hash(tagHasher,learn=True)
 	DP.pipe(
@@ -195,6 +198,9 @@ def train_centroid(stopwords):
 
 	rabbit.end_multiple([mqtags,mqcluster,mqsrc])
 	rabbit.end_multiple([mqvectag,mqveccontent])
+
+	# STEP#3
+	#----------------------------------------
 
 	# Join each of the component together
 	# Assembly a training vector

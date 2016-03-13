@@ -9,8 +9,7 @@ from sklearn.cluster import KMeans
 
 def new(n_labels=10):
 	kmeans = KMeans(
-		n_clusters = n_labels,
-		n_jobs = 2
+		n_clusters = n_labels
 	)
 
 	return kmeans

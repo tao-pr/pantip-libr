@@ -21,7 +21,7 @@ from sklearn.decomposition import TruncatedSVD
 
 
 # Create a text process pipeline (vectorizer)
-def new(n_components=8,stop_words=[]):
+def new(n_components=None,stop_words=[]):
 
 	# Prepare vectoriser engines
 	idf = TfidfVectorizer(
@@ -29,24 +29,17 @@ def new(n_components=8,stop_words=[]):
 		stop_words=stop_words
 	)
 
-	# Prepare dimentionality reducer
-	svd = TruncatedSVD(n_components)
-
-	# Non-negative matrix factorisation (smoother)
-	smoother = NMF(init='random')
-
-
 	# Prepare normaliser
 	norm = Normalizer(norm='l2') # Cosine similarity 
 
-	# Prepare task pipeline (in order of operation)
-	operations = [
-		idf,
-		##smoother, TAODEBUG: This causes suspension
-		svd,
-		norm
-	]
-	return operations
+	# Prepare dimentionality reducer
+	if n_components:
+		svd = TruncatedSVD(n_components)
+		return [idf,svd,norm]
+	else:
+		svd = TruncatedSVD()
+		return [idf,norm]
+
 
 def save(operations,path):
 	with open(path,'wb+') as f:

@@ -115,7 +115,7 @@ def train_centroid(stopwords):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=720,
+		n_components=800,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -137,13 +137,14 @@ def train_centroid(stopwords):
 	mqdst = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
-		n_labels=8
+		n_labels=5
 	)
 	clusterMe  = textcluster.classify(contentClf,learn=True)
 
 	# Classification doesn't accept a generator,
 	# So we need to roll the matrix out of the MQ
 	srcmatrix = [np.array(json.loads(x)) for x in rabbit.iter(mqsrc)]
+	rabbit.end(mqsrc)
 	DP.pipe(
 		srcmatrix,
 		mqdst,
@@ -151,7 +152,6 @@ def train_centroid(stopwords):
 		title='Clustering'
 	)
 
-	rabbit.end(mqsrc)
 	rabbit.end_multiple(mqdst)
 
 	print(colored('#STEP-1 finished ...','cyan'))
@@ -186,7 +186,7 @@ def train_centroid(stopwords):
 	mqvectag  = rabbit.create('localhost','pantip-vectag')
 	tagHasher = taghasher.safe_load(
 		TAG_HASHER_PATH,
-		n_feature=30
+		n_feature=8
 	)
 	hashtagMe = taghasher.hash(tagHasher,learn=True)
 	DP.pipe(

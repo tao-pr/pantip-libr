@@ -198,7 +198,7 @@ def train_centroid(stopwords):
 
 	# Join each of the component together
 	# Assembly a training vector
-	mqy = rabbit.create('localhost','pantip-x2')
+	mqy = rabbit.create('localhost','pantip-x3')
 	Y = [y for y in rabbit.iter(mqy,take_sentiment_score)]
 
 	mqx_cluster = rabbit.create('localhost','pantip-cluster')

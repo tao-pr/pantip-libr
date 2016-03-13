@@ -97,7 +97,7 @@ if __name__ == '__main__':
 	time.sleep(1)
 
 	# Prepare MQs for training sources
-	qs = ['pantip-x1','pantip-x2']
+	qs = ['pantip-x1','pantip-x2','pantip-x3']
 	mqs = [rabbit.create('localhost',q) for q in qs]
 
 	# Prepare the processing pipeline (order matters)

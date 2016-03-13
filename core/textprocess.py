@@ -250,7 +250,7 @@ def train_centroid(stopwords):
 		num_correct = len([1 for y,y0 in samples if y==y0])
 		num_all     = len(samples)
 		accuracy    = 100*float(num_correct)/float(num_all)
-		print('    accuracy class #{0} :    {0:.2f} %'.format(lbl,accuracy))
+		print('    accuracy class #{0} :    {1:.2f} %'.format(lbl,accuracy))
 
 	
 

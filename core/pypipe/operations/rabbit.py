@@ -30,6 +30,15 @@ def create(server_addr,q):
 	feeder = Feeder(conn,channel,q)
 	return feeder
 
+def purge(feeder,qlist):
+	conn,channel,q = feeder.components()
+	for q in qlist:
+		try:
+			channel.queue_purge(q)
+		except pika.exceptions.ChannelClosed:
+			# Q is not up, but we ignore the unwanted error
+			pass
+
 # @param {list} of feeders
 # @return {Record} it remains unchanged 
 def feed(feeders):

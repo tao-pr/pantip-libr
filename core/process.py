@@ -56,20 +56,21 @@ def terminate_background_services(workers):
 
 	# Wait for all child processes to finish
 	# (apart from the ruby server #1st elem)
-	wait_list = deque(workers[1:])
+	wait_list = deque([p.pid for p in workers[1:]])
 
 	print('    {0} subprocess to wait for ...'.format(len(wait_list)))
+	print('    \n'.join([str(p) for p in wait_list]))
 	while len(wait_list)>0:
-		p = wait_list.pop()
+		pid = wait_list.pop()
 		try:
-			os.kill(p.pid,0) #This won't force termination if still running
+			os.kill(pid,0) #This won't force termination if still running
 		except OSError:
 			# @p has already finished and died
 			print('    1 down!')
 			pass
 		else:
 			# @p is still running
-			wait_list.appendleft(p)
+			wait_list.appendleft(pid)
 
 
 	print(colored('All subprocesses finished! Bye','green'))
@@ -88,6 +89,7 @@ def process_with(pipe):
 	def f(input0):
 		Pipe.operate(pipe,input0)
 	return f
+	
 
 if __name__ == '__main__':
 	# Prepare the database server connection
@@ -109,8 +111,6 @@ if __name__ == '__main__':
 	# Prepare MQs for training sources
 	qs = ['pantip-x1','pantip-x2']
 	mqs = [rabbit.create('localhost',q) for q in qs]
-
-	#TAOTODO: Empty the MQs before starting
 
 	# Prepare the processing pipeline (order matters)
 	pipe = Pipe.new('preprocess',[])

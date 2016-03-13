@@ -12,14 +12,18 @@ from pypipe import datapipe as DP
 from pypipe.operations import rabbit
 from pypipe.operations import tapper as T
 from pypipe.operations import cluster
-from pypipe.operations import textcluster
 from pypipe.operations import texthasher
+from pypipe.operations import compressor
+from pypipe.operations import textcluster
+
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
-TEXT_TRANSFORMER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
-TEXT_CLUSTER_PATH = '{0}/data/cluster/00'.format(REPO_DIR)
-CONTENT_CLUSTER_PATH = '{0}/data/cluster/22'.format(REPO_DIR)
-STOPWORDS_PATH = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
+TEXT_VECTORIZER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
+VECT_COMPRESSOR_PATH  = '{0}/data/hasher/22'.format(REPO_DIR)
+TEXT_CLUSTER_PATH     = '{0}/data/cluster/00'.format(REPO_DIR)
+CONTENT_CLUSTER_PATH  = '{0}/data/cluster/22'.format(REPO_DIR)
+STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
+
 
 def load_stopwords():
 	if (os.path.isfile(STOPWORDS_PATH)):
@@ -103,9 +107,13 @@ def train_centroid(stopwords):
 	mqsrc  = rabbit.create('localhost','pantip-x1')
 	mqdst  = [
 		rabbit.create('localhost','pantip-vector1'),
-		rabbit.create('localhost','pantip-y1')
+		rabbit.create('localhost','pantip-vector2')
 	]
-	topicHasher = texthasher.safe_load(TEXT_TRANSFORMER_PATH)
+	topicHasher = texthasher.safe_load(
+		TEXT_VECTORIZER_PATH,
+		n_components=512,
+		stop_words=stopwords
+	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
 
 	print(colored('#STEP-1 started ...','cyan'))
@@ -141,24 +149,42 @@ def train_centroid(stopwords):
 
 	print(colored('#STEP-1 finished ...','cyan'))
 
-	# TAOTODO:
+
 	# STEP#2
 	# ---------------------------------------------
 	# Assembly training vector and sentiment labels
 	mqtags    = rabbit.create('localhost','pantip-x2') # User tags
 	mqcluster = rabbit.create('localhost','pantip-cluster') # Cluster results
-	mqsrc     = rabbit.create('localhost','pantip-vector1') # Hash matrix
+	mqsrc     = rabbit.create('localhost','pantip-vector2') # Hash matrix
 
 	tags     = rabbit.iter(mqtags,take_tags)
 	clusters = rabbit.iter(mqcluster)
 	matV     = rabbit.iter(mqsrc)
 
-	#TAOTODO: Decomposite @matV with SVD
-	#TAOTODO: Convert tags into a numeric vector
+	# Decompose @matV with SVD
+	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
+	topicCompressor = compressor.safe_load(
+		VECT_COMPRESSOR_PATH,
+		n_components=16
+	)
+	compressMe = compressor.compress(topicCompressor,learn=True)
+	DP.pipe(
+		matV,
+		mqveccontent,	
+		compressMe,
+		title='Compressing Text'
+	)
 	
+	#TAOTODO: Convert tags into a numeric vector
 
 
 	rabbit.end_multiple([mqtags,mqcluster,mqsrc])
+
+
+	#TAOTODO: Save trained models / vectoriser / classifiers
+	#topicHasher
+	#contentClf
+	#topicCompressor	
 
 	pass
 

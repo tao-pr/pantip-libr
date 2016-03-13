@@ -17,10 +17,13 @@ from sklearn.decomposition import TruncatedSVD
 
 
 # Create a text process pipeline (vectorizer)
-def new(n_components=8):
+def new(n_components=None):
 
 	# Prepare dimentionality reducer
-	svd = TruncatedSVD(n_components)
+	if n_components is None:
+		svd = TruncatedSVD()
+	else:
+		svd = TruncatedSVD(n_components)
 
 	# Prepare normaliser
 	norm = Normalizer(norm='l2') # Cosine similarity 

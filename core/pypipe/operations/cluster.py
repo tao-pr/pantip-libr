@@ -9,13 +9,8 @@ from sklearn.cluster import KMeans
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
 def new():
-	# kmean = KMeans(
-	# 	n_clusters=num_class,
-	# 	max_iter=64,
-	# 	n_init=1
-	# 	)
 	nc = NearestCentroid(
-		metric='euclidean',
+		metric='euclidean',#TAOTODO: Any better metric?
 		shrink_threshold=None
 	)
 
@@ -42,7 +37,7 @@ def analyze(clf,labels=None):
 	def _do(matrix):
 		if labels:  # Learning mode
 			clf.fit(matrix,labels)
-			return matrix
+			return clf.predict(matrix)
 		else: # Classification mode
 			y = clf.predict(matrix)
 			return iter(y)

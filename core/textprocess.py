@@ -24,7 +24,9 @@ VECT_COMPRESSOR_PATH  = '{0}/data/hasher/22'.format(REPO_DIR)
 TAG_HASHER_PATH       = '{0}/data/hasher/33'.format(REPO_DIR)
 TEXT_CLUSTER_PATH     = '{0}/data/cluster/00'.format(REPO_DIR)
 CONTENT_CLUSTER_PATH  = '{0}/data/cluster/22'.format(REPO_DIR)
+CLF_PATH              = '{0}/data/cluster/ff'.format(REPO_DIR)
 STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
+
 
 
 def load_stopwords():
@@ -167,7 +169,7 @@ def train_centroid(stopwords):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=16
+		n_components=8 #TAOTODO: Change to 64 for larger space
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
@@ -181,7 +183,7 @@ def train_centroid(stopwords):
 	mqvectag  = rabbit.create('localhost','pantip-vectag')
 	tagHasher = taghasher.safe_load(
 		TAG_HASHER_PATH,
-		n_feature=128
+		n_feature=32
 	)
 	hashtagMe = taghasher.hash(tagHasher,learn=True)
 	DP.pipe(
@@ -191,9 +193,45 @@ def train_centroid(stopwords):
 		title='Tag Vectorising'
 	)
 
-	#TAOTODO:
 	rabbit.end_multiple([mqtags,mqcluster,mqsrc])
 	rabbit.end_multiple([mqvectag,mqveccontent])
+
+	# Join each of the component together
+	# Assembly a training vector
+	mqy = rabbit.create('localhost','pantip-x2')
+	Y = [y for y in rabbit.iter(mqy,take_sentiment_score)]
+
+	mqx_cluster = rabbit.create('localhost','pantip-cluster')
+	mqx_vec     = rabbit.create('localhost','pantip-veccontent')
+	mqx_tag     = rabbit.create('localhost','pantip-vectag')
+	X = zip(
+		rabbit.iter(mqx_tag),
+		rabbit.iter(mqx_cluster),
+		rabbit.iter(mqx_vec)
+	)
+
+	# Train!
+	print(colored('Training process started...','cyan'))
+
+	#TAODEBUG:
+	print('Y:')
+	print(Y)
+
+	clf     = cluster.safe_load(CLF_PATH)
+	trainMe = cluster.analyze(clf,labels=Y)
+	Y_      = trainMe(X)
+	print(colored('[DONE]','yellow'))
+
+	rabbit.end_multiple([mqy,mqx_cluster,mqx_vec,mqx_tag])
+
+	# Self-validation
+
+	#TAODEBUG:
+	print(colored('========= OUTPUT ========','magenta'))
+	print(Y_)
+
+
+	
 
 
 	#TAOTODO: Save trained models / vectoriser / classifiers
@@ -201,6 +239,7 @@ def train_centroid(stopwords):
 	#contentClf
 	#topicCompressor	
 	#tagHasher
+	#clf
 
 	pass
 

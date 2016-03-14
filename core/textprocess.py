@@ -56,14 +56,14 @@ def take_sentiment_score(record):
 	negatives = sum([v[1] for v in data['emoti'] if v[0] in ['สยอง']])
 
 	# Classify by degree of attention & sentiments
-	if negatives > positives*0.67: # Negative
+	if negatives >= 3: # Negative
 		return -1 # People dislike this
-	if vote + positives + negatives == 0  or vote<10:
+	if vote + positives + negatives == 0:
 		return 0 # Nobody cares
-	if vote < 100: # Many people love it
+	if vote < 12: # Some like it
 		return 1
 	else:
-		return 10 # Awesome post
+		return 10 # Popular post
 
 	
 def validate(predicted,truth):
@@ -85,7 +85,7 @@ def conclude_validation(results):
 	print(colored('=================','cyan'))
 
 # Train the centroid clustering
-def train_centroid(stopwords):
+def train_centroid(stopwords,save=False):
 
 	"""
 	STEP#1 :: Cluster topic with unsupervised classification
@@ -113,7 +113,7 @@ def train_centroid(stopwords):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=1000,
+		n_components=2048,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -135,7 +135,7 @@ def train_centroid(stopwords):
 	mqdst = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
-		n_labels=8
+		n_labels=3
 	)
 	clusterMe  = textcluster.classify(contentClf,learn=True)
 
@@ -170,7 +170,7 @@ def train_centroid(stopwords):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=256
+		n_components=1024
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
@@ -248,19 +248,21 @@ def train_centroid(stopwords):
 		num_correct = len([1 for y,y0 in samples if y==y0])
 		num_all     = len(samples)
 		accuracy    = 100*float(num_correct)/float(num_all)
-		print('    accuracy class #{0} :    {1:.2f} %'.format(lbl,accuracy))
-
+		print('    accuracy class #{0} :    {1:.2f} % (out of {2} cases)'.format(lbl,accuracy,num_all))
+ 
+	#TAOTODO: Plot the distribution of votes & reactions
 	
 
 
-	#TAOTODO: Save trained models / vectoriser / classifiers
-	#topicHasher
-	#contentClf
-	#topicCompressor	
-	#tagHasher
-	#clf
-
-	pass
+	#Save the trained models
+	if save:
+		print(colored('Saving models...','cyan'))
+		hasher.save(topicHasher,TEXT_VECTORIZER_PATH)
+		textcluster.save(contentClf,CONTENT_CLUSTER_PATH)
+		compressor.save(topicCompressor,VECT_COMPRESSOR_PATH)
+		taghasher.save(tagHasher,TAG_HASHER_PATH)
+		cluster.save(clf,CLF_PATH)
+		print(colored('[DONE]','green'))
 
 
 

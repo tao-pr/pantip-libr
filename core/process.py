@@ -89,7 +89,7 @@ if __name__ == '__main__':
 	# Execute list of required background services
 	services = [
 		'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR),
-		'python3 {0}/core/textprocess.py'.format(REPO_DIR)
+		##'python3 {0}/core/textprocess.py'.format(REPO_DIR)
 		]
 	workers  = execute_background_services(services)
 

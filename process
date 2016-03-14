@@ -1,3 +1,4 @@
 #!/bin/bash
 
 python3 core/process.py
+pyhton3 core/textprocess.py

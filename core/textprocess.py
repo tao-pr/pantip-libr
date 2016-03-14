@@ -106,8 +106,8 @@ def train_centroid(stopwords,save=False):
 	# STEP#1
 	#------------------------------------
 	# Vectorise the input topic (text only) 
-	mqsrc  = rabbit.create('localhost','pantip-x1')
-	mqdst  = [
+	mqx1     = rabbit.create('localhost','pantip-x1')
+	mqvec12  = [
 		rabbit.create('localhost','pantip-vector1'),
 		rabbit.create('localhost','pantip-vector2')
 	]
@@ -121,18 +121,15 @@ def train_centroid(stopwords,save=False):
 	print(colored('#STEP-1 started ...','cyan'))
 	print('hasher : {0}'.format(topicHasher))
 	DP.pipe(
-		rabbit.iter(mqsrc,take_x1),
-		mqdst,
+		rabbit.iter(mqx1,take_x1),
+		mqvec12,
 		hashMe,
 		title='Vectorisation'
 	)
 
-	rabbit.end(mqsrc)
-	rabbit.end_multiple(mqdst)
-
 	# Cluster the vectorised records with unsupervised clf
-	mqsrc = rabbit.create('localhost','pantip-vector1')
-	mqdst = [rabbit.create('localhost','pantip-cluster')]
+	mqvec1 = rabbit.create('localhost','pantip-vector1')
+	mqcluster = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
 		n_labels=4
@@ -141,18 +138,22 @@ def train_centroid(stopwords,save=False):
 
 	# Classification doesn't accept a generator,
 	# So we need to roll the matrix out of the MQ
-	srcmatrix = [np.array(json.loads(x)) for x in rabbit.iter(mqsrc)]
-	rabbit.end(mqsrc)
+	srcmatrix = [np.array(json.loads(x)) for x in rabbit.iter(mqvec1)]
+	
 	DP.pipe(
 		srcmatrix,
-		mqdst,
+		mqcluster,
 		clusterMe,
 		title='Clustering'
 	)
 
-	rabbit.end_multiple(mqdst)
-
 	print(colored('#STEP-1 finished ...','cyan'))
+
+
+	rabbit.end(mqx1)
+	rabbit.end_multiple(mqvec12)
+	rabbit.end(mqvec1)
+	rabbit.end_multiple(mqcluster)
 
 
 	# STEP#2

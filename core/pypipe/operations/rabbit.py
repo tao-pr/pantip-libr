@@ -62,7 +62,7 @@ def feed(feeders):
 
 # Message generator
 def iter(feeder,transformation=lambda x:x):
-	TIMEOUT = 3 # seconds
+	TIMEOUT = 5 # seconds
 	# Start the awaiting signal
 	try:
 		def __timeout(signum,frame):

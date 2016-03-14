@@ -14,16 +14,14 @@ sports, movies, and lots of others.
 
 ---
 
-## Why Pantip Librarian?
+## What does this do?
 
-At a glance, Pantip is quite friendly to simple web crawlers 
-as it uses `unique number` in the URL to identify a particular 
-thread. By changing this number, you simply access another topic.
-This is super simple.
-
-Pantip Librarian is a quick prototype of Q&A site crawler 
-which scrapes the content of a range of topics on Pantip site 
-and analyses the popularity factors over the scraped data.
+Pantip Librarian downloads and analyses a bulk of 
+Pantip's user-generated questions and answers with 
+text mining techniques. The ultimate purpose (experimentally) 
+of the project is to extract and capture potential 
+patterns which make the question popular or 
+negatively reacted by the users.
 
 ---
 
@@ -108,6 +106,13 @@ of the repo.
 | 1 | core/process.py | Tokenise the downloaded records and push to MQ
 | 2 | core/textprocess.py | Takes the dataset out of MQ and runs machine learning
 
+---
+
+## Caveat
+
+The process takes slightly high computational power. 
+It probably breaks on some workstations due to 
+computational capability shortage. YMMV.
 
 ---
 

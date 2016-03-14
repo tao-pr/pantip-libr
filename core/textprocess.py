@@ -56,14 +56,12 @@ def take_sentiment_score(record):
 	negatives = sum([v[1] for v in data['emoti'] if v[0] in ['สยอง']])
 
 	# Classify by degree of attention & sentiments
-	if vote + positives + negatives == 0:
-		return 0 # Nobody cares
 	if negatives > positives*0.67: # Negative
 		return -1 # People dislike this
-	if vote < 20: # Some people like it
-		return 1
+	if vote + positives + negatives == 0  or vote<10:
+		return 0 # Nobody cares
 	if vote < 100: # Many people love it
-		return 5
+		return 1
 	else:
 		return 10 # Awesome post
 
@@ -115,7 +113,7 @@ def train_centroid(stopwords):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=800,
+		n_components=1000,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -137,7 +135,7 @@ def train_centroid(stopwords):
 	mqdst = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
-		n_labels=5
+		n_labels=8
 	)
 	clusterMe  = textcluster.classify(contentClf,learn=True)
 
@@ -172,7 +170,7 @@ def train_centroid(stopwords):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=100
+		n_components=256
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
@@ -186,7 +184,7 @@ def train_centroid(stopwords):
 	mqvectag  = rabbit.create('localhost','pantip-vectag')
 	tagHasher = taghasher.safe_load(
 		TAG_HASHER_PATH,
-		n_feature=8
+		n_feature=16
 	)
 	hashtagMe = taghasher.hash(tagHasher,learn=True)
 	DP.pipe(

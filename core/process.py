@@ -89,7 +89,7 @@ if __name__ == '__main__':
 	# Execute list of required background services
 	services = [
 		'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR),
-		'python3 {0}/core/textprocess.py > textprocess.log'.format(REPO_DIR)
+		'python3 {0}/core/textprocess.py'.format(REPO_DIR)
 		]
 	workers  = execute_background_services(services)
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe),limit=3000)
+	couch.each_do(db,process_with(pipe),limit=2400)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]

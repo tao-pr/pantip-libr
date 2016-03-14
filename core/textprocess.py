@@ -135,7 +135,7 @@ def train_centroid(stopwords,save=False):
 	mqdst = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
-		n_labels=3
+		n_labels=4
 	)
 	clusterMe  = textcluster.classify(contentClf,learn=True)
 
@@ -170,7 +170,7 @@ def train_centroid(stopwords,save=False):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=1024
+		n_components=728
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(

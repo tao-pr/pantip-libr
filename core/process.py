@@ -54,8 +54,11 @@ def terminate_background_services(workers):
 	subprocess.Popen('kill {0}'.format(workers[0].pid),
 		shell=True, stdout=subprocess.PIPE)
 
+
 	# Wait for the rest
 	wait_list  = workers[1:]
+	if len(wait_list)==0: return
+
 	pids       = [str(p.pid) for p in wait_list]
 	print('waiting for : {0}'.format(','.join(pids)))
 	exit_codes = [subp.wait() for subp in wait_list]

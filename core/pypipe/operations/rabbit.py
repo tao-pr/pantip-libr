@@ -90,7 +90,7 @@ def iter(feeder,transformation=lambda x:x):
 		raise
 
 def end(feeder):
-	print(colored('Ending MQ #','silver'),feeder.q)
+	print(colored('Ending MQ #','white'),feeder.q)
 	conn,channel,q = feeder.components()
 	conn.close()
 

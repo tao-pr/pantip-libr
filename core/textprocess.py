@@ -85,7 +85,7 @@ def conclude_validation(results):
 	print(colored('=================','cyan'))
 
 # Train the centroid clustering
-def train_centroid(stopwords,save=False):
+def train_sentiment_capture(stopwords,save=False):
 
 	"""
 	STEP#1 :: Cluster topic with unsupervised classification
@@ -113,7 +113,7 @@ def train_centroid(stopwords,save=False):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=1036,
+		n_components=1024,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -171,7 +171,7 @@ def train_centroid(stopwords,save=False):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=728
+		n_components=625
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
@@ -276,7 +276,7 @@ if __name__ == '__main__':
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
-	output = train_centroid(stopwords)
+	output = train_sentiment_capture(stopwords)
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

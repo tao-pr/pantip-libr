@@ -113,7 +113,7 @@ def train_centroid(stopwords,save=False):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=1800,
+		n_components=1036,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -126,6 +126,9 @@ def train_centroid(stopwords,save=False):
 		hashMe,
 		title='Vectorisation'
 	)
+
+	rabbit.end(mqx1)
+	rabbit.end_multiple(mqvec12)
 
 	# Cluster the vectorised records with unsupervised clf
 	mqvec1 = rabbit.create('localhost','pantip-vector1')
@@ -149,9 +152,6 @@ def train_centroid(stopwords,save=False):
 
 	print(colored('#STEP-1 finished ...','cyan'))
 
-
-	rabbit.end(mqx1)
-	rabbit.end_multiple(mqvec12)
 	rabbit.end(mqvec1)
 	rabbit.end_multiple(mqcluster)
 

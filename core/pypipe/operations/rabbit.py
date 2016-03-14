@@ -52,10 +52,14 @@ def feed(feeders):
 			else:
 				data = json.dumps(record,ensure_ascii=False)
 
-			channel.basic_publish(
-				exchange='',
-				routing_key=q,
-				body=data)
+			try:
+				channel.basic_publish(
+					exchange='',
+					routing_key=q,
+					body=data)
+			except Exception:
+				print(colored('ERROR publishing to MQ #','red'),q)
+				raise
 		return record
 	return feed_message
 

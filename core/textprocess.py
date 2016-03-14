@@ -113,7 +113,7 @@ def train_centroid(stopwords,save=False):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=2048,
+		n_components=1800,
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)

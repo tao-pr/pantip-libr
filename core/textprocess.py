@@ -250,16 +250,16 @@ def train_sentiment_capture(stopwords,save=False):
 		accuracy    = 100*float(num_correct)/float(num_all)
 		
 		print('    accuracy class #{0} :    {1:.2f} % (out of {2} cases)'.format(lbl,accuracy,num_all))
-		lbl_predict_rate.append('{0:.2f}'.format(accuracy))
+		lbl_predict_rate.append('{0:.2f}'.format(accuracy).center(7))
 	
 	
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
-		csv.write('{0},{1},{2},{3:.2f},{4}\n'.format(
-			args['dim'], #0
-			args['kcluster'], #1,
-			args['tagdim'], #2
-			predict_rate, #3
+		csv.write('{0},{1},{2},{3},{4}\n'.format(
+			str(args['dim']).center(4), #0
+			str(args['kcluster']).center(3), #1,
+			str(args['tagdim']).center(5), #2
+			'{0:.2f}'.format(predict_rate).center(7), #3
 			','.join(lbl_predict_rate) #4
 		))
 	

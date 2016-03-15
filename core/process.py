@@ -101,7 +101,7 @@ if __name__ == '__main__':
 	time.sleep(1)
 
 	# These are MQs we'll push preprocessed records to
-	qs = ['pantip-x1','pantip-x2','pantip-x3']
+	qs = ['pantip-x1','pantip-x2','pantip-x3','pantip-x0']
 	mqs = [rabbit.create('localhost',q) for q in qs]
 
 	# Prepare the processing pipeline (order matters)

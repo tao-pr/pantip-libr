@@ -42,12 +42,12 @@ def purge(feeder,qlist):
 # @param {list} of feeders
 # @return {Record} it remains unchanged 
 def feed(feeders):
-	def feed_message(record):
+	def feed_message(record,no_parse=False):
 		for feeder in feeders:
 			conn,channel,q = feeder.components()
 			
 			# Make sure the data type is compatible
-			if isinstance(record,str):
+			if isinstance(record,str) or no_parse:
 				data = record
 			else:
 				data = json.dumps(record,ensure_ascii=False)

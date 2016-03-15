@@ -4,8 +4,8 @@ Source MQ requeue task
 """
 
 from pypipe import pipe as Pipe
-from pypipe import datapipe as DP
 from pypipe.operations import rabbit
+import json
 
 if __name__ == '__main__':
 	qsrc = rabbit.create('localhost','pantip-x0')
@@ -13,13 +13,9 @@ if __name__ == '__main__':
 
 	# Requeue!
 	print('Requeuing ...')
-	DP.pipe(
-		rabbit.iter(qsrc),
-		qdst,
-		lambda x:x,
-		'Requeue'	
-	)
-
+	for m in rabbit.iter(qsrc):
+		rabbit.feed(qdst)(m)
+	
 	# Bye all queues!
 	rabbit.end_multiple(qdst)
 	print('[DONE] All input queues are recycled.')

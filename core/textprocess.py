@@ -281,7 +281,7 @@ def train_sentiment_capture(stopwords,save=False):
 			args['kcluster'], #3,
 			args['tagdim'], #4
 			predict_rate, #5
-			lbl_predict_rate.join(',') #6
+			','.join(lbl_predict_rate) #6
 		))
 	
 

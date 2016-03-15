@@ -4,7 +4,9 @@ Text processing worker
 """
 
 import os
+import sys
 import json
+import argparse
 import numpy as np
 from termcolor import colored
 from pypipe import pipe as Pipe
@@ -26,8 +28,15 @@ TEXT_CLUSTER_PATH     = '{0}/data/cluster/00'.format(REPO_DIR)
 CONTENT_CLUSTER_PATH  = '{0}/data/cluster/22'.format(REPO_DIR)
 CLF_PATH              = '{0}/data/cluster/ff'.format(REPO_DIR)
 STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
+CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
-
+# Prepare training arguments
+arguments = argparse.ArgumentParser()
+arguments.add_argument('--predim', type=int, default=800) # Dimension of preprocess text hasher
+arguments.add_argument('--kcluster', type=int, default=4) # Number of text cluster
+arguments.add_argument('--postdim', type=int, default=625) # Dimension of postprocess text hasher
+arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
+args = vars(arguments.parse_args(sys.argv[1:]))
 
 def load_stopwords():
 	if (os.path.isfile(STOPWORDS_PATH)):
@@ -103,6 +112,15 @@ def train_sentiment_capture(stopwords,save=False):
 
 	"""
 
+	print(colored('==============================','cyan'))
+	print(colored('  SENTIMENT TRAINING','cyan'))
+	print()
+	print(colored('  predim   : {0}'.format(args['predim']),'cyan'))
+	print(colored('  postdim  : {0}'.format(args['postdim']),'cyan'))
+	print(colored('  kcluster : {0}'.format(args['kcluster']),'cyan'))
+	print(colored('  tagdim   : {0}'.format(args['tagdim']),'cyan'))
+	print(colored('==============================','cyan'))
+
 	# STEP#1
 	#------------------------------------
 	# Vectorise the input topic (text only) 
@@ -113,7 +131,7 @@ def train_sentiment_capture(stopwords,save=False):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=800,
+		n_components=args['predim'],
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -135,7 +153,7 @@ def train_sentiment_capture(stopwords,save=False):
 	mqcluster = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
-		n_labels=4
+		n_labels=args['kcluster']
 	)
 	clusterMe  = textcluster.classify(contentClf,learn=True)
 
@@ -171,7 +189,7 @@ def train_sentiment_capture(stopwords,save=False):
 	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
 	topicCompressor = compressor.safe_load(
 		VECT_COMPRESSOR_PATH,
-		n_components=625
+		n_components=args['postdim']
 	)
 	compressMe = compressor.compress(topicCompressor,learn=True)
 	DP.pipe(
@@ -185,7 +203,7 @@ def train_sentiment_capture(stopwords,save=False):
 	mqvectag  = rabbit.create('localhost','pantip-vectag')
 	tagHasher = taghasher.safe_load(
 		TAG_HASHER_PATH,
-		n_feature=16
+		n_feature=args['tagdim']
 	)
 	hashtagMe = taghasher.hash(tagHasher,learn=True)
 	DP.pipe(
@@ -244,16 +262,28 @@ def train_sentiment_capture(stopwords,save=False):
 
 	# Report accuracy by each of the labels
 	labels = list(set(Y_))
+	lbl_predict_rate = []
 	for lbl in labels:
 		samples = [(y,y0) for y,y0 in zip(Y_,Y) if y0==lbl]
 		num_correct = len([1 for y,y0 in samples if y==y0])
 		num_all     = len(samples)
 		accuracy    = 100*float(num_correct)/float(num_all)
+		
 		print('    accuracy class #{0} :    {1:.2f} % (out of {2} cases)'.format(lbl,accuracy,num_all))
- 
-	#TAOTODO: Plot the distribution of votes & reactions
+		lbl_predict_rate.append('{0:.2f}'.format(accuracy))
 	
-
+	
+	# Record the training accuracy to the CSV
+	with open(CSV_REPORT_PATH,'a') as csv:
+		csv.write('{0},{1},{3},{4},{5:.2f},{6}\n'.format(
+			args['predim'], #0
+			args['postdim'], #2,
+			args['kcluster'], #3,
+			args['tagdim'], #4
+			predict_rate, #5
+			lbl_predict_rate.join(',') #6
+		))
+	
 
 	#Save the trained models
 	if save:

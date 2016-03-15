@@ -1,4 +1,16 @@
 #!/bin/bash
 
+# Prepare report CSV
+CSV_PATH="$PANTIPLIBR/data/report.csv"
+
+if [ ! -f "$CSV_PATH" ] 
+then
+	touch "$CSV_PATH"
+else
+	rm "$CSV_PATH"
+	touch "$CSV_PATH"
+fi
+echo "PREDIM,POSTDIM,K,TAG,% Total,class 0,class 1,class 10,class -1" > "$CSV_PATH"
+
 python3 core/process.py
-python3 core/textprocess.py
+python3 core/textprocess.py --predim 800 --postdim 500 --kcluster 5 --tagdim 16

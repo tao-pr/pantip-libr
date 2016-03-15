@@ -2,6 +2,7 @@
 
 echo Collecting libraries...
 
+pip3 install argparse
 pip3 install htmldom
 pip3 install couchdb
 pip3 install multiprocessing

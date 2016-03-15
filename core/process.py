@@ -26,6 +26,7 @@ import os
 REPO_DIR = os.getenv('PANTIPLIBR','.')
 WORD_BAG_DIR = '{0}/data/words/freq.txt'.format(REPO_DIR)
 
+# DEPRECATED:
 def execute_background_services(commands):
 	workers = []
 	for cmd in commands:
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 	# Delayed start
 	time.sleep(1)
 
-	# Prepare MQs for training sources
+	# These are MQs we'll push preprocessed records to
 	qs = ['pantip-x1','pantip-x2','pantip-x3']
 	mqs = [rabbit.create('localhost',q) for q in qs]
 
@@ -111,7 +112,7 @@ if __name__ == '__main__':
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
 	# Iterate through each record and process
-	couch.each_do(db,process_with(pipe),limit=2500)
+	couch.each_do(db,process_with(pipe),limit=2000)
 
 	# Disconnect from the MQs
 	[rabbit.end(mq) for mq in mqs]

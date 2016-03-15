@@ -4,6 +4,7 @@ Source MQ requeue task
 """
 
 from pypipe import pipe as Pipe
+from pypipe import datapipe as DP
 from pypipe.operations import rabbit
 
 if __name__ == '__main__':

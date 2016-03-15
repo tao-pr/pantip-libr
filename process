@@ -10,15 +10,15 @@ else
 	rm "$CSV_PATH"
 	touch "$CSV_PATH"
 fi
-echo "PREDIM,POSTDIM,K,TAG,% Total,class 0,class 1,class 10,class -1" > "$CSV_PATH"
+echo "DIM,K,TAG,% Total,class 0,class 1,class 10,class -1" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py
 
-# Grid train
-python3 core/textprocess.py --predim 1000 --postdim 840 --kcluster 5 --tagdim 16
+# Batch train
+python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 32
 python3 core/requeue.py
-python3 core/textprocess.py --predim 1000 --postdim 720 --kcluster 5 --tagdim 16
+python3 core/textprocess.py --dim 1200 --kcluster 3 --tagdim 32
 python3 core/requeue.py
-python3 core/textprocess.py --predim 1000 --postdim 500 --kcluster 5 --tagdim 16
-python3 core/requeue.py
+python3 core/textprocess.py --dim 1420 --kcluster 3 --tagdim 32
+

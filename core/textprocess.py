@@ -32,9 +32,8 @@ CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
 # Prepare training arguments
 arguments = argparse.ArgumentParser()
-arguments.add_argument('--predim', type=int, default=800) # Dimension of preprocess text hasher
+arguments.add_argument('--dim', type=int, default=800) # Dimension of preprocess text hasher
 arguments.add_argument('--kcluster', type=int, default=4) # Number of text cluster
-arguments.add_argument('--postdim', type=int, default=625) # Dimension of postprocess text hasher
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
 args = vars(arguments.parse_args(sys.argv[1:]))
 
@@ -115,10 +114,9 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('==============================','cyan'))
 	print(colored('  SENTIMENT TRAINING','cyan'))
 	print()
-	print(colored('  predim   : {0}'.format(args['predim']),'cyan'))
-	print(colored('  postdim  : {0}'.format(args['postdim']),'cyan'))
-	print(colored('  kcluster : {0}'.format(args['kcluster']),'cyan'))
-	print(colored('  tagdim   : {0}'.format(args['tagdim']),'cyan'))
+	print(colored('  DIM   : {0}'.format(args['dim']),'cyan'))
+	print(colored('  K     : {0}'.format(args['kcluster']),'cyan'))
+	print(colored('  TAG   : {0}'.format(args['tagdim']),'cyan'))
 	print(colored('==============================','cyan'))
 
 	# STEP#1
@@ -131,7 +129,7 @@ def train_sentiment_capture(stopwords,save=False):
 	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=args['predim'],
+		n_components=args['dim'],
 		stop_words=stopwords
 	)
 	hashMe      = texthasher.hash(topicHasher,learn=True)
@@ -176,28 +174,12 @@ def train_sentiment_capture(stopwords,save=False):
 
 	# STEP#2
 	# ---------------------------------------------
-	# Assembly training vector and sentiment labels
+	# Vectorise tags
 	mqtags    = rabbit.create('localhost','pantip-x2') # User tags
 	mqcluster = rabbit.create('localhost','pantip-cluster') # Cluster results
-	mqsrc     = rabbit.create('localhost','pantip-vector2') # Hash matrix
 
 	tags     = rabbit.iter(mqtags,take_tags)
 	clusters = rabbit.iter(mqcluster)
-	matV     = np.array([json.loads(v) for v in rabbit.iter(mqsrc)])
-
-	# Decompose @matV with SVD
-	mqveccontent    = rabbit.create('localhost','pantip-veccontent')
-	topicCompressor = compressor.safe_load(
-		VECT_COMPRESSOR_PATH,
-		n_components=args['postdim']
-	)
-	compressMe = compressor.compress(topicCompressor,learn=True)
-	DP.pipe(
-		matV,
-		[mqveccontent],	
-		compressMe,
-		title='Compressing Text'
-	)
 	
 	# Convert tags into a numeric vector
 	mqvectag  = rabbit.create('localhost','pantip-vectag')
@@ -213,19 +195,17 @@ def train_sentiment_capture(stopwords,save=False):
 		title='Tag Vectorising'
 	)
 
-	rabbit.end_multiple([mqtags,mqcluster,mqsrc])
-	rabbit.end_multiple([mqvectag,mqveccontent])
+	rabbit.end_multiple([mqtags,mqcluster,mqvectag])
 
 	# STEP#3
 	#----------------------------------------
-
 	# Join each of the component together
 	# Assembly a training vector
 	mqy = rabbit.create('localhost','pantip-x3')
 	Y = [y for y in rabbit.iter(mqy,take_sentiment_score)]
 
 	mqx_cluster = rabbit.create('localhost','pantip-cluster')
-	mqx_vec     = rabbit.create('localhost','pantip-veccontent')
+	mqx_vec     = rabbit.create('localhost','pantip-vector2')
 	mqx_tag     = rabbit.create('localhost','pantip-vectag')
 	XS = zip(
 		[x for x in rabbit.iter(mqx_tag)],
@@ -275,13 +255,12 @@ def train_sentiment_capture(stopwords,save=False):
 	
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
-		csv.write('{0},{1},{2},{3},{4:.2f},{5}\n'.format(
-			args['predim'], #0
-			args['postdim'], #1,
-			args['kcluster'], #2,
-			args['tagdim'], #3
-			predict_rate, #4
-			','.join(lbl_predict_rate) #5
+		csv.write('{0},{1},{2},{3:.2f},{4}\n'.format(
+			args['dim'], #0
+			args['kcluster'], #1,
+			args['tagdim'], #2
+			predict_rate, #3
+			','.join(lbl_predict_rate) #4
 		))
 	
 

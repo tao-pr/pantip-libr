@@ -37,7 +37,6 @@ def new(n_components=None,stop_words=[]):
 		svd = TruncatedSVD(n_components)
 		return [idf,svd,norm]
 	else:
-		svd = TruncatedSVD()
 		return [idf,norm]
 
 

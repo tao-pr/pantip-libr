@@ -24,9 +24,9 @@ if __name__ == '__main__':
 	q00 = rabbit.create('localhost','pantip-x00')
 	q0 = rabbit.create('localhost','pantip-x0')
 	for m in rabbit.iter(q00):
-		rabbit.feed(q0)(m)
+		rabbit.feed([q0])(m)
 
 	# Bye all queues!
 	rabbit.end_multiple([q0,q00])
-	
+
 	print('[DONE] All input queues are recycled.')

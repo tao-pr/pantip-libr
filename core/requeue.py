@@ -7,8 +7,8 @@ from pypipe import pipe as Pipe
 from pypipe.operations import rabbit
 
 if __name__ == '__main__':
-	qsrc = rabbit.create('pantip-x0')
-	qdst = [rabbit.create(q) for q in ['pantip-x1','pantip-x2','pantip-x3']]
+	qsrc = rabbit.create('localhost','pantip-x0')
+	qdst = [rabbit.create('localhost',q) for q in ['pantip-x1','pantip-x2','pantip-x3']]
 
 	# Requeue!
 	print('Requeuing ...')

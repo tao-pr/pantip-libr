@@ -275,13 +275,13 @@ def train_sentiment_capture(stopwords,save=False):
 	
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
-		csv.write('{0},{1},{3},{4},{5:.2f},{6}\n'.format(
+		csv.write('{0},{1},{2},{3},{4:.2f},{5}\n'.format(
 			args['predim'], #0
-			args['postdim'], #2,
-			args['kcluster'], #3,
-			args['tagdim'], #4
-			predict_rate, #5
-			','.join(lbl_predict_rate) #6
+			args['postdim'], #1,
+			args['kcluster'], #2,
+			args['tagdim'], #3
+			predict_rate, #4
+			','.join(lbl_predict_rate) #5
 		))
 	
 

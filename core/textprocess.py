@@ -22,7 +22,6 @@ from pypipe.operations import textcluster
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
 TEXT_VECTORIZER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
-VECT_COMPRESSOR_PATH  = '{0}/data/hasher/22'.format(REPO_DIR)
 TAG_HASHER_PATH       = '{0}/data/hasher/33'.format(REPO_DIR)
 TEXT_CLUSTER_PATH     = '{0}/data/cluster/00'.format(REPO_DIR)
 CONTENT_CLUSTER_PATH  = '{0}/data/cluster/22'.format(REPO_DIR)
@@ -269,7 +268,6 @@ def train_sentiment_capture(stopwords,save=False):
 		print(colored('Saving models...','cyan'))
 		hasher.save(topicHasher,TEXT_VECTORIZER_PATH)
 		textcluster.save(contentClf,CONTENT_CLUSTER_PATH)
-		compressor.save(topicCompressor,VECT_COMPRESSOR_PATH)
 		taghasher.save(tagHasher,TAG_HASHER_PATH)
 		cluster.save(clf,CLF_PATH)
 		print(colored('[DONE]','green'))

@@ -26,9 +26,13 @@ def pipe(src,dests,transform=lambda d:d,title=''):
 	
 	# Transform the input at once
 	outcome = transform(_src)
-	safe_feed(dests,outcome)
+
+	# Feed the output to destination queues if supplied
+	if dests and len(dests)>0:
+		safe_feed(dests,outcome)
 
 	print(colored(title,'cyan'), colored(' [DONE]','green'))
+	return outcome
 
 # Pipe the list of input, one-by-one to the processing
 # @param {Iterable} src

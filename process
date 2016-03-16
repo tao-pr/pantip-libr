@@ -16,13 +16,10 @@ echo "DIM , K , TAG ,% Total,  C#0  ,  C#1  ,  C#10 ,  C#-1" > "$CSV_PATH"
 python3 core/process.py
 
 # Batch train
-python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 32
-python3 core/requeue.py
+python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 256
+# python3 core/requeue.py
+# python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 128
+# python3 core/requeue.py
 # python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 64
 # python3 core/requeue.py
-# python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 16
-# python3 core/requeue.py
-# python3 core/textprocess.py --dim 1200 --kcluster 3 --tagdim 32
-# python3 core/requeue.py
-# python3 core/textprocess.py --dim 1420 --kcluster 3 --tagdim 32
-# python3 core/requeue.py
+# python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 32

@@ -1,0 +1,8 @@
+core/pydb/__pycache__/
+core/pypantip/__pycache__/
+core/pypipe/__pycache__/
+core/pypipe/operations/__pycache__/
+data/report.csv
+data/report_copy.csv
+derby.log
+metastore_db/

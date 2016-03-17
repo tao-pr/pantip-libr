@@ -122,32 +122,27 @@ def train_sentiment_capture(stopwords,save=False):
 	#------------------------------------
 	# Vectorise the input topic (text only) 
 	mqx1     = rabbit.create('localhost','pantip-x1')
-	mqvec12  = [
-		rabbit.create('localhost','pantip-vector1'),
-		rabbit.create('localhost','pantip-vector2')
-	]
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
 		n_components=args['dim'],
 		stop_words=stopwords
 	)
-	hashMe      = texthasher.hash(topicHasher,learn=True)
+	hashMe = texthasher.hash(topicHasher,learn=True)
 
 	print(colored('#STEP-1 started ...','cyan'))
 	print('hasher : {0}'.format(topicHasher))
-	DP.pipe(
+	iterX = DP.pipe(
 		rabbit.iter(mqx1,take_x1),
-		mqvec12,
-		hashMe,
+		dests=None,
+		transform=hashMe,
 		title='Vectorisation'
 	)
 
 	rabbit.end(mqx1)
-	rabbit.end_multiple(mqvec12)
+
+	vecX = [x for x in iterX]
 
 	# Cluster the vectorised records with unsupervised clf
-	mqvec1 = rabbit.create('localhost','pantip-vector1')
-	mqcluster = [rabbit.create('localhost','pantip-cluster')]
 	contentClf = textcluster.safe_load(
 		CONTENT_CLUSTER_PATH,
 		n_labels=args['kcluster']
@@ -156,46 +151,36 @@ def train_sentiment_capture(stopwords,save=False):
 
 	# Classification doesn't accept a generator,
 	# So we need to roll the matrix out of the MQ
-	srcmatrix = [np.array(json.loads(x)) for x in rabbit.iter(mqvec1)]
-	
-	DP.pipe(
-		srcmatrix,
-		mqcluster,
-		clusterMe,
+	clusters = DP.pipe(
+		[x for x in vecX],
+		dests=None,
+		transform=clusterMe,
 		title='Clustering'
 	)
 
 	print(colored('#STEP-1 finished ...','cyan'))
 
-	rabbit.end(mqvec1)
-	rabbit.end_multiple(mqcluster)
-
 
 	# STEP#2
 	# ---------------------------------------------
-	# Vectorise tags
-	mqtags    = rabbit.create('localhost','pantip-x2') # User tags
-	mqcluster = rabbit.create('localhost','pantip-cluster') # Cluster results
-
-	tags     = rabbit.iter(mqtags,take_tags)
-	clusters = rabbit.iter(mqcluster)
+	# Vectorise tags	
 	
 	# Convert tags into a numeric vector
-	mqvectag  = rabbit.create('localhost','pantip-vectag')
 	tagHasher = taghasher.safe_load(
 		TAG_HASHER_PATH,
 		n_feature=args['tagdim']
 	)
+	mqx2      = rabbit.create('localhost','pantip-x2')
 	hashtagMe = taghasher.hash(tagHasher,learn=True)
-	DP.pipe(
-		tags,
-		[mqvectag],
-		hashtagMe,
+	vectags   = DP.pipe(
+		[tag for tag in rabbit.iter(mqx2,take_tags)],
+		dests=None,
+		transform=hashtagMe,
 		title='Tag Vectorising'
 	)
 
-	rabbit.end_multiple([mqtags,mqcluster,mqvectag])
-
+	rabbit.end(mqx2)	
+	
 	# STEP#3
 	#----------------------------------------
 	# Join each of the component together
@@ -203,20 +188,19 @@ def train_sentiment_capture(stopwords,save=False):
 	mqy = rabbit.create('localhost','pantip-x3')
 	Y = [y for y in rabbit.iter(mqy,take_sentiment_score)]
 
-	mqx_cluster = rabbit.create('localhost','pantip-cluster')
-	mqx_vec     = rabbit.create('localhost','pantip-vector2')
-	mqx_tag     = rabbit.create('localhost','pantip-vectag')
 	XS = zip(
-		[x for x in rabbit.iter(mqx_tag)],
-		[x for x in rabbit.iter(mqx_cluster)],
-		[x for x in rabbit.iter(mqx_vec)]
+		list(vectags),
+		[[i] for i in clusters], # Make scalar a single-element vector
+		list(vecX)
 	)
-	X = [json.loads(a) + [int(b)] + json.loads(c)
-			for a,b,c in XS] # Concatenate vectors
+
+	X = [list(a) + list(b) + list(c) for a,b,c in XS]
 
 	print(colored('[X] ','yellow'),len(X),' samples')
 	for x in X:
 		print('x[{0}] : '.format(len(x)), x[:6], '...')
+
+	rabbit.end(mqy)
 
 	# Train!
 	print(colored('Training process started...','cyan'))
@@ -226,8 +210,6 @@ def train_sentiment_capture(stopwords,save=False):
 	trainMe = cluster.analyze(clf,labels=Y)
 	Y_      = trainMe(X)
 	print(colored('[DONE]','yellow'))
-
-	rabbit.end_multiple([mqy,mqx_cluster,mqx_vec,mqx_tag])
 
 	# Self-validation
 	num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])

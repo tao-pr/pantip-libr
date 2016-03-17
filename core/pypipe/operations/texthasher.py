@@ -18,10 +18,12 @@ from sklearn.preprocessing import Normalizer
 from sklearn.decomposition import NMF
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import SparsePCA
+from sklearn.decomposition import RandomizedPCA
 
 
 # Create a text process pipeline (vectorizer)
-def new(n_components=None,stop_words=[]):
+def new(n_components=None,stop_words=[],decomposition='SVD'):
 
 	# Prepare vectoriser engines
 	idf = TfidfVectorizer(
@@ -34,8 +36,20 @@ def new(n_components=None,stop_words=[]):
 
 	# Prepare dimentionality reducer
 	if n_components:
-		svd = TruncatedSVD(n_components)
-		return [idf,svd,norm]
+		if decomposition=='PCA':
+			reducer = SparsePCA( # Faster, less precise
+				n_components,
+				max_iter=100,
+				method='lars'
+			)
+		elif decomposition=='RandomPCA':
+			reducer = RandomizedPCA(
+				n_components,
+				copy=False
+			)
+		else:
+			reducer = TruncatedSVD(n_components) # Damn slow
+		return [idf,reducer,norm]
 	else:
 		return [idf,norm]
 

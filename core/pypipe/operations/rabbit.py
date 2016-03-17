@@ -95,8 +95,12 @@ def iter(feeder,transformation=lambda x:x):
 
 def end(feeder):
 	print(colored('Ending MQ #','white'),feeder.q)
-	conn,channel,q = feeder.components()
-	conn.close()
+	try:
+		conn,channel,q = feeder.components()
+		conn.close()
+	except pika.exceptions.ConnectionClosed:
+		print(colored('MQ appeared offline','red'))
+		
 
 def end_multiple(feeders):
 	[end(f) for f in feeders]

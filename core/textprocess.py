@@ -196,9 +196,8 @@ def train_sentiment_capture(stopwords,save=False):
 
 	X = [list(a) + list(b) + list(c) for a,b,c in XS]
 
-	print(colored('[X] ','yellow'),len(X),' samples')
-	for x in X:
-		print('x[{0}] : '.format(len(x)), x[:6], '...')
+	# for i in range(len(X)):
+	# 	print('x[{0}] : {1}'.format(i,len(X[i])))
 
 	rabbit.end(mqy)
 

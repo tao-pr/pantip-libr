@@ -125,7 +125,8 @@ def train_sentiment_capture(stopwords,save=False):
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
 		n_components=args['dim'],
-		stop_words=stopwords
+		stop_words=stopwords,
+		decomposition='SVD'
 	)
 	hashMe = texthasher.hash(topicHasher,learn=True)
 
@@ -195,9 +196,6 @@ def train_sentiment_capture(stopwords,save=False):
 	)
 
 	X = [list(a) + list(b) + list(c) for a,b,c in XS]
-
-	# for i in range(len(X)):
-	# 	print('x[{0}] : {1}'.format(i,len(X[i])))
 
 	rabbit.end(mqy)
 

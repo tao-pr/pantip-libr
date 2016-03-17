@@ -18,8 +18,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn.decomposition import NMF
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
-from sklearn.decomposition import SparsePCA
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import LatentDirichletAllocation
 
 
 # Create a text process pipeline (vectorizer)
@@ -36,16 +35,10 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 
 	# Prepare dimentionality reducer
 	if n_components:
-		if decomposition=='PCA':
-			reducer = SparsePCA( # Faster, less precise
-				n_components,
-				max_iter=100,
-				method='lars'
-			)
-		elif decomposition=='RandomPCA':
-			reducer = RandomizedPCA(
-				n_components,
-				copy=False
+		if decomposition=='LDA':
+			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
+				n_topics=n_components,
+				max_iter=15
 			)
 		else:
 			reducer = TruncatedSVD(n_components) # Damn slow
@@ -65,9 +58,9 @@ def load(path):
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path,n_components,stop_words):
+def safe_load(path,n_components,stop_words,decomposition):
 	if os.path.isfile(path): return load(path)
-	else: return new(n_components,stop_words)
+	else: return new(n_components,stop_words,decomposition)
 
 def hash(operations,learn=False):
 	# @param {iterable} of string

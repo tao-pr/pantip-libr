@@ -93,6 +93,17 @@ def iter(feeder,transformation=lambda x:x):
 		print(colored('--Exception broke the iteration--','magenta'))
 		raise
 
+# Start a message listening loop (endless)
+def listen(feeder,callback):
+	def on_message(ch,method,prop,body):
+		# Trigger the callback
+		callback(body.decode('utf-8'))
+		ch.basic_ack(methodframe.delivery_tag)
+	feeder.channel.basic_qos(prefetch_count=1)
+	feeder.channel.basic_consume(callback,queue=feeder.q)
+	feeder.start_consuming()
+
+
 def end(feeder):
 	print(colored('Ending MQ #','white'),feeder.q)
 	try:

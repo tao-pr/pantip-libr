@@ -26,8 +26,10 @@ import sys
 import os
 
 
-workers  = []
-REPO_DIR = os.getenv('PANTIPLIBR','.')
+workers   = []
+REPO_DIR  = os.getenv('PANTIPLIBR','.')
+MQ_INPUT  = 'feed-in'
+MQ_OUTPUT = 'feed-out'
 
 def execute_background_services():
 	global workers
@@ -46,21 +48,17 @@ def execute_background_services():
 
 	return workers
 
-def next_queue_please(feeder):
-	# Take the input message out of the MQ
-	# TAOTODO: this should be a consumer model 
-	# (non-blocking)
 
-	msg = rabbit.iter(feeder)
-
-	# Tokenise the message
+# Event handler: An incoming requested message received
+def on_phone_ring(msg):
+	print(colored('[MSG] ','magenta'), msg)
+	# Preprocess the message (tokenisation)
 	_msg = preprocess.take(msg)
 
-	# Feed the tokenised message 
-	# to the classification process
-	# TAOTODO:
+	#TAODEBUG:
+	print(colored('[AFTER PREPROCESS] ','green'),_msg)
 
-
+	#TAOTODO: Analyse the message
 	pass
 
 def process_text(text):
@@ -104,7 +102,7 @@ if __name__ == '__main__':
 	print(colored('--------------------------','cyan'))
 
 	# Start the monitoring process
-	mqinput = rabbit.create('localhost','for-process')
+	mqinput = rabbit.create('localhost',MQ_INPUT)
 
 	# Execute all background services
 	workers = execute_background_services()
@@ -112,4 +110,5 @@ if __name__ == '__main__':
 
 	# Await ...
 	signal.signal(signal.SIGINT, on_signal)
-	signal.pause()
+	rabbit.listen(mqinput,on_phone_ring)
+	##signal.pause()

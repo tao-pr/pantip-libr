@@ -101,7 +101,7 @@ def train_sentiment_capture(stopwords,save=False):
 
 	STEP#2 :: Combine topic, tags, and group to make feature vector
 
-		X2 <--  [tags, y1, SVD(X1)]
+		X2 <--  [tags, y1, X1]
 		Y2 <--  Sentiment score
 
 	STEP#3 :: Train the classification

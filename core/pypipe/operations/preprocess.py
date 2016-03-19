@@ -12,8 +12,11 @@ def take(record):
 	package = {
 		'data':[record['title'],record['topic']]
 	}
+	
 	results = tokenizer.tokenize(json.dumps(package,ensure_ascii=False))
 	record['title'] = ' '.join(results['data'][0])
 	record['topic'] = ' '.join(results['data'][1])
 
 	return record
+
+

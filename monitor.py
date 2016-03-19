@@ -47,6 +47,20 @@ def execute_background_services():
 	return workers
 
 def next_queue_please(feeder):
+	# Take the input message out of the MQ
+	# TAOTODO: this should be a consumer model 
+	# (non-blocking)
+
+	msg = rabbit.iter(feeder)
+
+	# Tokenise the message
+	_msg = preprocess.take(msg)
+
+	# Feed the tokenised message 
+	# to the classification process
+	# TAOTODO:
+
+
 	pass
 
 def process_text(text):

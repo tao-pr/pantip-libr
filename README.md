@@ -106,6 +106,25 @@ of the repo.
 | 1 | core/process.py | Tokenise the downloaded records and push to MQ
 | 2 | core/textprocess.py | Takes the dataset out of MQ and runs machine learning
 
+
+---
+
+### 3. Start topic analysis services
+
+To process any seen or unseen topic with the trained 
+models, you need to start analysis services by:
+
+```bash
+$ ./start_server
+```
+
+The command will execute the following services.
+
+- **MQ Monitor service** (monitor.py)
+- **REST server** (server/terminal.py)
+
+To end the process, do it manually (for the time being).
+
 ---
 
 ## Caveat

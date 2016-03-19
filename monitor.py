@@ -26,7 +26,25 @@ import sys
 import os
 
 
+workers  = []
 REPO_DIR = os.getenv('PANTIPLIBR','.')
+
+def execute_background_services():
+	global workers
+	services = ['ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR)]
+
+	workers = []
+	for s in services:
+		print('Executing: {0}'.format(s))
+		sp = subprocess.Popen(
+			s,
+			shell=True,
+			stdout=subprocess.PIPE,
+			preexec_fn=os.setsid
+		)
+		workers.append(sp)
+
+	return workers
 
 def next_queue_please(feeder):
 	pass
@@ -45,9 +63,23 @@ def publish_output(feeders,messageid,output):
 	feed(pack)
 
 def on_signal(signal,frame):
+	global workers
 	print(colored('--------------------------','yellow'))
 	print(colored(' Signaled to terminate...','yellow'))
 	print(colored('--------------------------','yellow'))
+
+	# End all background services
+	for sp in workers:
+		subprocess.Popen(
+			'kill {0}'.format(sp.pid),
+			shell=True, 
+			stdout=subprocess.PIPE
+		)	
+
+	# Keep waiting until all subprocess were killed
+	print('Waiting for services to end...')
+	[sp.wait() for sp in workers]
+
 	sys.exit(0)
 
 if __name__ == '__main__':
@@ -59,6 +91,9 @@ if __name__ == '__main__':
 
 	# Start the monitoring process
 	mqinput = rabbit.create('localhost','for-process')
+
+	# Execute all background services
+	workers = execute_background_services()
 
 
 	# Await ...

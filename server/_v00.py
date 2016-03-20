@@ -24,8 +24,13 @@ def process(topic):
 	if not __is_valid(topic):
 		return '{"error":true,"reason":"Invalid request structure"}'
 	mqinput = rabbit.create('localhost',MQ_INPUT)
-	rabbit.feed(mqinput)(topic)
+	rabbit.feed([mqinput])(topic)
 	print('Message fed to input MQ')
+
+	return json.dumps({
+		"error": False,
+		"result": None
+	})
 
 def __is_valid(topic):
 	if topic is None:

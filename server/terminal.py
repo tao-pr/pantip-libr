@@ -18,7 +18,8 @@ def root():
 
 @app.route('/topic/<version>/sentiment',methods=["POST","PUT"])
 def check_topic_sentiment(version):
-	topic = request.get_json(silent=True)
+	topic = request.get_json(silent=False)
+
 	if version=='00':
 		return _v00.process(topic)
 	else:

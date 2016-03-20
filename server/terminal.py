@@ -17,8 +17,8 @@ def root():
 	return SERVICE_NAME
 
 @app.route('/topic/<version>/sentiment',methods=["POST","PUT"])
-def check_topic_sentiment():
-	topic = request.get_json(silient=True)
+def check_topic_sentiment(version):
+	topic = request.get_json(silent=True)
 	if version=='00':
 		return _v00.process(topic)
 	else:
@@ -26,4 +26,4 @@ def check_topic_sentiment():
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True,host="0.0.0.0",port=5858)

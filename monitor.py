@@ -61,11 +61,6 @@ def on_phone_ring(msg):
 	#TAOTODO: Analyse the message
 	pass
 
-def process_text(text):
-	# Push the text to process
-	feeder = rabbit.create('localhost','mqinput')
-	pass
-
 def publish_output(feeders,messageid,output):
 	feed = rabbit.feed([feeders])
 	pack = {

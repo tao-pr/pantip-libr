@@ -98,10 +98,10 @@ def listen(feeder,callback):
 	def on_message(ch,method,prop,body):
 		# Trigger the callback
 		callback(body.decode('utf-8'))
-		ch.basic_ack(methodframe.delivery_tag)
+		ch.basic_ack(method.delivery_tag)
 	feeder.channel.basic_qos(prefetch_count=1)
-	feeder.channel.basic_consume(callback,queue=feeder.q)
-	feeder.start_consuming()
+	feeder.channel.basic_consume(on_message,queue=feeder.q)
+	feeder.channel.start_consuming()
 
 
 def end(feeder):

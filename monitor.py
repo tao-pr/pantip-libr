@@ -53,10 +53,11 @@ def execute_background_services():
 def on_phone_ring(msg):
 	print(colored('[MSG] ','magenta'), msg)
 	# Preprocess the message (tokenisation)
-	_msg = preprocess.take(msg)
+	topic  = json.loads(msg)
+	_topic = preprocess.take(topic)
 
 	#TAODEBUG:
-	print(colored('[AFTER PREPROCESS] ','green'),_msg)
+	print(colored('[AFTER PREPROCESS] ','green'),_topic)
 
 	#TAOTODO: Analyse the message
 	pass
@@ -105,5 +106,8 @@ if __name__ == '__main__':
 
 	# Await ...
 	signal.signal(signal.SIGINT, on_signal)
+
+
+	print(colored("Monitoring process begins...","cyan"))
 	rabbit.listen(mqinput,on_phone_ring)
 	##signal.pause()

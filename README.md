@@ -109,7 +109,9 @@ of the repo.
 
 ---
 
-### 3. Start topic analysis services
+## Analysis Services
+
+![Service Diagram](data/diagram.png)
 
 To process any seen or unseen topic with the trained 
 models, you need to start analysis services by:

@@ -18,6 +18,7 @@ from core.pypipe import pipe as Pipe
 from core.pypipe.operations import preprocess
 from core.pypipe.operations import wordbag
 from core.pypipe.operations import rabbit
+from importlib.machinery import SourceFileLoader
 import subprocess
 import signal
 import json
@@ -25,11 +26,19 @@ import time
 import sys
 import os
 
-
 workers   = []
 REPO_DIR  = os.getenv('PANTIPLIBR','.')
 MQ_INPUT  = 'feed-in'
 MQ_OUTPUT = 'feed-out'
+
+textprocess = SourceFileLoader(
+	'textprocess',
+	REPO_DIR + 'core/textprocess.py'
+).load_module()
+
+# Text classification models
+topicHasher,taghasher,contentClf,clf = None,None,None,None
+classify = lambda x:x # Eta expansion
 
 def execute_background_services():
 	global workers
@@ -56,8 +65,14 @@ def on_phone_ring(msg):
 	topic  = json.loads(msg)
 	_topic = preprocess.take(topic)
 
-	#TAOTODO: Analyse the message
-	pass
+	# Analyse
+	(y,x) = classify([_topic])
+	
+	#TAODEBUG:
+	print(colored('[ANALYSED]','magenta'))
+	print(colored(y,"red"), " --> ", _topic['title'])
+
+	return y
 
 def publish_output(feeders,messageid,output):
 	feed = rabbit.feed([feeders])
@@ -93,6 +108,11 @@ if __name__ == '__main__':
 	print(colored('--------------------------','cyan'))
 	print(colored(' Analysis service started','cyan'))
 	print(colored('--------------------------','cyan'))
+
+	# Load classification models
+	# and make a classifer function
+	(topicHasher,taghasher,contentClf,clf) = textprocess.load_models()
+	classify = textprocess.classify_text(topicHasher,taghasher,contentClf,clf)
 
 	# Start the monitoring process
 	mqinput = rabbit.create('localhost',MQ_INPUT)

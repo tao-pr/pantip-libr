@@ -7,8 +7,9 @@ Batch topic request fire
 
 import requests
 import json
+import os
 from termcolor import colored
-from importlib.machinery import SourceFileLoader
+import ..core.textprocess
 
 REPO_DIR  = os.getenv('PANTIPLIBR','.')
 couch = SourceFileLoader(
@@ -34,9 +35,10 @@ def fire_request(skip):
 
 def fire_em_all(skip,limit):
 	db = couch.connector('pantip')
-	couch.each_do(db,fire_request(skip),limit)
+	couch.each_do(db,fire_request(skip),limit+skip)
 
 
 if __name__ == '__main__':
 	# Fire batch requests
-	pass
+	fire_em_all(skip=3,limit=1)
+

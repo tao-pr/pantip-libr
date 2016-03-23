@@ -56,9 +56,6 @@ def on_phone_ring(msg):
 	topic  = json.loads(msg)
 	_topic = preprocess.take(topic)
 
-	#TAODEBUG:
-	print(colored('[AFTER PREPROCESS] ','green'),_topic)
-
 	#TAOTODO: Analyse the message
 	pass
 

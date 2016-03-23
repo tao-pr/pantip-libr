@@ -252,6 +252,60 @@ def train_sentiment_capture(stopwords,save=False):
 		print(colored('[DONE]','green'))
 
 
+def load_models():
+	topicHasher = hasher.safe_load(TEXT_VECTORIZER_PATH)
+	tagHasher   = tagHasher.safe_load(TAG_HASHER_PATH)
+	contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH)
+	clf         = cluster.safe_load(CLF_PATH)
+	return (topicHasher,taghasher,contentClf,clf)
+
+# @param {iterable} topics
+def classify_text(topicHasher,tagHasher,contentClf,clf):
+	def _classify(textsrc):
+		print(colored('[Classifying]...','green'))
+		# Prepare operations
+		hashMe     = texthasher.hash(topicHasher,learn=False)
+		clusterMe  = textcluster.classify(contentClf,learn=False)
+		hashtagMe  = taghasher.hash(tagHasher,learn=False)
+		classifyMe = cluster.analyze(clf)
+	
+		iterX = DP.pipe(
+			[take_x1(x) for x in textsrc],
+			dests=None,
+			transform=hashMe,
+			title='Vectorisation'
+		)
+
+		vecX = [x for x in iterX]
+
+		clusters = DP.pipe(
+			[x for x in vecX],
+			dests=None,
+			transform=clusterMe,
+			title='Clustering'
+		)
+
+		vectags   = DP.pipe(
+			[take_tags(x) for x in textsrc],
+			dests=None,
+			transform=hashtagMe,
+			title='Tag Vectorising'
+		)
+
+		XS = zip(
+			list(vectags),
+			[[i] for i in clusters], # Make scalar a single-element vector
+			list(vecX)
+		)
+		X = [list(a) + list(b) + list(c) for a,b,c in XS]
+
+		# Analyse 
+		Y_ = classifyMe(X)
+
+		# Returns the results as tuples
+		return zip(Y_,X)
+	return _classify
+
 
 if __name__ == '__main__':
 

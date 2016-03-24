@@ -131,11 +131,34 @@ To end the process, do it manually (for the time being).
 
 ## How it got so far?
 
-Still in experimental phase. Accuracy reaches around 70% 
-but the training time is painful and the models are 
-too huge (over 4GB ...). 
+Still in experimental phase. 
+The training time is painful and the models are 
+too huge (over 4GB ...). Yet the accuracy still 
+needs improvement.
 
-Improvements are currently being done...
+
+**Hashing with Truncated SVD : 4000 samples**
+
+-----------------------------------------------------
+DIM | K | TAG |% Total|  Class=0  |  Class=1  |  Class=10 |  Class=-1
+-----------------------------------------------------
+1000| 3 | 1024| 62.83 | 80.73 |  0.82 | 51.92 | 31.25 
+1000| 3 | 512 | 63.25 | 78.92 |  8.60 | 51.92 | 68.75
+1000| 3 | 256 | 63.45 | 78.65 | 10.60 | 51.92 | 62.50 
+1000| 3 | 128 | 62.88 | 78.55 |  8.01 | 51.92 | 75.00 
+1000| 3 |  64 | 62.15 | 70.31 | 34.28 | 52.88 | 56.25 
+1000| 3 |  32 | 60.23 | 68.39 | 32.04 | 50.00 | 75.00
+-----------------------------------------------------
+
+**Hashing with LDA : 4000 samples**
+
+-----------------------------------------------------
+DIM | K | TAG | % Total |  Class=0  |  Class=1  |  Class=10 |  Class=-1 
+-----------------------------------------------------
+ 30 | 3 |  32 |  58.12  | 71.13 | 15.19 | 32.69 | 37.50 
+ 20 | 3 |  32 |  57.23  | 68.23 | 21.44 | 31.73 | 37.50 
+ 10 | 3 |  32 |  61.12  | 74.33 | 17.79 | 33.65 | 37.50 
+-----------------------------------------------------
 
 ## Caveat
 

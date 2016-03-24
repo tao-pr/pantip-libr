@@ -15,16 +15,20 @@ echo "DIM , K , TAG ,% Total,  C#0  ,  C#1  ,  C#10 ,  C#-1" > "$CSV_PATH"
 # Tokenise input
 python3 core/process.py
 
+rm data/cluster/*
+
+rm data/hasher/*
+
 # Batch train for SVD
 #python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 1024
 #python3 core/requeue.py
-python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 512
+#python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 512
 #python3 core/requeue.py
 # python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 256
 # python3 core/requeue.py
 # python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 128
 # python3 core/requeue.py
-# python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 64
+ python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 64
 # python3 core/requeue.py
 # python3 core/textprocess.py --dim 1000 --kcluster 3 --tagdim 32
 

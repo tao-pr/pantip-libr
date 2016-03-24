@@ -60,6 +60,10 @@ def on_phone_ring(msg):
 	topic  = json.loads(msg)
 	_topic = preprocess.take(topic)
 
+	# Stringify those JSON first 
+	# TAODEBUG: It shouldn't be JSON stringify now, double effort
+	_topic = json.dumps(_topic,ensure_ascii=False)
+
 	# Analyse
 	(y,x) = classify([_topic])
 	

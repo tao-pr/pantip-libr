@@ -245,7 +245,7 @@ def train_sentiment_capture(stopwords,save=False):
 	#Save the trained models
 	if save:
 		print(colored('Saving models...','cyan'))
-		topichasher.save(topicHasher,TEXT_VECTORIZER_PATH)
+		texthasher.save(topicHasher,TEXT_VECTORIZER_PATH)
 		textcluster.save(contentClf,CONTENT_CLUSTER_PATH)
 		taghasher.save(tagHasher,TAG_HASHER_PATH)
 		cluster.save(clf,CLF_PATH)
@@ -253,9 +253,9 @@ def train_sentiment_capture(stopwords,save=False):
 
 
 def load_models():
-	topicHasher = topichasher.safe_load(TEXT_VECTORIZER_PATH)
-	tagHasher   = tagHasher.safe_load(TAG_HASHER_PATH)
-	contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH)
+	topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,n_components=None,stop_words=[],decomposition='SVD')
+	tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
+	contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=16)
 	clf         = cluster.safe_load(CLF_PATH)
 	return (topicHasher,taghasher,contentClf,clf)
 

@@ -129,6 +129,14 @@ To end the process, do it manually (for the time being).
 
 ---
 
+## How it got so far?
+
+Still in experimental phase. Accuracy reaches around 70% 
+but the training time is painful and the models are 
+too huge (over 4GB ...). 
+
+Improvements are currently being done...
+
 ## Caveat
 
 The process takes slightly high computational power. 

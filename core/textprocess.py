@@ -316,7 +316,7 @@ if __name__ == '__main__':
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
-	output = train_sentiment_capture(stopwords,save=True)
+	output = train_sentiment_capture(stopwords,save=False)
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

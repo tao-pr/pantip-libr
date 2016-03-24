@@ -13,12 +13,12 @@ from termcolor import colored
 from pprint import pprint
 from queue import Queue
 from collections import deque
-from core.pydb import couch
-from core.pypipe import pipe as Pipe
-from core.pypipe.operations import preprocess
-from core.pypipe.operations import wordbag
-from core.pypipe.operations import rabbit
-from importlib.machinery import SourceFileLoader
+from pydb import couch
+from pypipe import pipe as Pipe
+from pypipe.operations import preprocess
+from pypipe.operations import wordbag
+from pypipe.operations import rabbit
+import textprocess
 import subprocess
 import signal
 import json
@@ -30,11 +30,6 @@ workers   = []
 REPO_DIR  = os.getenv('PANTIPLIBR','.')
 MQ_INPUT  = 'feed-in'
 MQ_OUTPUT = 'feed-out'
-
-textprocess = SourceFileLoader(
-	'textprocess',
-	REPO_DIR + 'core/textprocess.py'
-).load_module()
 
 # Text classification models
 topicHasher,taghasher,contentClf,clf = None,None,None,None

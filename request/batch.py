@@ -8,34 +8,44 @@ Batch topic request fire
 import requests
 import json
 import os
+from couchdb.client import Server
 from termcolor import colored
-import ..core.textprocess #TAOTODO: This doesn't work
 
 REPO_DIR  = os.getenv('PANTIPLIBR','.')
-couch = SourceFileLoader(
-	'couch',
-	REPO_DIR + 'core/pydb/couch.py'
-).load_module()
-
 URL = "http://0.0.0.0:5858/topic/00/sentiment"
 
-def fire_request(skip):
-	n = 0
-	def _fire(record):
-		n += 1
-		if n<skip: return 
+def fire_request(record):	
+	print(colored('Firing request...','cyan'))
+	resp = requests.post(URL,json=json.dumps(record,ensure_ascii=False))
 
-		print(colored('Firing request...','cyan'))
-		resp = requests.post(URL,json=json.dumps(record,ensure_ascii=False))
+	print(" API response: [{0}]".format(resp.status_code))
+	print(resp.text)
 
-		print(" API response: [{0}]".format(resp.status_code))
-		print(resp.text)
-
-	return _fire
 
 def fire_em_all(skip,limit):
-	db = couch.connector('pantip')
-	couch.each_do(db,fire_request(skip),limit+skip)
+	collection = 'pantip'
+	svr = Server()
+	if collection not in svr:
+		src = svr.create(collection)
+	else:
+		src = svr[collection]
+
+	# Iterate through the collection and fire
+	n = 0
+	n_processed = 0
+	for _id in src:
+		n += 1
+		rec = src.get(_id)
+		if n<skip: continue
+
+		if n_processed>limit:
+			print(colored('Out of ammo!','red'))
+			return 
+
+		# Fire a single request
+		print(colored('Firing #{0}'.format(_id)))
+		fire_request(rec)
+		n_processed += 1
 
 
 if __name__ == '__main__':

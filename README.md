@@ -8,7 +8,7 @@ Pantip librarian!
 
 [Pantip](http://www.pantip.com) is the biggest online Q&A community 
 in Thailand founded in 1996. Pantip stores a very large 
-user-generated questions and answers in numberous topics, 
+user-generated questions and answers in numerous topics, 
 e.g., lifestyle, health, tradings, technologies, sciences, 
 sports, movies, and lots of others. 
 
@@ -16,7 +16,7 @@ sports, movies, and lots of others.
 
 ## What does this do?
 
-Pantip Librarian downloads and analyses a bulk of 
+`Pantip Librarian` downloads and analyses a bulk of 
 Pantip's user-generated questions and answers with 
 text mining techniques. The ultimate purpose (experimentally) 
 of the project is to extract and capture potential 
@@ -31,7 +31,7 @@ Before running the tasks, these dependencies need to me met:
 
 - [x] [Python 3.4+](https://www.python.org/download/releases/3.4.3/)
 - [x] [Apache CouchDB](http://couchdb.apache.org/)
-- [x] [Apache Spark](http://spark.apache.org/)
+- [ ] ~~[Apache Spark](http://spark.apache.org/)~~
 - [x] [Ruby 2.1+](https://www.ruby-lang.org/en/news/2015/08/18/ruby-2-1-7-
 released/)
 - [x] [RabbitMQ](https://www.rabbitmq.com)
@@ -156,6 +156,21 @@ needs improvement.
  30 | 3 |  32 |  58.12  | 71.13 | 15.19 | 32.69 | 37.50 |
  20 | 3 |  32 |  57.23  | 68.23 | 21.44 | 31.73 | 37.50 |
  10 | 3 |  32 |  61.12  | 74.33 | 17.79 | 33.65 | 37.50 |
+
+--
+
+## Future development (Ideas)
+
+A few different approaches may be experimented. 
+As can be seen from above results, the current method 
+is still far from proven mature to model the pattern 
+of the data. 
+
+Also, I'm looking forward to running tests 
+on larger dataset. Perhaps at least 20k records 
+(currently just 4000 samples).
+
+--
 
 ## Caveat
 

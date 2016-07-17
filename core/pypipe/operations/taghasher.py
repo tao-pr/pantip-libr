@@ -12,7 +12,7 @@ from termcolor import colored
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import MaxAbsScaler
+from sklearn.preprocessing import Binarizer
 from sklearn.decomposition import NMF
 
 def new(n_feature=128):
@@ -25,10 +25,11 @@ def new(n_feature=128):
 
 	smoother = NMF(n_components=n_feature)
 
-	# Scaler which scales the feature values by abs max
-	scaler = MaxAbsScaler(copy=True) #Avoid in-place update
+	# Binarise the vector's individual values 
+	binariser = Binarizer(copy=True)
 
-	return [vectorizer,smoother,scaler]
+	# Count vectoriser => NMF as smoother => Binariser
+	return [vectorizer,smoother,binariser]
 
 
 def save(operations,path):

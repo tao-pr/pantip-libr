@@ -178,6 +178,7 @@ def train_sentiment_capture(stopwords,save=False):
 		list(vecX)
 	)
 
+	# TAOTODO: Consider joining a:b with any probabilistic model?
 	X = [list(a) + list(b) for a,b in XS]
 
 	rabbit.end(mqy)

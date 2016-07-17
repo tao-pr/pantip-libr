@@ -13,7 +13,6 @@ from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.preprocessing import Normalizer
 from sklearn.decomposition import TruncatedSVD
-##from sklearn.decomposition import PCA
 
 
 # Create a text process pipeline (vectorizer)

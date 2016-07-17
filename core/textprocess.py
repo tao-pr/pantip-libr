@@ -62,15 +62,15 @@ def take_sentiment_score(record):
 	positives = sum([v[1] for v in data['emoti'] if v[0] not in ['สยอง']])
 	negatives = sum([v[1] for v in data['emoti'] if v[0] in ['สยอง']])
 
-	# Classify by degree of attention & sentiments
-	if negatives >= 3: # Negative
-		return -1 # People dislike this
-	if vote + positives + negatives == 0:
-		return 0 # Nobody cares
-	if vote < 12: # Some like it
-		return 1
+	if vote>16: # TAOTOREVIEW: This number should be derived based on statistic
+		if negatives>=positives:
+			# People deem it negative content
+			return -1
+		else:
+			# People deem it positive content
+			return 1
 	else:
-		return 10 # Popular post
+		return 0 # Not gaining much attention
 
 	
 def validate(predicted,truth):

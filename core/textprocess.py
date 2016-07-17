@@ -94,22 +94,6 @@ def conclude_validation(results):
 # Train the centroid clustering
 def train_sentiment_capture(stopwords,save=False):
 
-	"""
-	STEP#1 :: Cluster topic with unsupervised classification
-
-		X1 text ---> [@cluster] ----> (y1 group, X1 text)
-
-	STEP#2 :: Combine topic, tags, and group to make feature vector
-
-		X2 <--  [tags, y1, X1]
-		Y2 <--  Sentiment score
-
-	STEP#3 :: Train the classification
-
-		(Y2,X2) -----> [@classification] ----> @model
-
-	"""
-
 	print(colored('==============================','cyan'))
 	print(colored('  SENTIMENT TRAINING','cyan'))
 	print()
@@ -118,7 +102,7 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('  TAG   : {0}'.format(args['tagdim']),'cyan'))
 	print(colored('==============================','cyan'))
 
-	# STEP#1
+	# STEP#1 : [text] => [numeric vectors]
 	#------------------------------------
 	# Vectorise the input topic (text only) 
 	mqx1     = rabbit.create('localhost','pantip-x1')
@@ -141,28 +125,28 @@ def train_sentiment_capture(stopwords,save=False):
 
 	rabbit.end(mqx1)
 
-	vecX = [x for x in iterX]
+	# vecX = [x for x in iterX]
 
 	# Cluster the vectorised records with unsupervised clf
-	contentClf = textcluster.safe_load(
-		CONTENT_CLUSTER_PATH,
-		n_labels=args['kcluster']
-	)
-	clusterMe  = textcluster.classify(contentClf,learn=True)
+	# contentClf = textcluster.safe_load(
+	# 	CONTENT_CLUSTER_PATH,
+	# 	n_labels=args['kcluster']
+	# )
+	# clusterMe  = textcluster.classify(contentClf,learn=True)
 
-	# Classification doesn't accept a generator,
-	# So we need to roll the matrix out of the MQ
-	clusters = DP.pipe(
-		[x for x in vecX],
-		dests=None,
-		transform=clusterMe,
-		title='Clustering'
-	)
+	# # Classification doesn't accept a generator,
+	# # So we need to roll the matrix out of the MQ
+	# clusters = DP.pipe(
+	# 	[x for x in vecX],
+	# 	dests=None,
+	# 	transform=clusterMe,
+	# 	title='Clustering'
+	# )
 
 	print(colored('#STEP-1 finished ...','cyan'))
 
 
-	# STEP#2
+	# STEP#2 : [tags] => [numeric vectors]
 	# ---------------------------------------------
 	# Vectorise tags	
 	
@@ -182,7 +166,7 @@ def train_sentiment_capture(stopwords,save=False):
 
 	rabbit.end(mqx2)	
 	
-	# STEP#3
+	# STEP#3 : [X] = [vectorised text] : [vectorised tags]
 	#----------------------------------------
 	# Join each of the component together
 	# Assembly a training vector
@@ -191,11 +175,10 @@ def train_sentiment_capture(stopwords,save=False):
 
 	XS = zip(
 		list(vectags),
-		[[i] for i in clusters], # Make scalar a single-element vector
 		list(vecX)
 	)
 
-	X = [list(a) + list(b) + list(c) for a,b,c in XS]
+	X = [list(a) + list(b) for a,b in XS]
 
 	rabbit.end(mqy)
 

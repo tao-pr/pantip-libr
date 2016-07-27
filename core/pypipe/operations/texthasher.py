@@ -38,7 +38,7 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 		if decomposition=='LDA':
 			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
 				n_topics=n_components,
-				max_iter=15
+				max_iter=15	
 			)
 		else:
 			reducer = TruncatedSVD(n_components) # Damn slow
@@ -50,7 +50,7 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 def save(operations,path):
 	print('Saving texthasher model...')
 	with open(path,'wb+') as f:
-		pickle.dump(operations,f)
+		pickle.dump(operations,f,protocal=4)
 
 def load(path):
 	with open(path,'rb') as f:

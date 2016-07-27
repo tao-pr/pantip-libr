@@ -19,6 +19,7 @@ from sklearn.decomposition import NMF
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.decomposition import SparsePCA
 
 
 # Create a text process pipeline (vectorizer)
@@ -40,8 +41,13 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 				n_topics=n_components,
 				max_iter=15	
 			)
+		elif decomposition=='SVD':
+			reducer = TruncatedSVD(n_components,n_iter=15) # Damn slow
+		elif decomposition=='PCA':
+			reducer = SparsePCA(n_components,alpha=1.,max_iter=15)
 		else:
-			reducer = TruncatedSVD(n_components) # Damn slow
+			return [idf,norm]
+
 		return [idf,reducer,norm]
 	else:
 		return [idf,norm]

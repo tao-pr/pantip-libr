@@ -30,7 +30,8 @@ CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
 # Prepare training arguments
 arguments = argparse.ArgumentParser()
-arguments.add_argument('--decom',  type=str, default='SVD') # Text decomposition method
+arguments.add_argument('--save', dest='save', action='store_true') # Save the models?
+arguments.add_argument('--decom',  type=str, default=None) # Text decomposition method
 arguments.add_argument('--dim',    type=int, default=800) # Dimension of preprocess text hasher
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
 args = vars(arguments.parse_args(sys.argv[1:]))
@@ -287,7 +288,7 @@ if __name__ == '__main__':
 
 	# Start the training process
 	print(colored('Training centroid model ...','cyan'))
-	output = train_sentiment_capture(stopwords,save=True)
+	output = train_sentiment_capture(stopwords,save=args['save'])
 
 	# Bye
 	print(colored('[WORKER FINISHED!]','cyan'))

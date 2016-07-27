@@ -19,10 +19,12 @@ rm data/cluster/*
 
 rm data/hasher/*
 
-# Batch train for SVD
+# Batch trainings
 python3 core/textprocess.py --decom SVD --dim 512 --tagdim 16
+python3 core/requeue.py
+#python3 core/textprocess.py --decom PCA --dim 512 --tagdim 16
 #python3 core/requeue.py
+python3 core/textprocess.py --decom LDA --dim 512 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --tagdim 16
 
-# Batch train for LDA
-# python3 core/textprocess.py --decom LDA --tagdim 16
-# python3 core/requeue.py

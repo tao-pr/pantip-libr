@@ -60,13 +60,13 @@ def save(operations,path):
 
 def load(path):
 	with open(path,'rb') as f:
-		return pickle.load(f)
+		return pickle.load(f,protocal=4)
 
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
 def safe_load(path,n_components,stop_words,decomposition):
-	if os.path.isfile(path): return load(path)
+	if os.path.isfile(path) and os.stat(path).st_size>0: return load(path)
 	else: return new(n_components,stop_words,decomposition)
 
 def hash(operations,learn=False):

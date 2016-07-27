@@ -23,6 +23,10 @@ def new(n_feature=128):
 		binary=True
 	)
 
+	# Fill the gap (missing expected tags)
+	# ---
+	# Hypothesis: Some tags are somehow related so 
+	# we smoothen the missing values with matrix factorisation.
 	smoother = NMF(n_components=n_feature)
 
 	# Binarise the vector's individual values 
@@ -33,6 +37,7 @@ def new(n_feature=128):
 
 
 def save(operations,path):
+	print('Saving taghasher model...')
 	with open(path,'wb+') as f:
 		pickle.dump(operations,f)
 

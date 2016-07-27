@@ -16,7 +16,6 @@ from pypipe.operations import tapper as T
 from pypipe.operations import cluster
 from pypipe.operations import taghasher
 from pypipe.operations import texthasher
-from pypipe.operations import compressor
 from pypipe.operations import textcluster
 
 
@@ -31,8 +30,8 @@ CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
 # Prepare training arguments
 arguments = argparse.ArgumentParser()
-arguments.add_argument('--dim', type=int, default=800) # Dimension of preprocess text hasher
-arguments.add_argument('--kcluster', type=int, default=4) # Number of text cluster
+arguments.add_argument('--decom',  type=str, default='SVD') # Text decomposition method
+arguments.add_argument('--dim',    type=int, default=800) # Dimension of preprocess text hasher
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
 args = vars(arguments.parse_args(sys.argv[1:]))
 
@@ -97,9 +96,9 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('==============================','cyan'))
 	print(colored('  SENTIMENT TRAINING','cyan'))
 	print()
-	print(colored('  DIM   : {0}'.format(args['dim']),'cyan'))
-	print(colored('  K     : {0}'.format(args['kcluster']),'cyan'))
-	print(colored('  TAG   : {0}'.format(args['tagdim']),'cyan'))
+	print(colored('  TEXT DECOMPOSITION WITH  : {0}'.format(args['decom']),'cyan'))
+	print(colored('  DIMENSION OF TEXT VECTOR : {0}'.format(args['dim']),'cyan'))
+	print(colored('  MAX LENGTH OF TAG VECTOR : {0}'.format(args['tagdim']),'cyan'))
 	print(colored('==============================','cyan'))
 
 	# STEP#1 : [text] => [numeric vectors]
@@ -110,7 +109,7 @@ def train_sentiment_capture(stopwords,save=False):
 		TEXT_VECTORIZER_PATH,
 		n_components=args['dim'],
 		stop_words=stopwords,
-		decomposition='SVD'
+		decomposition=args['decom']
 	)
 	hashMe = texthasher.hash(topicHasher,learn=True)
 
@@ -125,23 +124,7 @@ def train_sentiment_capture(stopwords,save=False):
 
 	rabbit.end(mqx1)
 
-	# vecX = [x for x in iterX]
-
-	# Cluster the vectorised records with unsupervised clf
-	# contentClf = textcluster.safe_load(
-	# 	CONTENT_CLUSTER_PATH,
-	# 	n_labels=args['kcluster']
-	# )
-	# clusterMe  = textcluster.classify(contentClf,learn=True)
-
-	# # Classification doesn't accept a generator,
-	# # So we need to roll the matrix out of the MQ
-	# clusters = DP.pipe(
-	# 	[x for x in vecX],
-	# 	dests=None,
-	# 	transform=clusterMe,
-	# 	title='Clustering'
-	# )
+	vecX = [x for x in iterX]
 
 	print(colored('#STEP-1 finished ...','cyan'))
 
@@ -218,8 +201,8 @@ def train_sentiment_capture(stopwords,save=False):
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
 		csv.write('{0},{1},{2},{3},{4}\n'.format(
-			str(args['dim']).center(4), #0
-			str(args['kcluster']).center(3), #1,
+			str(args['decom'].center(7)), #0
+			str(args['dim']).center(5), #1
 			str(args['tagdim']).center(5), #2
 			'{0:.2f}'.format(predict_rate).center(7), #3
 			','.join(lbl_predict_rate) #4
@@ -230,7 +213,7 @@ def train_sentiment_capture(stopwords,save=False):
 	if save:
 		print(colored('Saving models...','cyan'))
 		texthasher.save(topicHasher,TEXT_VECTORIZER_PATH)
-		textcluster.save(contentClf,CONTENT_CLUSTER_PATH)
+		# textcluster.save(contentClf,CONTENT_CLUSTER_PATH)
 		taghasher.save(tagHasher,TAG_HASHER_PATH)
 		cluster.save(clf,CLF_PATH)
 		print(colored('[DONE]','green'))

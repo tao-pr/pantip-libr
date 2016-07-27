@@ -3,6 +3,8 @@ Vector compressor
 @starcolon projects
 """
 
+# TAOTODO: Deprecated module
+
 import numpy as np
 import os.path
 import pickle
@@ -14,24 +16,23 @@ from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.preprocessing import Normalizer
 from sklearn.decomposition import TruncatedSVD
 
-
 # Create a text process pipeline (vectorizer)
 def new(n_components=None):
 
+	operations = []
+
 	# Prepare dimentionality reducer
-	if n_components is None:
-		svd = TruncatedSVD()
-	else:
-		svd = TruncatedSVD(n_components)
+	if n_components is not None:
+		operations.append(TruncatedSVD(n_components))
 
 	# Prepare normaliser
-	norm = Normalizer(norm='l2') # Cosine similarity 
-
-	operations = [svd,norm]
+	operations.append(Normalizer(norm='l2')) # Cosine similarity 
+	
 	return operations
 
 
 def save(operations,path):
+	print('Saving compressor model...')
 	with open(path,'wb+') as f:
 		pickle.dump(operations,f)
 

@@ -48,6 +48,7 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 
 
 def save(operations,path):
+	print('Saving texthasher model...')
 	with open(path,'wb+') as f:
 		pickle.dump(operations,f)
 

@@ -34,17 +34,19 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 	# Prepare normaliser
 	norm = Normalizer(norm='l2') # Cosine similarity 
 
+	# TAOTODO: Apply feature selection with xi2 score weighting
+
 	# Prepare dimentionality reducer
 	if n_components:
 		if decomposition=='LDA':
 			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
 				n_topics=n_components,
-				max_iter=15	
+				max_iter=8	
 			)
 		elif decomposition=='SVD':
-			reducer = TruncatedSVD(n_components,n_iter=15) # Damn slow
+			reducer = TruncatedSVD(n_components,n_iter=8) # Damn slow
 		elif decomposition=='PCA':
-			reducer = SparsePCA(n_components,alpha=1.,max_iter=15)
+			reducer = SparsePCA(n_components,alpha=1.,max_iter=8)
 		else:
 			return [idf,norm]
 

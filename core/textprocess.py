@@ -209,11 +209,6 @@ def train_sentiment_capture(stopwords,save=False):
 			','.join(lbl_predict_rate) #4
 		))
 
-	# TAODEBUG:
-	print(colored('********************','green'))
-	print(labels)
-	
-
 	#Save the trained models
 	if save:
 		print(colored('Saving models...','cyan'))

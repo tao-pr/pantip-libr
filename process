@@ -10,7 +10,7 @@ else
 	rm "$CSV_PATH"
 	touch "$CSV_PATH"
 fi
-echo "DECOM , DIM ,   K , % TOT ,  [0]  ,  [1]  ,  [1]" > "$CSV_PATH"
+echo "DECOM , DIM , TAG , % TOT ,  [0]  ,  [1]  ,  [1]" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py

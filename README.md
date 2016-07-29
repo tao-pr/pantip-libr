@@ -112,7 +112,7 @@ Still in experimental phase.
 
 *Training with:* 14000 Samples
 
-| DECOM | DIM |   K | % TOT |  [0]  |  [1]  |  [-1] |
+| DECOM | DIM | TAG | % TOT |  [0]  |  [1]  |  [-1] |
 |-------|-----|-----|-------|-------|-------|-------|
 |  SVD  | 512 |  16 | 92.36 | 93.17 | 43.48 | 100.00|
 
@@ -120,8 +120,8 @@ Still in experimental phase.
 
 ```text
 DECOM : TFIDF to dense matrix decomposition
-DIM   : Dimension of the target dense matrix
-K     : Number of clusters
+DIM   : Dimension of the target dense matrix of topic
+TAG   : Dimension of the target dense matrix of topic tags
 %TOT  : Total accuracy
 [0]   : Accuracy of the class [0] : Neutral responses
 [1]   : Accuracy of the class [1] : Positive responses

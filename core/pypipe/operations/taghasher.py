@@ -12,7 +12,7 @@ from termcolor import colored
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import MaxAbsScaler
+from sklearn.preprocessing import Binarizer
 from sklearn.decomposition import NMF
 
 def new(n_feature=128):
@@ -23,15 +23,21 @@ def new(n_feature=128):
 		binary=True
 	)
 
+	# Fill the gap (missing expected tags)
+	# ---
+	# Hypothesis: Some tags are somehow related so 
+	# we smoothen the missing values with matrix factorisation.
 	smoother = NMF(n_components=n_feature)
 
-	# Scaler which scales the feature values by abs max
-	scaler = MaxAbsScaler(copy=True) #Avoid in-place update
+	# Binarise the vector's individual values 
+	binariser = Binarizer(copy=True)
 
-	return [vectorizer,smoother,scaler]
+	# Count vectoriser => NMF as smoother => Binariser
+	return [vectorizer,smoother,binariser]
 
 
 def save(operations,path):
+	print('Saving taghasher model...')
 	with open(path,'wb+') as f:
 		pickle.dump(operations,f)
 

@@ -8,11 +8,16 @@ import pickle
 from sklearn.cluster import KMeans
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
-def new():
-	nc = NearestCentroid(
+METHODS = {
+	'centroid': NearestCentroid(
 		metric='euclidean',#TAOTODO: Any better metric?
 		shrink_threshold=None
 	)
+}
+
+def new(method='centroid'):
+
+	nc = METHODS[method]
 
 	return nc
 

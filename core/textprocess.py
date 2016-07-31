@@ -203,8 +203,8 @@ def train_sentiment_capture(stopwords,save=False):
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
 		csv.write('{0},{1},{2},{3},{4},{5}\n'.format(
-			str(args['decom'].center(5)), #0
-			str(args['n'].center(5)), #1
+			str(args['decom']).center(5), #0
+			str(args['n']).center(5), #1
 			str(args['feat']).center(5), #2
 			str(args['tagdim']).center(5), #3
 			'{0:.2f}'.format(predict_rate).center(7), #4

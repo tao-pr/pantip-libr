@@ -31,7 +31,8 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 	)
 
 	# Prepare normaliser
-	norm = Normalizer(norm='l2') # Cosine similarity 
+	# TAOTODO: Needs to be non-negative normaliser
+	norm = Normalizer(norm='max')
 
 	# Prepare dimensionality reduction
 	if decomposition and n_components:
@@ -41,11 +42,11 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 				max_iter=8	
 			)
 		elif decomposition=='SVD':
-			reducer = TruncatedSVD(
-				n_components,
+			reducer = TruncatedSVD( # Best for small dataset, 
+				n_components,         # nightmare for large dataset
 				n_iter=8) # Damn slow
 		elif decomposition=='PCA':
-			reducer = IncrementalPCA(
+			reducer = IncrementalPCA( # TAOTODO: Not yet working
 				n_components,
 				batch_size=16)
 		else:

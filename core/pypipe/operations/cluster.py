@@ -57,12 +57,13 @@ def analyze(clf,labels=None):
 			print(colored('X: {0}'.format(np.shape(X)),'yellow'))
 			print(colored('y: {0}'.format(np.shape(labels)),'yellow'))
 
-			for opr in clf:
+			for opr in clf[:-1]:
 				print(colored(opr,'yellow'))
 				X = opr.fit_transform(X,labels)
 
 			# NOTE: The last operation of the CLF is always a clustering algo
-			return clf[-1].predict(matrix)
+			clf[-1].fit(X,labels)
+			return clf[-1].predict(X)
 
 		else: # Classification mode
 			X = matrix

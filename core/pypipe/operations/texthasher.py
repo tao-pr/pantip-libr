@@ -7,6 +7,7 @@ import numpy as np
 import os.path
 import pickle
 import json
+from .sparsetodense import SparseToDense
 from termcolor import colored
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -36,21 +37,26 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 
 	# Prepare dimensionality reduction
 	if decomposition and n_components:
-		if decomposition=='LDA':
+		if decomposition=='LDA': # Results in Non-negative matrix
 			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
 				n_topics=n_components,
 				max_iter=8	
 			)
+			return [idf,norm,reducer]
+
 		elif decomposition=='SVD':
 			reducer = TruncatedSVD( # Best for small dataset, 
 				n_components,         # nightmare for large dataset
 				n_iter=8) # Damn slow
+			return [idf,norm,reducer]
+
 		elif decomposition=='PCA':
 			reducer = IncrementalPCA( # TAOTODO: Not yet working
 				n_components,
-				batch_size=16)
-		else:
-			return [idf,norm]
+				batch_size=100)
+			return [idf,norm,reducer]
+
+		return [idf,norm]
 
 		return [idf,reducer,norm]
 	else:

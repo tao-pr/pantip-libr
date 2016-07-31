@@ -111,7 +111,7 @@ if __name__ == '__main__':
 	Pipe.push(pipe,wordbag.feed(bag))
 	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
-	# Iterate through each record and process
+	# Iterate through each record and processing
 	couch.each_do(db,process_with(pipe),limit=500)
 
 	# Disconnect from the MQs

@@ -6,6 +6,7 @@ Topic category classifier
 import os
 import pickle
 from sklearn.cluster import KMeans
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
 METHODS = {
@@ -15,11 +16,15 @@ METHODS = {
 	)
 }
 
-def new(method='centroid'):
+def new(method='centroid',n_features=8):
 
+	# Clustering method
 	nc = METHODS[method]
 
-	return nc
+	# Orthogonal feature selector
+	selector = SelectKBest(chi2, k=n_features)
+
+	return [selector, nc]
 
 def save(operations,path):
 	with open(path,'wb+') as f:
@@ -32,19 +37,27 @@ def load(path):
 # Load the hasher pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path):
+def safe_load(path,method,n_features):
 	if os.path.isfile(path): return load(path)
-	else: return new()
+	else: return new(method,n_features)
 
 # @return {matrix} if {labels} is supplied
 # @return {list} of classification, otherwise
 def analyze(clf,labels=None):
 	def _do(matrix):
 		if labels:  # Learning mode
-			clf.fit(matrix,labels)
-			return clf.predict(matrix)
+			X = matrix
+			for opr in clf:
+				X = clf.fit_transform(X,labels)
+			# NOTE: The last operation of the CLF is always a clustering algo
+			return clf[-1].predict(matrix)
 		else: # Classification mode
-			y = clf.predict(matrix)
+			X = matrix
+			# Feature transformations
+			for opr in clf[:-1]:
+				X = opr.transform(X)
+			# NOTE: Predict the clusters with the last operation
+			y = clf[-1].predict(X)
 			return iter(y)
 	return _do
 

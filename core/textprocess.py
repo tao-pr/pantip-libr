@@ -97,7 +97,6 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('==============================','cyan'))
 	print(colored('  SENTIMENT TRAINING','cyan'))
 	print()
-	print(colored('  TEXT DECOMPOSITION WITH  : {0}'.format(args['decom']),'cyan'))
 	print(colored('  DIMENSION OF TEXT VECTOR : {0}'.format(args['dim']),'cyan'))
 	print(colored('  MAX LENGTH OF TAG VECTOR : {0}'.format(args['tagdim']),'cyan'))
 	print(colored('==============================','cyan'))
@@ -108,9 +107,7 @@ def train_sentiment_capture(stopwords,save=False):
 	mqx1     = rabbit.create('localhost','pantip-x1')
 	topicHasher = texthasher.safe_load(
 		TEXT_VECTORIZER_PATH,
-		n_components=args['dim'],
-		stop_words=stopwords,
-		decomposition=args['decom']
+		stop_words=stopwords
 	)
 	hashMe = texthasher.hash(topicHasher,learn=True)
 

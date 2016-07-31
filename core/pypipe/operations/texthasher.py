@@ -23,7 +23,7 @@ from sklearn.decomposition import SparsePCA
 
 
 # Create a text process pipeline (vectorizer)
-def new(n_components=None,stop_words=[],decomposition='SVD'):
+def new(stop_words=[],decomposition='SVD'):
 
 	# Prepare vectoriser engines
 	idf = TfidfVectorizer(
@@ -34,25 +34,27 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 	# Prepare normaliser
 	norm = Normalizer(norm='l2') # Cosine similarity 
 
-	# TAOTODO: Apply feature selection with xi2 score weighting
+	return [idf,norm]
 
 	# Prepare dimentionality reducer
-	if n_components:
-		if decomposition=='LDA':
-			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
-				n_topics=n_components,
-				max_iter=8	
-			)
-		elif decomposition=='SVD':
-			reducer = TruncatedSVD(n_components,n_iter=8) # Damn slow
-		elif decomposition=='PCA':
-			reducer = SparsePCA(n_components,alpha=1.,max_iter=8)
-		else:
-			return [idf,norm]
+	# TAOTODO: Deprecate following
 
-		return [idf,reducer,norm]
-	else:
-		return [idf,norm]
+	# if n_components:
+	# 	if decomposition=='LDA':
+	# 		reducer = LatentDirichletAllocation( # TFIDF --> Topic term
+	# 			n_topics=n_components,
+	# 			max_iter=8	
+	# 		)
+	# 	elif decomposition=='SVD':
+	# 		reducer = TruncatedSVD(n_components,n_iter=8) # Damn slow
+	# 	elif decomposition=='PCA':
+	# 		reducer = SparsePCA(n_components,alpha=1.,max_iter=8)
+	# 	else:
+	# 		return [idf,norm]
+
+	# 	return [idf,reducer,norm]
+	# else:
+	# 	return [idf,norm]
 
 
 def save(operations,path):
@@ -67,9 +69,9 @@ def load(path):
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path,n_components,stop_words,decomposition):
+def safe_load(path,stop_words,decomposition):
 	if os.path.isfile(path) and os.stat(path).st_size>0: return load(path)
-	else: return new(n_components,stop_words,decomposition)
+	else: return new(stop_words,decomposition)
 
 def hash(operations,learn=False):
 	# @param {iterable} of string

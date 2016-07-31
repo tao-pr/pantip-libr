@@ -48,13 +48,17 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 			reducer = TruncatedSVD( # Best for small dataset, 
 				n_components,         # nightmare for large dataset
 				n_iter=8) # Damn slow
+
+			# TAOTODO: Needs to convert to Non-negative matrix
+
 			return [idf,norm,reducer]
 
 		elif decomposition=='PCA':
-			reducer = IncrementalPCA( # TAOTODO: Not yet working
-				n_components,
-				batch_size=100)
-			return [idf,norm,reducer]
+			# When using IPCA, remember to always keep:
+			# n_samples > n_components > batch_size
+			reducer = IncrementalPCA(n_components)
+			to_dense = SparseToDense()
+			return [idf,norm,to_dense,reducer]
 
 		return [idf,norm]
 

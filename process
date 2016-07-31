@@ -32,5 +32,5 @@ rm data/hasher/*
 #       very efficiently. So the accuracy is not good.
 
 # Batch trainings
-python3 core/textprocess.py --decom LDA --n 200 --tagdim 16
+python3 core/textprocess.py --decom PCA --n 200 --tagdim 16
 #python3 core/requeue.py

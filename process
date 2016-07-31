@@ -16,7 +16,7 @@ else
 	rm "$CSV_PATH"
 	touch "$CSV_PATH"
 fi
-echo "DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [1]" > "$CSV_PATH"
+echo "DECOM ,  N , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py
@@ -32,5 +32,29 @@ rm data/hasher/*
 #       very efficiently. So the accuracy is not good.
 
 # Batch trainings
+python3 core/textprocess.py --decom SVD --n 400 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom SVD --n 200 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom SVD --n 100 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom SVD --n 50 --tagdim 16
+python3 core/requeue.py
+
+python3 core/textprocess.py --decom LDA --n 400 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom LDA --n 200 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom LDA --n 100 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom LDA --n 50 --tagdim 16
+python3 core/requeue.py
+
+python3 core/textprocess.py --decom PCA --n 400 --tagdim 16
+python3 core/requeue.py
 python3 core/textprocess.py --decom PCA --n 200 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom PCA --n 100 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom PCA --n 50 --tagdim 16
 #python3 core/requeue.py

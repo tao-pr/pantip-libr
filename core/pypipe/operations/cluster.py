@@ -8,7 +8,7 @@ import pickle
 import numpy as np
 from termcolor import colored
 from sklearn.cluster import KMeans
-from sklearn.feature_selection import SelectKBest, chi2
+from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
 METHODS = {
@@ -25,7 +25,7 @@ def new(method='centroid',n_features=8):
 
 	# Orthogonal feature selector
 	if n_features is None: n_features = 'all'
-	selector = SelectKBest(chi2, k=n_features)
+	selector = SelectKBest(f_classif, k=n_features)
 
 	# NOTE: The only last operation of the list
 	# must be a classifier or clustering model

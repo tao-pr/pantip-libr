@@ -49,8 +49,6 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 				n_components,         # nightmare for large dataset
 				n_iter=8) # Damn slow
 
-			# TAOTODO: Needs to convert to Non-negative matrix
-
 			return [idf,norm,reducer]
 
 		elif decomposition=='PCA':
@@ -58,8 +56,6 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 			# n_samples > n_components > batch_size
 			reducer = IncrementalPCA(n_components)
 			to_dense = SparseToDense()
-
-			# TAOTODO: Needs to convert to Non-negative matrix
 
 			return [idf,norm,to_dense,reducer]
 

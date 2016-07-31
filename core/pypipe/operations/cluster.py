@@ -24,8 +24,11 @@ def new(method='centroid',n_features=8):
 	nc = METHODS[method]
 
 	# Orthogonal feature selector
+	if n_features is None: n_features = 'all'
 	selector = SelectKBest(chi2, k=n_features)
 
+	# NOTE: The only last operation of the list
+	# must be a classifier or clustering model
 	return [selector, nc]
 
 def save(operations,path):
@@ -50,7 +53,7 @@ def analyze(clf,labels=None):
 		if labels:  # Learning mode
 			X = matrix
 
-			# Display the dimension of the training matrix
+			# Display the dimension of the training elements
 			print(colored('X: {0}'.format(np.shape(X)),'yellow'))
 			print(colored('y: {0}'.format(np.shape(labels)),'yellow'))
 

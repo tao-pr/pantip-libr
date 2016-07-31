@@ -31,8 +31,7 @@ CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 # Prepare training arguments
 arguments = argparse.ArgumentParser()
 arguments.add_argument('--save', dest='save', action='store_true') # Save the models?
-arguments.add_argument('--decom',  type=str, default=None) # Text decomposition method
-arguments.add_argument('--dim',    type=int, default=800) # Dimension of preprocess text hasher
+arguments.add_argument('--feat',  type=int, default=100) # Dimension of text feature
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
 args = vars(arguments.parse_args(sys.argv[1:]))
 
@@ -97,7 +96,7 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('==============================','cyan'))
 	print(colored('  SENTIMENT TRAINING','cyan'))
 	print()
-	print(colored('  DIMENSION OF TEXT VECTOR : {0}'.format(args['dim']),'cyan'))
+	print(colored('  DIMENSION OF FEATURE     : {0}'.format(args['feat']),'cyan'))
 	print(colored('  MAX LENGTH OF TAG VECTOR : {0}'.format(args['tagdim']),'cyan'))
 	print(colored('==============================','cyan'))
 
@@ -168,7 +167,7 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('Training process started...','cyan'))
 
 
-	clf     = cluster.safe_load(CLF_PATH)
+	clf     = cluster.safe_load(CLF_PATH,'centroid',args['feat'])
 	trainMe = cluster.analyze(clf,labels=Y)
 	Y_      = trainMe(X)
 	print(colored('[DONE]','yellow'))
@@ -198,26 +197,25 @@ def train_sentiment_capture(stopwords,save=False):
 	
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
-		csv.write('{0},{1},{2},{3},{4}\n'.format(
-			str(args['decom'].center(7)), #0
-			str(args['dim']).center(5), #1
-			str(args['tagdim']).center(5), #2
-			'{0:.2f}'.format(predict_rate).center(7), #3
-			','.join(lbl_predict_rate) #4
+		csv.write('{0},{1},{2},{3}\n'.format(
+			str(args['feat']).center(5), #0
+			str(args['tagdim']).center(5), #1
+			'{0:.2f}'.format(predict_rate).center(7), #2
+			','.join(lbl_predict_rate) #3
 		))
 
 	#Save the trained models
 	if save:
 		print(colored('Saving models...','cyan'))
 		texthasher.save(topicHasher,TEXT_VECTORIZER_PATH)
-		# textcluster.save(contentClf,CONTENT_CLUSTER_PATH)
 		taghasher.save(tagHasher,TAG_HASHER_PATH)
 		cluster.save(clf,CLF_PATH)
 		print(colored('[DONE]','green'))
 
 
+# TAOTOREVIEW: 
 def load_models():
-	topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,n_components=None,stop_words=[],decomposition='SVD')
+	topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,stop_words=[])
 	tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
 	contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=16)
 	clf         = cluster.safe_load(CLF_PATH)

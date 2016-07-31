@@ -48,17 +48,21 @@ def analyze(clf,labels=None):
 		if labels:  # Learning mode
 			X = matrix
 			for opr in clf:
-				X = clf.fit_transform(X,labels)
+				X = opr.fit_transform(X,labels)
+
 			# NOTE: The last operation of the CLF is always a clustering algo
 			return clf[-1].predict(matrix)
+
 		else: # Classification mode
 			X = matrix
 			# Feature transformations
 			for opr in clf[:-1]:
 				X = opr.transform(X)
+
 			# NOTE: Predict the clusters with the last operation
 			y = clf[-1].predict(X)
 			return iter(y)
+
 	return _do
 
 

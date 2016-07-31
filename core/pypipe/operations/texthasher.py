@@ -23,7 +23,7 @@ from sklearn.decomposition import SparsePCA
 
 
 # Create a text process pipeline (vectorizer)
-def new(stop_words=[],decomposition='SVD'):
+def new(stop_words=[]):
 
 	# Prepare vectoriser engines
 	idf = TfidfVectorizer(
@@ -69,9 +69,9 @@ def load(path):
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path,stop_words,decomposition):
+def safe_load(path,stop_words):
 	if os.path.isfile(path) and os.stat(path).st_size>0: return load(path)
-	else: return new(stop_words,decomposition)
+	else: return new(stop_words)
 
 def hash(operations,learn=False):
 	# @param {iterable} of string

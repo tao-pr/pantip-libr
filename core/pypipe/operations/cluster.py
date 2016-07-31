@@ -5,6 +5,8 @@ Topic category classifier
 
 import os
 import pickle
+import numpy as np
+from termcolor import colored
 from sklearn.cluster import KMeans
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.neighbors.nearest_centroid import NearestCentroid
@@ -47,7 +49,13 @@ def analyze(clf,labels=None):
 	def _do(matrix):
 		if labels:  # Learning mode
 			X = matrix
+
+			# Display the dimension of the training matrix
+			print(colored('X: {0}'.format(np.shape(X)),'yellow'))
+			print(colored('y: {0}'.format(np.shape(labels)),'yellow'))
+
 			for opr in clf:
+				print(colored(opr,'yellow'))
 				X = opr.fit_transform(X,labels)
 
 			# NOTE: The last operation of the CLF is always a clustering algo

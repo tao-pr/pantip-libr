@@ -34,6 +34,8 @@ def new(stop_words=[]):
 	# Prepare normaliser
 	norm = Normalizer(norm='l2') # Cosine similarity 
 
+	# TAOTODO: Needs a mapping [Sparse] => [Dense] matrix here
+
 	return [idf,norm]
 
 	# Prepare dimentionality reducer

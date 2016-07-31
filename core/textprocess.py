@@ -31,7 +31,7 @@ CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 # Prepare training arguments
 arguments = argparse.ArgumentParser()
 arguments.add_argument('--save', dest='save', action='store_true') # Save the models?
-arguments.add_argument('--decom', dest=str, default=None) # Text feature decomposition method
+arguments.add_argument('--decom', type=str, default=None) # Text feature decomposition method
 arguments.add_argument('--n', type=int, default=None) # Number of decomposed components
 arguments.add_argument('--feat',  type=int, default=None) # Dimension of text feature
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash

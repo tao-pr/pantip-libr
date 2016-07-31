@@ -3,6 +3,12 @@
 # Prepare report CSV
 CSV_PATH="$PANTIPLIBR/data/report.csv"
 
+# Dirty way to flush RabbitMQ memory
+# brew services restart rabbitmq
+
+# Delay
+sleep 3
+
 if [ ! -f "$CSV_PATH" ] 
 then
 	touch "$CSV_PATH"
@@ -10,7 +16,7 @@ else
 	rm "$CSV_PATH"
 	touch "$CSV_PATH"
 fi
-echo "DECOM , DIM , TAG , % TOT ,  [0]  ,  [1]  ,  [1]" > "$CSV_PATH"
+echo "DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [1]" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py
@@ -20,5 +26,5 @@ rm data/cluster/*
 rm data/hasher/*
 
 # Batch trainings
-python3 core/textprocess.py --tagdim 16
+python3 core/textprocess.py --decom SVD --n 200 --tagdim 16
 #python3 core/requeue.py

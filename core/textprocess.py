@@ -181,10 +181,10 @@ def train_sentiment_capture(stopwords,save=False):
 	# Self-validation
 	num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])
 	predict_rate = 100*float(num_correct)/float(len(Y))
-	print(colored('====== TRAINING LABELS =====','magenta'))
-	print(Y)
-	print(colored('========= PREDICTED ========','magenta'))
-	print(list(Y_))
+	# print(colored('====== TRAINING LABELS =====','magenta'))
+	# print(Y)
+	# print(colored('========= PREDICTED ========','magenta'))
+	# print(list(Y_))
 	print(colored('=========== RESULTS ========','magenta'))
 	print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
 

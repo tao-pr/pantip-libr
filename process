@@ -16,7 +16,7 @@ else
 	rm "$CSV_PATH"
 	touch "$CSV_PATH"
 fi
-echo "  CLUSTER  , DECOM ,  N , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
+echo "CLUSTER  , DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py

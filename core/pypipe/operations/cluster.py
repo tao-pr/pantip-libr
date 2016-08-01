@@ -12,8 +12,9 @@ from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
 METHODS = {
+	# TAOTODO: Try other clustering methods
 	'centroid': NearestCentroid(
-		metric='euclidean',#TAOTODO: Any better metric?
+		metric='euclidean',#TAOTOREVIEW: Any better metric?
 		shrink_threshold=None
 	)
 }

@@ -21,6 +21,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.decomposition import IncrementalPCA
+from sklearn.decomposition import SparsePCA
 
 # Create a text process pipeline (vectorizer)
 def new(stop_words=[],decomposition='SVD',n_components=5):
@@ -40,6 +41,7 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 		if decomposition=='LDA': # Results in Non-negative matrix
 			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
 				n_topics=n_components,
+				max_doc_update_iter=20,
 				max_iter=8	
 			)
 			return [idf,norm,reducer]
@@ -54,10 +56,15 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 		elif decomposition=='PCA':
 			# When using IPCA, remember to always keep:
 			# n_samples > n_components > batch_size
-			reducer = IncrementalPCA(n_components)
-			to_dense = SparseToDense()
+			# reducer = IncrementalPCA(n_components)
 
-			return [idf,norm,to_dense,reducer]
+			# Sparse -> Dense greedily consumes large amount of mem
+			# to_dense = SparseToDense()
+
+			# return [idf,norm,to_dense,reducer]
+
+			reducer = SparsePCA(n_components)
+			return [idf,norm,reducer]
 
 		return [idf,norm]
 	else:

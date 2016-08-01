@@ -5,21 +5,32 @@ Topic category classifier
 
 import os
 import pickle
+import numpy as np
+from termcolor import colored
 from sklearn.cluster import KMeans
+from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
 METHODS = {
+	# TAOTODO: Try other clustering methods
 	'centroid': NearestCentroid(
-		metric='euclidean',#TAOTODO: Any better metric?
+		metric='euclidean',#TAOTOREVIEW: Any better metric?
 		shrink_threshold=None
 	)
 }
 
-def new(method='centroid'):
+def new(method='centroid',n_features=8):
 
+	# Clustering method
 	nc = METHODS[method]
 
-	return nc
+	# Orthogonal feature selector
+	if n_features is None: n_features = 'all'
+	selector = SelectKBest(f_classif, k=n_features)
+
+	# NOTE: The only last operation of the list
+	# must be a classifier or clustering model
+	return [selector, nc]
 
 def save(operations,path):
 	with open(path,'wb+') as f:
@@ -32,20 +43,39 @@ def load(path):
 # Load the hasher pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path):
+def safe_load(path,method,n_features):
 	if os.path.isfile(path): return load(path)
-	else: return new()
+	else: return new(method,n_features)
 
 # @return {matrix} if {labels} is supplied
 # @return {list} of classification, otherwise
 def analyze(clf,labels=None):
 	def _do(matrix):
 		if labels:  # Learning mode
-			clf.fit(matrix,labels)
-			return clf.predict(matrix)
+			X = matrix
+
+			# Display the dimension of the training elements
+			print(colored('X: {0}'.format(np.shape(X)),'yellow'))
+			print(colored('y: {0}'.format(np.shape(labels)),'yellow'))
+
+			for opr in clf[:-1]:
+				print(colored(opr,'yellow'))
+				X = opr.fit_transform(X,labels)
+
+			# NOTE: The last operation of the CLF is always a clustering algo
+			clf[-1].fit(X,labels)
+			return clf[-1].predict(X)
+
 		else: # Classification mode
-			y = clf.predict(matrix)
+			X = matrix
+			# Feature transformations
+			for opr in clf[:-1]:
+				X = opr.transform(X)
+
+			# NOTE: Predict the clusters with the last operation
+			y = clf[-1].predict(X)
 			return iter(y)
+
 	return _do
 
 

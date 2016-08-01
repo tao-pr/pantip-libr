@@ -110,18 +110,41 @@ of the repo.
 
 Still in experimental phase. 
 
-*Training with:* 14000 Samples
+**Brief Process:**
 
-| DECOM | DIM |   K | % TOT |  [0]  |  [1]  |  [-1] |
-|-------|-----|-----|-------|-------|-------|-------|
-|  SVD  | 512 |  16 | 92.36 | 93.17 | 43.48 | 100.00|
+```text
+text => [tfidf] => [normaliser] => [decomposition] => X1
+
+tag  => [vectoriser] => [NMF] => [binariser] => X2
+
+input <--- [X1:X2]
+
+input => [feature selection] => [centroid] => clusters
+```
+
+**Training with:** 5000 Samples
+
+| DECOM | DIM |#FEAT|   TAG | % TOT |  [0]  |  [1]  |  [-1] |
+|-------|-----|-----|-------|-------|-------|-------|-------|
+|  SVD  | 400 | full|   16  | 82.48 | 82.77 | 67.35 | 100.00
+|  SVD  | 200 | full|   16  | 81.30 | 81.55 | 68.37 | 100.00
+|  SVD  | 100 | full|   16  | 79.60 | 79.85 | 66.33 | 100.00
+|  SVD  |  50 | full|   16  | 78.44 | 78.87 | 56.12 | 100.00
+|  LDA  | 400 | full|   16  | 72.30 | 73.55 | 10.20 | 66.67 
+|  LDA  | 200 | full|   16  | 71.88 | 73.14 |  9.18 | 66.67 
+|  LDA  | 100 | full|   16  | 72.66 | 73.93 |  9.18 | 66.67 
+|  LDA  |  50 | full|   16  | 72.54 | 73.63 | 18.37 | 66.67 
+
+> PCA has also been tested but it requires too large amount 
+of memory footprint to produce a proper dense matrix as its input.
 
 *Where*
 
 ```text
 DECOM : TFIDF to dense matrix decomposition
-DIM   : Dimension of the target dense matrix
-K     : Number of clusters
+DIM   : Dimension of the target dense matrix of topic
+FEAT  : Number of selection of best features
+TAG   : Dimension of the target dense matrix of topic tags
 %TOT  : Total accuracy
 [0]   : Accuracy of the class [0] : Neutral responses
 [1]   : Accuracy of the class [1] : Positive responses

@@ -3,6 +3,12 @@
 # Prepare report CSV
 CSV_PATH="$PANTIPLIBR/data/report.csv"
 
+# Dirty way to flush RabbitMQ memory
+# brew services restart rabbitmq
+
+# Delay
+sleep 3
+
 if [ ! -f "$CSV_PATH" ] 
 then
 	touch "$CSV_PATH"
@@ -10,7 +16,7 @@ else
 	rm "$CSV_PATH"
 	touch "$CSV_PATH"
 fi
-echo "DECOM , DIM ,   K , % TOT ,  [0]  ,  [1]  ,  [1]" > "$CSV_PATH"
+echo "DECOM ,  N , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py
@@ -19,10 +25,42 @@ rm data/cluster/*
 
 rm data/hasher/*
 
-# Batch trainings
-python3 core/textprocess.py --decom SVD --dim 512 --tagdim 16
-python3 core/requeue.py
-python3 core/textprocess.py --decom LDA --dim 512 --tagdim 16
-# python3 core/requeue.py
-# python3 core/textprocess.py --tagdim 16
+# Quick notes:
+# ------------------
+# [LDA] works with chi2 best since it produces non-negative results.
+#       However, it doesn't seem to decompose the principal features 
+#       very efficiently. So the accuracy is not good.
 
+#       It runs amazingly slow when running on large dataset.
+
+# [SVD] runs so blazingly fast at smaller size of [n].
+
+# [PCA] does not work with sparse data.
+
+# Batch trainings
+# python3 core/textprocess.py --decom SVD --n 400 --tagdim 16
+# python3 core/requeue.py
+# python3 core/textprocess.py --decom SVD --n 200 --tagdim 16
+# python3 core/requeue.py
+# python3 core/textprocess.py --decom SVD --n 100 --tagdim 16
+# python3 core/requeue.py
+# python3 core/textprocess.py --decom SVD --n 50 --tagdim 16
+# python3 core/requeue.py
+
+# python3 core/textprocess.py --decom LDA --n 400 --tagdim 16
+# python3 core/requeue.py
+# python3 core/textprocess.py --decom LDA --n 200 --tagdim 16
+# python3 core/requeue.py
+# python3 core/textprocess.py --decom LDA --n 100 --tagdim 16
+# python3 core/requeue.py
+# python3 core/textprocess.py --decom LDA --n 50 --tagdim 16
+# python3 core/requeue.py
+
+python3 core/textprocess.py --decom PCA --n 400 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom PCA --n 200 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom PCA --n 100 --tagdim 16
+python3 core/requeue.py
+python3 core/textprocess.py --decom PCA --n 50 --tagdim 16
+#python3 core/requeue.py

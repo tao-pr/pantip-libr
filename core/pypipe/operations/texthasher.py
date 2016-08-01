@@ -7,6 +7,7 @@ import numpy as np
 import os.path
 import pickle
 import json
+from .sparsetodense import SparseToDense
 from termcolor import colored
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -19,11 +20,11 @@ from sklearn.decomposition import NMF
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.decomposition import IncrementalPCA
 from sklearn.decomposition import SparsePCA
 
-
 # Create a text process pipeline (vectorizer)
-def new(n_components=None,stop_words=[],decomposition='SVD'):
+def new(stop_words=[],decomposition='SVD',n_components=5):
 
 	# Prepare vectoriser engines
 	idf = TfidfVectorizer(
@@ -32,25 +33,40 @@ def new(n_components=None,stop_words=[],decomposition='SVD'):
 	)
 
 	# Prepare normaliser
-	norm = Normalizer(norm='l2') # Cosine similarity 
+	# TAOTODO: Needs to be non-negative normaliser
+	norm = Normalizer(norm='max')
 
-	# TAOTODO: Apply feature selection with xi2 score weighting
-
-	# Prepare dimentionality reducer
-	if n_components:
-		if decomposition=='LDA':
+	# Prepare dimensionality reduction
+	if decomposition and n_components:
+		if decomposition=='LDA': # Results in Non-negative matrix
 			reducer = LatentDirichletAllocation( # TFIDF --> Topic term
 				n_topics=n_components,
+				max_doc_update_iter=20,
 				max_iter=8	
 			)
-		elif decomposition=='SVD':
-			reducer = TruncatedSVD(n_components,n_iter=8) # Damn slow
-		elif decomposition=='PCA':
-			reducer = SparsePCA(n_components,alpha=1.,max_iter=8)
-		else:
-			return [idf,norm]
+			return [idf,norm,reducer]
 
-		return [idf,reducer,norm]
+		elif decomposition=='SVD':
+			reducer = TruncatedSVD( # Best for small dataset, 
+				n_components,         # nightmare for large dataset
+				n_iter=8) # Damn slow
+
+			return [idf,norm,reducer]
+
+		elif decomposition=='PCA':
+			# When using IPCA, remember to always keep:
+			# n_samples > n_components > batch_size
+			# reducer = IncrementalPCA(n_components)
+
+			# Sparse -> Dense greedily consumes large amount of mem
+			# to_dense = SparseToDense()
+
+			# return [idf,norm,to_dense,reducer]
+
+			reducer = SparsePCA(n_components)
+			return [idf,norm,reducer]
+
+		return [idf,norm]
 	else:
 		return [idf,norm]
 
@@ -67,9 +83,9 @@ def load(path):
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path,n_components,stop_words,decomposition):
+def safe_load(path,stop_words,decomposition,n_components):
 	if os.path.isfile(path) and os.stat(path).st_size>0: return load(path)
-	else: return new(n_components,stop_words,decomposition)
+	else: return new(stop_words,decomposition,n_components)
 
 def hash(operations,learn=False):
 	# @param {iterable} of string

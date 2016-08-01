@@ -9,6 +9,7 @@ import numpy as np
 from termcolor import colored
 from sklearn.cluster import KMeans
 from sklearn.feature_selection import SelectKBest, chi2, f_classif
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 
 METHODS = {
@@ -16,7 +17,12 @@ METHODS = {
 	'centroid': NearestCentroid(
 		metric='euclidean',#TAOTOREVIEW: Any better metric?
 		shrink_threshold=None
-	)
+	),
+	'knn': KNeighborsClassifier(
+    n_neighbors=8,
+    weights='distance',
+    algorithm='kd_tree'
+  )
 }
 
 def new(method='centroid',n_features=8):

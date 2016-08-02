@@ -124,16 +124,26 @@ input => [feature selection] => [centroid] => clusters
 
 **Training with:** 5000 Samples
 
-| DECOM | DIM |#FEAT|   TAG | % TOT |  [0]  |  [1]  |  [-1] |
-|-------|-----|-----|-------|-------|-------|-------|-------|
-|  SVD  | 400 | full|   16  | 82.48 | 82.77 | 67.35 | 100.00
-|  SVD  | 200 | full|   16  | 81.30 | 81.55 | 68.37 | 100.00
-|  SVD  | 100 | full|   16  | 79.60 | 79.85 | 66.33 | 100.00
-|  SVD  |  50 | full|   16  | 78.44 | 78.87 | 56.12 | 100.00
-|  LDA  | 400 | full|   16  | 72.30 | 73.55 | 10.20 | 66.67 
-|  LDA  | 200 | full|   16  | 71.88 | 73.14 |  9.18 | 66.67 
-|  LDA  | 100 | full|   16  | 72.66 | 73.93 |  9.18 | 66.67 
-|  LDA  |  50 | full|   16  | 72.54 | 73.63 | 18.37 | 66.67 
+|CLUSTER  | DECOM |  N  | #FT | TAG | % TOT |  [0]  |  [1]  |  [-1]
+|---------|-------|-----|-----|-----|-------|-------|-------|-------
+|  knn    |  SVD  | 400 | None|  16 | 100.00| 100.00| 100.00| 100.00
+|  knn    |  SVD  | 200 | None|  16 | 100.00| 100.00| 100.00| 100.00
+|  knn    |  SVD  | 100 | None|  16 | 100.00| 100.00| 100.00| 100.00
+|  knn    |  SVD  |  50 | None|  16 | 100.00| 100.00| 100.00| 100.00  
+|  knn    |  LDA  |  50 | None|  16 | 100.00| 100.00| 100.00| 100.00
+|  knn    |  LDA  |  25 | None|  16 | 100.00| 100.00| 100.00| 100.00
+|  knn    |  LDA  |  10 | None|  16 | 100.00| 100.00| 100.00| 100.00
+|  knn    |  LDA  |  5  | None|  16 | 100.00| 100.00| 100.00| 100.00
+|---------|-------|-----|-----|-----|-------|-------|-------|-------
+|centroid |  SVD  | 400 | None|  16 | 84.14 | 84.40 | 70.41 | 100.00
+|centroid |  SVD  | 200 | None|  16 | 81.60 | 81.81 | 70.41 | 100.00
+|centroid |  SVD  | 100 | None|  16 | 79.46 | 79.85 | 59.18 | 100.00
+|centroid |  SVD  |  50 | None|  16 | 77.00 | 77.26 | 63.27 | 100.00
+|centroid |  LDA  |  50 | None|  16 | 73.56 | 74.75 | 14.29 | 66.67 
+|centroid |  LDA  |  25 | None|  16 | 76.20 | 77.28 | 22.45 | 66.67 
+|centroid |  LDA  |  10 | None|  16 | 75.22 | 76.36 | 18.37 | 66.67 
+|centroid |  LDA  |  5  | None|  16 | 75.24 | 76.48 | 13.27 | 66.67 
+
 
 > PCA has also been tested but it requires too large amount 
 of memory footprint to produce a proper dense matrix as its input.
@@ -141,14 +151,15 @@ of memory footprint to produce a proper dense matrix as its input.
 *Where*
 
 ```text
-DECOM : TFIDF to dense matrix decomposition
-DIM   : Dimension of the target dense matrix of topic
-FEAT  : Number of selection of best features
-TAG   : Dimension of the target dense matrix of topic tags
-%TOT  : Total accuracy
-[0]   : Accuracy of the class [0] : Neutral responses
-[1]   : Accuracy of the class [1] : Positive responses
-[-1]  : Accuracy of the class [-1] : Negative responses
+CLUSTER : Clustering algorithm
+DECOM   : TFIDF to dense matrix decomposition
+N       : Dimension of feature matrix (after reduction)
+FT      : Number of selection of best features
+TAG     : Dimension of the target dense matrix of topic tags
+%TOT    : Total accuracy
+[0]     : Accuracy of the class [0] : Neutral responses
+[1]     : Accuracy of the class [1] : Positive responses
+[-1]    : Accuracy of the class [-1] : Negative responses
 ```
 
 ---

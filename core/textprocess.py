@@ -31,6 +31,7 @@ CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 # Prepare training arguments
 arguments = argparse.ArgumentParser()
 arguments.add_argument('--save', dest='save', action='store_true') # Save the models?
+arguments.add_argument('--cluster', type=str, default='centroid') # Chosen Clustering algorithm
 arguments.add_argument('--decom', type=str, default=None) # Text feature decomposition method
 arguments.add_argument('--n', type=int, default=None) # Number of decomposed components
 arguments.add_argument('--feat',  type=int, default=None) # Dimension of text feature
@@ -172,7 +173,7 @@ def train_sentiment_capture(stopwords,save=False):
 	print(colored('Training process started...','cyan'))
 
 
-	clf     = cluster.safe_load(CLF_PATH,'centroid',args['feat'])
+	clf     = cluster.safe_load(CLF_PATH,args['cluster'],args['feat'])
 	trainMe = cluster.analyze(clf,labels=Y)
 	Y_      = trainMe(X)
 	print(colored('[DONE]','yellow'))
@@ -180,10 +181,10 @@ def train_sentiment_capture(stopwords,save=False):
 	# Self-validation
 	num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])
 	predict_rate = 100*float(num_correct)/float(len(Y))
-	print(colored('====== TRAINING LABELS =====','magenta'))
-	print(Y)
-	print(colored('========= PREDICTED ========','magenta'))
-	print(list(Y_))
+	# print(colored('====== TRAINING LABELS =====','magenta'))
+	# print(Y)
+	# print(colored('========= PREDICTED ========','magenta'))
+	# print(list(Y_))
 	print(colored('=========== RESULTS ========','magenta'))
 	print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
 
@@ -202,13 +203,14 @@ def train_sentiment_capture(stopwords,save=False):
 	
 	# Record the training accuracy to the CSV
 	with open(CSV_REPORT_PATH,'a') as csv:
-		csv.write('{0},{1},{2},{3},{4},{5}\n'.format(
-			str(args['decom']).center(5), #0
-			str(args['n']).center(5), #1
-			str(args['feat']).center(5), #2
-			str(args['tagdim']).center(5), #3
-			'{0:.2f}'.format(predict_rate).center(7), #4
-			','.join(lbl_predict_rate) #5
+		csv.write('{0},{1},{2},{3},{4},{5},{6}\n'.format(
+			str(args['cluster']).center(11), #0
+			str(args['decom']).center(7), #1
+			str(args['n']).center(5), #2
+			str(args['feat']).center(5), #3
+			str(args['tagdim']).center(5), #4
+			'{0:.2f}'.format(predict_rate).center(7), #5
+			','.join(lbl_predict_rate) #6
 		))
 
 	#Save the trained models

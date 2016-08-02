@@ -143,6 +143,15 @@ input => [feature selection] => [centroid] => clusters
 |centroid |  LDA  |  25 | None|  16 | 76.20 | 77.28 | 22.45 | 66.67 
 |centroid |  LDA  |  10 | None|  16 | 75.22 | 76.36 | 18.37 | 66.67 
 |centroid |  LDA  |  5  | None|  16 | 75.24 | 76.48 | 13.27 | 66.67 
+|---------|-------|-----|-----|-----|-------|-------|-------|-------
+|  qda    |  SVD  | 400 | None|  16 | 98.32 | 100.00| 17.35 | 0
+|  qda    |  SVD  | 200 | None|  16 | 99.53 | 100.00| 78.85 | 0
+|  qda    |  SVD  | 100 | None|  16 | 99.94 | 100.00| 100.00| 0
+|  qda    |  SVD  |  50 | None|  16 | 74.17 | 73.70 | 100.00| 0
+|  qda    |  LDA  |  50 | None|  16 | 59.76 | 58.95 | 100.00| 66.67 
+|  qda    |  LDA  |  25 | None|  16 | 18.90 | 17.27 | 100.00| 33.33 
+|  qda    |  LDA  |  10 | None|  16 | 28.60 | 27.52 | 82.65 | 33.33 
+|  qda    |  LDA  |  5  | None|  16 | 81.70 | 82.73 | 31.63 | 33.33 
 
 
 > PCA has also been tested but it requires too large amount 

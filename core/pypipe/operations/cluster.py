@@ -12,6 +12,7 @@ from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 from sklearn.qda import QDA
+from sklearn.linear_model import SGDClassifier
 
 METHODS = {
 	# TAOTODO: Try other clustering methods
@@ -24,7 +25,12 @@ METHODS = {
     weights='distance',
     algorithm='kd_tree'
   ),
-  'qda': QDA()
+  'qda': QDA(),
+  'sgd': SGDClassifier(
+  	loss='squared_loss',
+  	penalty='l2', # Same penalty as in linear SVM
+  	n_iter=10
+  )
 }
 
 def new(method='centroid',n_features=8):

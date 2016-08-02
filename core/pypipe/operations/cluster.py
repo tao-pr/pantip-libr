@@ -11,6 +11,8 @@ from sklearn.cluster import KMeans
 from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors.nearest_centroid import NearestCentroid
+from sklearn.qda import QDA
+from sklearn.linear_model import SGDClassifier
 
 METHODS = {
 	# TAOTODO: Try other clustering methods
@@ -22,6 +24,12 @@ METHODS = {
     n_neighbors=8,
     weights='distance',
     algorithm='kd_tree'
+  ),
+  'qda': QDA(),
+  'sgd': SGDClassifier(
+  	loss='squared_loss',
+  	penalty='l2', # Same penalty as in linear SVM
+  	n_iter=10
   )
 }
 
@@ -59,6 +67,9 @@ def analyze(clf,labels=None):
 	def _do(matrix):
 		if labels:  # Learning mode
 			X = matrix
+
+			# Display what the underlying classifier is
+			print(colored(clf[-1],'yellow'))
 
 			# Display the dimension of the training elements
 			print(colored('X: {0}'.format(np.shape(X)),'yellow'))

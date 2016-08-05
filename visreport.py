@@ -80,6 +80,6 @@ if __name__ == '__main__':
   for par,vec in chart_input.items():
     chart.add(par, vec)
 
-  chart.render_to_png(args['to'] + '/radar.png')
+  chart.render_to_file(args['to'] + '/radar.svg')
 
   print(colored('Done!','green'))

@@ -6,6 +6,7 @@ Report charting renderer
 import sys
 import pygal
 import argparse
+from pygal import Config
 from itertools import tee
 from termcolor import colored
 from pprint import pprint
@@ -44,7 +45,7 @@ def to_hash(rec):
   }
 
 def label(rec):
-  return rec['cluster']
+  return rec['cluster'].upper()
 
 def param(rec):
   return rec['decom'] + '-' + str(rec['N'])
@@ -59,7 +60,9 @@ if __name__ == '__main__':
   # where the `decomposition algorithms` are plotted on X (corners of Radar)
   # and `variations of parameters` are plotted on Y (contour lines)
   print(colored('Preparing chart ...','cyan'))
-  chart = pygal.Radar()
+  cfg      = Config()
+  cfg.fill = True
+  chart    = pygal.Radar(cfg)
   chart.title = 'Clustering/Feature Comparison'
 
   labels = list(set([label(n) for n in data_1]))
@@ -81,5 +84,4 @@ if __name__ == '__main__':
     chart.add(par, vec)
 
   chart.render_to_file(args['to'] + '/radar.svg')
-
   print(colored('Done!','green'))

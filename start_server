@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# Start the topic queue monitoring service 
-nohup python3 monitor.py &> /dev/null &
-
-# Start the REST server for incoming topic request
-python3 server/terminal.py
-

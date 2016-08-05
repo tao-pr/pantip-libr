@@ -180,6 +180,8 @@ TAG     : Dimension of the target dense matrix of topic tags
 [-1]    : Accuracy of the class [-1] : Negative responses
 ```
 
+![IMG](data/radar.svg)
+
 ---
 
 

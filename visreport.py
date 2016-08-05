@@ -25,7 +25,21 @@ def gen_csv(lines):
         header_found = True
     else:
       if len(l)>10:
-        yield l
+        yield to_hash(l)
+
+def to_hash(rec):
+  rec = list(map(lambda n: n.strip(),rec.split(',')))
+  return {
+    'cluster': rec[0],
+    'decom':   rec[1],
+    'N':       int(rec[2]),
+    'feat':    None if rec[3] == 'None' else int(rec[3]),
+    'tag':     int(rec[4]),
+    '#total':  float(rec[5]),
+    '#0':      float(rec[6]),
+    '#1':      float(rec[7]),
+    '#-1':     float(rec[8])
+  }
 
 if __name__ == '__main__':
   # Read in CSV report, strip the headers, blank lines
@@ -35,8 +49,7 @@ if __name__ == '__main__':
   # Make a renderable format
 
   for rec in data:
-    rec_ = list(map(lambda n: n.strip(),rec.split(',')))
-    print(rec_)
+    print(rec)
 
     # Aggregate the raw data
     # TAOTODO:

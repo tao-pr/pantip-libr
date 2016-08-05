@@ -6,7 +6,9 @@ Report charting renderer
 import sys
 import pygal
 import argparse
+from itertools import tee
 from termcolor import colored
+from pprint import pprint
 
 arguments = argparse.ArgumentParser()
 arguments.add_argument('--from', type=str, default='data/report.csv') # CSV file input of the report
@@ -41,15 +43,43 @@ def to_hash(rec):
     '#-1':     float(rec[8])
   }
 
+def label(rec):
+  return rec['cluster']
+
+def param(rec):
+  return rec['decom'] + '-' + str(rec['N'])
+
 if __name__ == '__main__':
   # Read in CSV report, strip the headers, blank lines
+  print(colored('Reading CSV report ...','cyan'))
   csv = read_csv(args['from'])
-  data = gen_csv(csv)
+  data_1, data_2, data_3 = tee(gen_csv(csv),3)
 
-  # Make a renderable format
+  # Make a renderable chart
+  # where the `decomposition algorithms` are plotted on X (corners of Radar)
+  # and `variations of parameters` are plotted on Y (contour lines)
+  print(colored('Preparing chart ...','cyan'))
+  chart = pygal.Radar()
+  chart.title = 'Clustering/Feature Comparison'
 
-  for rec in data:
-    print(rec)
+  labels = list(set([label(n) for n in data_1]))
+  chart.x_labels = labels
 
-    # Aggregate the raw data
-    # TAOTODO:
+  params = list(set([param(n) for n in data_2]))
+
+  # Aggregate chart input vectors
+  chart_input = {par:[] for par in params}
+  prev_label = None
+  for d in data_3:
+    lbl = label(d)
+    par = param(d)
+    chart_input[par].append(d['#total'])
+
+  # Render now!
+  print(colored('Drawing chart...','cyan'))
+  for par,vec in chart_input.items():
+    chart.add(par, vec)
+
+  chart.render_to_png(args['to'] + '/radar.png')
+
+  print(colored('Done!','green'))

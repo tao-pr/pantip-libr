@@ -28,7 +28,7 @@ METHODS = {
   'qda': QDA(),
   'sgd': SGDClassifier(
   	loss='squared_loss',
-  	penalty='l2', # Same penalty as in linear SVM
+  	penalty='l2', # Equivalent to SVM (Norm-2)
   	n_iter=10
   )
 }

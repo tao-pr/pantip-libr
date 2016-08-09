@@ -32,8 +32,8 @@ METHODS = {
   	penalty='l2', # Equivalent to SVM (Norm-2)
   	n_iter=10
   ),
-  'svd': SVC(
-  	kernel='linear',
+  'svm': SVC(
+  	kernel='rbf', gamma=0.1,
   	C=1.0
   )
 }

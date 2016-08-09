@@ -7,6 +7,7 @@ import os
 import pickle
 import numpy as np
 from termcolor import colored
+from sklearn.svm import SVC
 from sklearn.cluster import KMeans
 from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors import KNeighborsClassifier
@@ -30,6 +31,10 @@ METHODS = {
   	loss='squared_loss',
   	penalty='l2', # Equivalent to SVM (Norm-2)
   	n_iter=10
+  ),
+  'svd': SVC(
+  	kernel='linear',
+  	C=1.0
   )
 }
 

@@ -65,10 +65,18 @@ if __name__ == '__main__':
   chart    = pygal.Radar(cfg)
   chart.title = 'Clustering/Feature Comparison'
 
-  labels = list(set([label(n) for n in data_1]))
+  # NOTE: Need to do the loop, not the `set` conversion
+  # otherwise the list gets sorted which becomes out of sync
+  labels = []
+  for n in data_1:
+    if label(n) not in labels:
+      labels.append(label(n))
   chart.x_labels = labels
 
-  params = list(set([param(n) for n in data_2]))
+  params = []
+  for n in data_2:
+    if param(n) not in params:
+      params.append(param(n))
 
   # Aggregate chart input vectors
   chart_input = {par:[] for par in params}

@@ -189,7 +189,7 @@ TAG     : Dimension of the target dense matrix of topic tags
 [-1]    : Accuracy of the class [-1] : Negative responses
 ```
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/radar.svg?v=2)
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/radar.svg?v=3)
 ---
 
 

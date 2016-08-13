@@ -1,7 +1,11 @@
+core/__pycache__/
 core/pydb/__pycache__/
 core/pypantip/__pycache__/
 core/pypipe/__pycache__/
 core/pypipe/operations/__pycache__/
+data/cluster/
+data/hasher/
+data/models/
 data/report.csv
 data/report_copy.csv
 derby.log

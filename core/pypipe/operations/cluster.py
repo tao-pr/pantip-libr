@@ -16,7 +16,6 @@ from sklearn.qda import QDA
 from sklearn.linear_model import SGDClassifier
 
 METHODS = {
-	# TAOTODO: Try other clustering methods
 	'centroid': NearestCentroid(
 		metric='euclidean',#TAOTOREVIEW: Any better metric?
 		shrink_threshold=None

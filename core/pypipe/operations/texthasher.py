@@ -9,15 +9,10 @@ import pickle
 import json
 from .sparsetodense import SparseToDense
 from termcolor import colored
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.linear_model import RidgeClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.preprocessing import Normalizer
-from sklearn.decomposition import NMF
-from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.decomposition import IncrementalPCA
@@ -73,12 +68,24 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 
 def save(operations,path):
 	print('Saving texthasher model...')
-	with open(path,'wb+') as f:
-		pickle.dump(operations,f,protocal=4)
+	# TAOTODO: Try saving each element on separate file
+	for i in range(len(operations)):
+		print('...Saving opr #{0}'.format(i), operations[i])
+		with open(path + '.' + str(i),'wb+') as f:
+			pickle.dump(operations[i],f,pickle.HIGHEST_PROTOCOL)
+	# with open(path,'wb+') as f:
+	# 	pickle.dump(operations,f,protocal=4)
 
 def load(path):
-	with open(path,'rb') as f:
-		return pickle.load(f,protocal=4)
+	operations = []
+	i = 0
+	while os.path.isfile(path + '.' + str(i)):
+		with open(path + '.' + str(i),'rb') as f:
+			operations.append(pickle.load(f))
+	return operations
+
+	# with open(path,'rb') as f:
+	# 	return pickle.load(f,protocal=4)
 
 # Load the transformer pipeline object
 # from the physical file,

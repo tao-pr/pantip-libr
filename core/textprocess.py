@@ -20,11 +20,9 @@ from pypipe.operations import textcluster
 
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
-TEXT_VECTORIZER_PATH	= '{0}/data/hasher/00'.format(REPO_DIR)
-TAG_HASHER_PATH       = '{0}/data/hasher/33'.format(REPO_DIR)
-TEXT_CLUSTER_PATH     = '{0}/data/cluster/00'.format(REPO_DIR)
-CONTENT_CLUSTER_PATH  = '{0}/data/cluster/22'.format(REPO_DIR)
-CLF_PATH              = '{0}/data/cluster/ff'.format(REPO_DIR)
+TEXT_VECTORIZER_PATH  = '{0}/data/models/vectoriser'.format(REPO_DIR)
+TAG_HASHER_PATH       = '{0}/data/models/taghash'.format(REPO_DIR)
+CLF_PATH              = '{0}/data/models/clf'.format(REPO_DIR)
 STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
 CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
@@ -181,10 +179,6 @@ def train_sentiment_capture(stopwords,save=False):
 	# Self-validation
 	num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])
 	predict_rate = 100*float(num_correct)/float(len(Y))
-	# print(colored('====== TRAINING LABELS =====','magenta'))
-	# print(Y)
-	# print(colored('========= PREDICTED ========','magenta'))
-	# print(list(Y_))
 	print(colored('=========== RESULTS ========','magenta'))
 	print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
 
@@ -216,9 +210,9 @@ def train_sentiment_capture(stopwords,save=False):
 	#Save the trained models
 	if save:
 		print(colored('Saving models...','cyan'))
-		texthasher.save(topicHasher,TEXT_VECTORIZER_PATH)
 		taghasher.save(tagHasher,TAG_HASHER_PATH)
 		cluster.save(clf,CLF_PATH)
+		texthasher.save(topicHasher,TEXT_VECTORIZER_PATH)
 		print(colored('[DONE]','green'))
 
 

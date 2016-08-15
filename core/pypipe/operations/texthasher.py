@@ -8,7 +8,7 @@ import os.path
 import pickle
 import json
 from .sparsetodense import SparseToDense
-from mongo
+from . import mongo
 from termcolor import colored
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2

@@ -8,6 +8,7 @@ import os.path
 import pickle
 import json
 from .sparsetodense import SparseToDense
+from mongo
 from termcolor import colored
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
@@ -17,6 +18,9 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.decomposition import IncrementalPCA
 from sklearn.decomposition import SparsePCA
+
+MONGO_DB         = 'pantip-model'
+MONGO_COLLECTION = 'hasher'
 
 # Create a text process pipeline (vectorizer)
 def new(stop_words=[],decomposition='SVD',n_components=5):
@@ -68,13 +72,15 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 
 def save(operations,path):
 	print('Saving texthasher model...')
-	# TAOTODO: Try saving each element on separate file
-	for i in range(len(operations)):
-		print('...Saving opr #{0}'.format(i), operations[i])
-		with open(path + '.' + str(i),'wb+') as f:
-			pickle.dump(operations[i],f,pickle.HIGHEST_PROTOCOL)
-	# with open(path,'wb+') as f:
-	# 	pickle.dump(operations,f,protocal=4)
+
+	db = mongo.new('localhost',MONGO_DB,MONGO_COLLECTION)
+	db.clear()
+	db.save(operations)
+	
+	# for i in range(len(operations)):
+	# 	print('...Saving opr #{0}'.format(i), operations[i])
+	# 	with open(path + '.' + str(i),'wb+') as f:
+	# 		pickle.dump(operations[i],f,pickle.HIGHEST_PROTOCOL)
 
 def load(path):
 	operations = []
@@ -84,8 +90,6 @@ def load(path):
 			operations.append(pickle.load(f))
 	return operations
 
-	# with open(path,'rb') as f:
-	# 	return pickle.load(f,protocal=4)
 
 # Load the transformer pipeline object
 # from the physical file,

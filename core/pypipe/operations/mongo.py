@@ -9,10 +9,9 @@ from pymongo import InsertOne
 
 def new(host,db,coll):
   conn = {}
-  conn['addr']  = "mongodb://{0}:27017/".format(host)
-  conn['mongo'] = MongoClient(addr)
-  conn['db']    = self.mongo[db]
-  conn['src']   = self.db[coll]
+  conn['mongo'] = MongoClient("mongodb://{0}:27017/".format(host))
+  conn['db']    = conn['mongo'][db]
+  conn['src']   = conn['db'][coll]
   return conn
 
 def save(conn,data):

@@ -74,8 +74,8 @@ def save(operations,path):
 	print('Saving texthasher model...')
 
 	db = mongo.new('localhost',MONGO_DB,MONGO_COLLECTION)
-	db.clear()
-	db.save(operations)
+	mongo.clear(db)
+	mongo.save(db,operations)
 	
 	# for i in range(len(operations)):
 	# 	print('...Saving opr #{0}'.format(i), operations[i])

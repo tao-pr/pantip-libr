@@ -7,8 +7,9 @@ import numpy as np
 import os.path
 import pickle
 import json
+import math
+import sys
 from .sparsetodense import SparseToDense
-from . import mongo
 from termcolor import colored
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
@@ -19,8 +20,8 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.decomposition import IncrementalPCA
 from sklearn.decomposition import SparsePCA
 
-MONGO_DB         = 'pantip-model'
-MONGO_COLLECTION = 'hasher'
+_1GB = 1073741824
+
 
 # Create a text process pipeline (vectorizer)
 def new(stop_words=[],decomposition='SVD',n_components=5):
@@ -73,14 +74,43 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 def save(operations,path):
 	print('Saving texthasher model...')
 
-	db = mongo.new('localhost',MONGO_DB,MONGO_COLLECTION)
-	mongo.clear(db)
-	mongo.save(db,operations)
+	s = pickle.dumps(operations, pickle.HIGHEST_PROTOCOL)
+	z = sys.getsizeof(s)
+	print('texthasher model occupies total size of {0:.2f} GB'.format(z/_1GB))
+
+	# In case of huge model, split it into smaller chunks 
+	# and save seperately
+	if z>_1GB:
+		i = 0
+		for c in split_to_chunks(s,_1GB):
+			i += 1
+			save_chunk(path, i, c)
+	else:
+		# Small model, just save it with typical method
+		with open(path, 'wb+') as f:
+			pickle.dump(operations, f)
+
+def save_chunk(path,i,chunk):
+	with open(path + '.' + str(i), 'wb+') as f:
+		print(colored('Saving chunk #{0} '.format(i), 'yellow'))
+		pickle.dump(chunk, f)
+
+# Split a bulky string into multiple parts by given size
+def split_to_chunks(bulky_str,chunk_size):
 	
-	# for i in range(len(operations)):
-	# 	print('...Saving opr #{0}'.format(i), operations[i])
-	# 	with open(path + '.' + str(i),'wb+') as f:
-	# 		pickle.dump(operations[i],f,pickle.HIGHEST_PROTOCOL)
+	pos,i,tot = 0, 0, len(bulky_str)
+
+	while pos<tot:
+		if pos+chunk_size >= tot:
+			chunk = bulky_str[pos:]
+		else:
+			chunk = bulky_str[pos:pos+chunk_size]
+		
+		yield chunk
+		i   += 1
+		pos += chunk_size
+
+
 
 def load(path):
 	operations = []

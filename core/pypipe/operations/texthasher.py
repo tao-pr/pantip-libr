@@ -87,7 +87,7 @@ def save(operations,path):
 			save_chunk(path, i, c)
 	else:
 		# Small model, just save it with typical method
-		with open(path, 'wb+') as f:
+		with open(path + '.0', 'wb+') as f:
 			pickle.dump(operations, f)
 
 def save_chunk(path,i,chunk):
@@ -111,14 +111,16 @@ def split_to_chunks(bulky_str,chunk_size):
 		pos += chunk_size
 
 
-
 def load(path):
-	operations = []
 	i = 0
+	s = ''
+	# Load all chunks, assembly them into one single object
 	while os.path.isfile(path + '.' + str(i)):
+		print(colored('Loading chunk #{0}'.format(i), 'yellow'))
 		with open(path + '.' + str(i),'rb') as f:
-			operations.append(pickle.load(f))
-	return operations
+			s += pickle.load(f)
+	
+	return pickle.loads(s)
 
 
 # Load the transformer pipeline object

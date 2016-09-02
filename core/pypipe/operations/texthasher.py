@@ -7,21 +7,21 @@ import numpy as np
 import os.path
 import pickle
 import json
+import math
+import sys
 from .sparsetodense import SparseToDense
 from termcolor import colored
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.linear_model import RidgeClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.preprocessing import Normalizer
-from sklearn.decomposition import NMF
-from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.decomposition import IncrementalPCA
 from sklearn.decomposition import SparsePCA
+
+_1GB = 1073741824
+
 
 # Create a text process pipeline (vectorizer)
 def new(stop_words=[],decomposition='SVD',n_components=5):
@@ -73,12 +73,55 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 
 def save(operations,path):
 	print('Saving texthasher model...')
-	with open(path,'wb+') as f:
-		pickle.dump(operations,f,protocal=4)
+
+	s = pickle.dumps(operations, pickle.HIGHEST_PROTOCOL)
+	z = sys.getsizeof(s)
+	print('texthasher model occupies total size of {0:.2f} GB'.format(z/_1GB))
+
+	# In case of huge model, split it into smaller chunks 
+	# and save seperately
+	if z>_1GB:
+		i = 0
+		for c in split_to_chunks(s,_1GB):
+			i += 1
+			save_chunk(path, i, c)
+	else:
+		# Small model, just save it with typical method
+		with open(path + '.0', 'wb+') as f:
+			pickle.dump(operations, f)
+
+def save_chunk(path,i,chunk):
+	with open(path + '.' + str(i), 'wb+') as f:
+		print(colored('Saving chunk #{0} '.format(i), 'yellow'))
+		pickle.dump(chunk, f)
+
+# Split a bulky string into multiple parts by given size
+def split_to_chunks(bulky_str,chunk_size):
+	
+	pos,i,tot = 0, 0, len(bulky_str)
+
+	while pos<tot:
+		if pos+chunk_size >= tot:
+			chunk = bulky_str[pos:]
+		else:
+			chunk = bulky_str[pos:pos+chunk_size]
+		
+		yield chunk
+		i   += 1
+		pos += chunk_size
+
 
 def load(path):
-	with open(path,'rb') as f:
-		return pickle.load(f,protocal=4)
+	i = 0
+	s = ''
+	# Load all chunks, assembly them into one single object
+	while os.path.isfile(path + '.' + str(i)):
+		print(colored('Loading chunk #{0}'.format(i), 'yellow'))
+		with open(path + '.' + str(i),'rb') as f:
+			s += pickle.load(f)
+	
+	return pickle.loads(s)
+
 
 # Load the transformer pipeline object
 # from the physical file,

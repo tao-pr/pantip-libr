@@ -126,7 +126,7 @@ def load(path):
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path,stop_words,decomposition,n_components):
+def safe_load(path,stop_words,decomposition=None,n_components=None):
 	if os.path.isfile(path) and os.stat(path).st_size>0: return load(path)
 	else: return new(stop_words,decomposition,n_components)
 

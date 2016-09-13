@@ -19,22 +19,21 @@ from pypipe.operations import taghasher
 from pypipe.operations import texthasher
 from pypipe.operations import textcluster
 
-class Classifier():
+REPO_DIR = os.getenv('PANTIPLIBR','../..')
+TEXT_VECTORIZER_PATH  = '{0}/data/models/vectoriser'.format(REPO_DIR)
+TAG_HASHER_PATH       = '{0}/data/models/taghash'.format(REPO_DIR)
+CLF_PATH              = '{0}/data/models/clf'.format(REPO_DIR)
+STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
+CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
-  REPO_DIR = os.getenv('PANTIPLIBR','../..')
-  TEXT_VECTORIZER_PATH  = '{0}/data/models/vectoriser'.format(REPO_DIR)
-  TAG_HASHER_PATH       = '{0}/data/models/taghash'.format(REPO_DIR)
-  CLF_PATH              = '{0}/data/models/clf'.format(REPO_DIR)
-  STOPWORDS_PATH        = '{0}/data/words/stopwords.txt'.format(REPO_DIR)
-  CSV_REPORT_PATH       = '{0}/data/report.csv'.format(REPO_DIR)
 
+class Classifier:
 
   def __init__(self):
     # Load the trained models
     self.topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,stop_words=[])
     self.tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
-    self.contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=16)
-    self.clf         = cluster.safe_load(CLF_PATH)
+    self.clf         = cluster.safe_load(CLF_PATH,method=None,n_features=256)
 
   def classify(self,topic):
     # Prepare processing functions
@@ -79,7 +78,7 @@ INVALID_REQ = ErrorResponse('Invalid Request',500)
 def try_parse(req):
   if len(req)<3:
     return None
-  elif any[(attr not in req) for attr in ALL_ATTRS]:
+  elif any([(attr not in req) for attr in ALL_ATTRS]):
     return None
   else:
     return req
@@ -107,6 +106,10 @@ def classify():
     raise INVALID_REQ
   else:
     return classify_req(req)
+
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=1996)
 
 
 

@@ -220,7 +220,6 @@ def train_sentiment_capture(stopwords,save=False):
 def load_models():
 	topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,stop_words=[])
 	tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
-	contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=16)
 	clf         = cluster.safe_load(CLF_PATH)
 	return (topicHasher,taghasher,contentClf,clf)
 

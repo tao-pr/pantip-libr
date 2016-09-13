@@ -1,5 +1,5 @@
 """
-Topic classifier module
+Topic classification server as a microservice
 @starcolon projects
 """
 
@@ -8,6 +8,7 @@ import sys
 import json
 import argparse
 import numpy as np
+from flask import Flask
 from termcolor import colored
 from pypipe import pipe as Pipe
 from pypipe import datapipe as DP
@@ -18,8 +19,7 @@ from pypipe.operations import taghasher
 from pypipe.operations import texthasher
 from pypipe.operations import textcluster
 
-
-class Classifier:
+class Classifier():
 
   REPO_DIR = os.getenv('PANTIPLIBR','../..')
   TEXT_VECTORIZER_PATH  = '{0}/data/models/vectoriser'.format(REPO_DIR)
@@ -52,4 +52,61 @@ class Classifier:
     return y
 
   def create_topic(self,title,tags,content):
-    pass
+    return {
+      'title': title,
+      'tags' : tags,
+      'topic': content
+    }
+
+
+# Server configuration and setup
+app = Flask(__name__)
+
+class ErrorResponse(Exception):
+  status_code = 500
+
+  def __init__(self,message,status_code=500):
+    Exception.__init__(self)
+    self.message     = message
+    self.status_code = status_code
+
+
+# Server lifetime-wide variables
+clf         = Classifier()
+ALL_ATTRS   = ['title','topic','tags']
+INVALID_REQ = ErrorResponse('Invalid Request',500)
+
+def try_parse(req):
+  if len(req)<3:
+    return None
+  elif any[(attr not in req) for attr in ALL_ATTRS]:
+    return None
+  else:
+    return req
+
+def classify_req(topic):
+  # TAOTODO: Log the request
+  global clf
+  c = clf.classify(topic)
+  return c
+
+@app.route('/')
+def root():
+  return __name__
+
+@app.errorhandler(ErrorResponse)
+def handle_http_error(e):
+  return json.dumps(e)
+
+@app.route('/classify', methods=['POST'])
+def classify():
+  # Parse the JSON request data
+  req = try_parse(request.json)
+  if req is None:
+    # Invalid request package
+    raise INVALID_REQ
+  else:
+    return classify_req(req)
+
+
+

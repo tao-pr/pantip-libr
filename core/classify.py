@@ -10,6 +10,7 @@ import argparse
 import numpy as np
 from flask import Flask
 from termcolor import colored
+from pprint import pprint
 from pypipe import pipe as Pipe
 from pypipe import datapipe as DP
 from pypipe.operations import rabbit
@@ -73,19 +74,27 @@ class ErrorResponse(Exception):
 # Server lifetime-wide variables
 clf         = Classifier()
 ALL_ATTRS   = ['title','topic','tags']
-INVALID_REQ = ErrorResponse('Invalid Request',500)
 
 def try_parse(req):
-  if len(req)<3:
+  try:
+    if len(req)<3:
+      print(colored('Unrecognised request format','red'))
+      return None
+    elif any([(attr not in req) for attr in ALL_ATTRS]):
+      print(colored('Missing mandatory attributes','red'))
+      return None
+    else:
+      print(colored('Valid request received.','green'))
+      return req
+  except e:
+    print(colored('[ERROR]','red'))
+    print(colored(e,'red'))
     return None
-  elif any([(attr not in req) for attr in ALL_ATTRS]):
-    return None
-  else:
-    return req
 
 def classify_req(topic):
-  # TAOTODO: Log the request
   global clf
+  print(colored('Classifying: ','cyan'))
+  pprint(topic)
   c = clf.classify(topic)
   return c
 
@@ -103,13 +112,16 @@ def classify():
   req = try_parse(request.json)
   if req is None:
     # Invalid request package
-    raise INVALID_REQ
+    print(colored('Unparsable request package','red'))
+    raise ErrorResponse('Invalid Request',500)
   else:
     return classify_req(req)
 
 
 if __name__ == '__main__':
+  print(colored('Classification microservice STARTED...','magenta'))
   app.run(host='0.0.0.0', port=1996)
+  print(colored('Classification microservice ENDED...','magenta'))
 
 
 

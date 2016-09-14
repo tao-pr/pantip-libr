@@ -36,6 +36,8 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 	# TAOTODO: Needs to be non-negative normaliser
 	norm = Normalizer(norm='max')
 
+	print(colored('Taghasher model created','yellow'))
+
 	# Prepare dimensionality reduction
 	if decomposition and n_components:
 		if decomposition=='LDA': # Results in Non-negative matrix
@@ -120,6 +122,7 @@ def load(path):
 		with open(path + '.' + str(i),'rb') as f:
 			s += pickle.load(f)
 	
+	print('Texthasher model loaded')
 	return pickle.loads(s)
 
 

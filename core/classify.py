@@ -32,9 +32,11 @@ class Classifier:
 
   def __init__(self):
     # Load the trained models
+    print(colored('Loading CLF models','magenta'))
     self.topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,stop_words=[])
     self.tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
     self.clf         = cluster.safe_load(CLF_PATH,method=None,n_features=256)
+    print(colored('[DONE] ','green'),'CLF models loaded')
 
   def classify(self,topic):
     # Prepare processing functions

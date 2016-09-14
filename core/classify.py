@@ -8,7 +8,7 @@ import sys
 import json
 import argparse
 import numpy as np
-from flask import Flask
+from flask import Flask, request
 from termcolor import colored
 from pprint import pprint
 from pypipe import pipe as Pipe
@@ -38,10 +38,9 @@ class Classifier:
 
   def classify(self,topic):
     # Prepare processing functions
-    hashMe     = texthasher.hash(topicHasher,learn=False)
-    clusterMe  = textcluster.classify(contentClf,learn=False)
-    hashtagMe  = taghasher.hash(tagHasher,learn=False)
-    classifyMe = cluster.analyze(clf)
+    hashMe     = texthasher.hash(self.topicHasher,learn=False)
+    hashtagMe  = taghasher.hash(self.tagHasher,learn=False)
+    classifyMe = cluster.analyze(self.clf)
 
     v = hashMe(str(topic['title'] + topic['topic']))
     t = ' '.join([tag for tag in topic['tags'] if len(tag)>1])

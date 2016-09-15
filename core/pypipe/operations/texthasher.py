@@ -130,9 +130,7 @@ def load_chunks(path):
 	while os.path.isfile(path + '.' + str(i)):
 		print(colored('Loading chunk #{0}'.format(i), 'yellow'))
 		with open(path + '.' + str(i),'rb') as f:
-			d = pickle.load(f)
-			pprint([d[i].__class__ for i in range(len(d))])
-			s += d
+			s += pickle.load(f)
 		i += 1
 	
 	print('Texthasher model loaded')

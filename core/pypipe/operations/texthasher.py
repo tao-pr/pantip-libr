@@ -33,7 +33,6 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 	)
 
 	# Prepare normaliser
-	# TAOTODO: Needs to be non-negative normaliser
 	norm = Normalizer(norm='max')
 
 	print(colored('Texthasher model created','yellow'))

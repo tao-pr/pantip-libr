@@ -47,7 +47,7 @@ class Classifier:
     v = hashMe(str(topic['title'] + topic['topic']))
     t = ' '.join([tag for tag in topic['tags'] if len(tag)>1])
     w = hashtagMe(t)
-    x = list(v) + list(w)
+    x = [list(a)+list(b) for a,b in zip(list(v),list(w))]
 
     y = classifyMe(x)
     return y

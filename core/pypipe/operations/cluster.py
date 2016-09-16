@@ -91,8 +91,11 @@ def analyze(clf,labels=None):
 
     else: # Classification mode
       X = matrix
+
       # Feature transformations
       for opr in clf[:-1]:
+        # TAOTODO: This causes a fatal error:
+        # ValueError: setting an array element with a sequence.
         X = opr.transform(X)
 
       # NOTE: Predict the clusters with the last operation

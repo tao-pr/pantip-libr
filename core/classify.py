@@ -96,8 +96,20 @@ def classify_req(topic):
   global clf
   print(colored('Classifying: ','cyan'))
   pprint(topic)
-  c = clf.classify(topic)
+  c = next(clf.classify(topic))
+  print(colored('#CLASS : ${}'.format(c),'cyan'))
   return c
+
+# Merge requesting topic along with the 
+# classification result
+def encap_resp(req,c):
+  resp = json.dumps({
+    'class': c.item(), # [c] is a numpy.int64, not a primitive py int
+    'title': req['title'],
+    'topic': req['topic'],
+    'tags':  req['tags']
+  }, ensure_ascii=False)
+  return resp
 
 @app.route('/')
 def root():
@@ -116,7 +128,7 @@ def classify():
     print(colored('Unparsable request package','red'))
     raise ErrorResponse('Invalid Request',500)
   else:
-    return classify_req(req)
+    return encap_resp(req,classify_req(req))
 
 
 if __name__ == '__main__':

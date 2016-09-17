@@ -7,6 +7,7 @@ import os
 import sys
 import json
 import argparse
+import subprocess
 import numpy as np
 from flask import Flask, request
 from termcolor import colored
@@ -19,6 +20,7 @@ from pypipe.operations import cluster
 from pypipe.operations import taghasher
 from pypipe.operations import texthasher
 from pypipe.operations import textcluster
+from pypipe.operations import preprocess
 
 REPO_DIR = os.getenv('PANTIPLIBR','../..')
 TEXT_VECTORIZER_PATH  = '{0}/data/models/vectoriser'.format(REPO_DIR)
@@ -75,6 +77,7 @@ class ErrorResponse(Exception):
 # Server lifetime-wide variables
 clf         = Classifier()
 ALL_ATTRS   = ['title','topic','tags']
+workers     = []
 
 def try_parse(req):
   try:
@@ -95,6 +98,9 @@ def try_parse(req):
 def classify_req(topic):
   global clf
   print(colored('Classifying: ','cyan'))
+
+  # Apply preprocessing
+  topic = preprocess.take(topic)
   pprint(topic)
   c = next(clf.classify(topic))
   print(colored('#CLASS : ${}'.format(c),'cyan'))
@@ -131,10 +137,31 @@ def classify():
     return encap_resp(req,classify_req(req))
 
 
+def run_tokeniser():
+  global workers
+  script = 'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR)
+  print(colored('🚀 Executing...','green') + script)
+  sp = subprocess.Popen(script, 
+    shell=True, stdout=subprocess.PIPE,
+    preexec_fn=os.setsid)
+  workers.append(sp)
+
+def end_worker(sp):
+  print(colored('Ending worker pid#${}'.format(sp.pid),'green'))
+  subprocess.Popen('kill {0}'.format(sp.pid),
+    shell=True, stdout=subprocess.PIPE)
+
 if __name__ == '__main__':
+
+  global workers
+
+  # Execute text tokeniser service in background
+  run_tokeniser()
+
   print(colored('Classification microservice STARTED...','magenta'))
   app.run(host='0.0.0.0', port=1996)
   print(colored('Classification microservice ENDED...','magenta'))
 
-
+  # End all workers (tokeniser)
+  [end_worker(sp) for sp in workers]
 

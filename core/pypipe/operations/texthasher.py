@@ -33,8 +33,9 @@ def new(stop_words=[],decomposition='SVD',n_components=5):
 	)
 
 	# Prepare normaliser
-	# TAOTODO: Needs to be non-negative normaliser
 	norm = Normalizer(norm='max')
+
+	print(colored('Texthasher model created','yellow'))
 
 	# Prepare dimensionality reduction
 	if decomposition and n_components:
@@ -112,6 +113,16 @@ def split_to_chunks(bulky_str,chunk_size):
 
 
 def load(path):
+	# In case of multiple chunks
+	if os.path.isfile(path + '.1'):
+		return load_chunks(path)
+	else:
+		# Single file
+		print(colored('Loading single chunk','yellow'))
+		with open(path + '.0', 'rb') as f:
+			return pickle.load(f)
+
+def load_chunks(path):
 	i = 0
 	s = ''
 	# Load all chunks, assembly them into one single object
@@ -119,15 +130,17 @@ def load(path):
 		print(colored('Loading chunk #{0}'.format(i), 'yellow'))
 		with open(path + '.' + str(i),'rb') as f:
 			s += pickle.load(f)
+		i += 1
 	
+	print('Texthasher model loaded')
 	return pickle.loads(s)
 
 
 # Load the transformer pipeline object
 # from the physical file,
 # or initialise a new object if the file doesn't exist
-def safe_load(path,stop_words,decomposition,n_components):
-	if os.path.isfile(path) and os.stat(path).st_size>0: return load(path)
+def safe_load(path,stop_words,decomposition=None,n_components=None):
+	if os.path.isfile(path + '.0') and os.stat(path + '.0').st_size>0: return load(path)
 	else: return new(stop_words,decomposition,n_components)
 
 def hash(operations,learn=False):

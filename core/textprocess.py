@@ -162,7 +162,6 @@ def train_sentiment_capture(stopwords,save=False):
 		list(vecX)
 	)
 
-	# TAOTODO: Consider joining a:b with any probabilistic model?
 	X = [list(a) + list(b) for a,b in XS]
 
 	rabbit.end(mqy)
@@ -216,13 +215,11 @@ def train_sentiment_capture(stopwords,save=False):
 		print(colored('[DONE]','green'))
 
 
-# TAOTOREVIEW: Rectify arguments
-def load_models():
-	topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,stop_words=[])
-	tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
-	contentClf  = textcluster.safe_load(CONTENT_CLUSTER_PATH,n_labels=16)
-	clf         = cluster.safe_load(CLF_PATH)
-	return (topicHasher,taghasher,contentClf,clf)
+# def load_models():
+# 	topicHasher = texthasher.safe_load(TEXT_VECTORIZER_PATH,stop_words=[])
+# 	tagHasher   = taghasher.safe_load(TAG_HASHER_PATH,n_feature=256)
+# 	clf         = cluster.safe_load(CLF_PATH)
+# 	return (topicHasher,taghasher,contentClf,clf)
 
 # @param {iterable} topics
 def classify_text(topicHasher,tagHasher,contentClf,clf):

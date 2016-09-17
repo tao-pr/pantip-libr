@@ -33,6 +33,7 @@ def new(n_feature=128):
 	binariser = Binarizer(copy=True)
 
 	# Count vectoriser => NMF as smoother => Binariser
+	print(colored('Taghasher model created','yellow'))
 	return [vectorizer,smoother,binariser]
 
 
@@ -43,6 +44,7 @@ def save(operations,path):
 
 def load(path):
 	with open(path,'rb') as f:
+		print('Taghasher model loaded')
 		return pickle.load(f)
 
 # Load the transformer pipeline object

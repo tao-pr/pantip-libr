@@ -17,22 +17,22 @@ from .operations import tapper
 # @param {Function} trasnformer function
 # @param {String} title of this pipe (optional)
 def pipe(src,dests,transform=lambda d:d,title=''):
-	print(colored('  pipe @{0} started'.format(title),'yellow'))
+  print(colored('  pipe @{0} started'.format(title),'yellow'))
 
-	if isinstance(src,rabbit.Feeder):
-		_src = rabbit.iter(src)
-	else:
-		_src = src
-	
-	# Transform the input at once
-	outcome = transform(_src)
+  if isinstance(src,rabbit.Feeder):
+    _src = rabbit.iter(src)
+  else:
+    _src = src
+  
+  # Transform the input at once
+  outcome = transform(_src)
 
-	# Feed the output to destination queues if supplied
-	if dests and len(dests)>0:
-		safe_feed(dests,outcome)
+  # Feed the output to destination queues if supplied
+  if dests and len(dests)>0:
+    safe_feed(dests,outcome)
 
-	print(colored(title,'cyan'), colored(' [DONE]','green'))
-	return outcome
+  print(colored(title,'cyan'), colored(' [DONE]','green'))
+  return outcome
 
 # Pipe the list of input, one-by-one to the processing
 # @param {Iterable} src
@@ -40,23 +40,23 @@ def pipe(src,dests,transform=lambda d:d,title=''):
 # @param {Function} transformer function
 # @param {String} title of this pipe (optional)
 def pipe_each(src,dests,transform=lambda d:d,title=''):
-	print(colored('  pipe @{0} started'.format(title),'yellow'))
+  print(colored('  pipe @{0} started'.format(title),'yellow'))
 
-	if isinstance(src,rabbit.Feeder):
-		_src = rabbit.iter(src)
-	else:
-		_src = src
+  if isinstance(src,rabbit.Feeder):
+    _src = rabbit.iter(src)
+  else:
+    _src = src
 
-	n = 0
-	# Transform the input one-by-one
-	for s in _src:
-		outcome = transformer(s)
-		# Feed the record
-		safe_feed(dests,outcome)
+  n = 0
+  # Transform the input one-by-one
+  for s in _src:
+    outcome = transformer(s)
+    # Feed the record
+    safe_feed(dests,outcome)
 
-	print(colored(title,'cyan'), colored(' [DONE]','green'))	
+  print(colored(title,'cyan'), colored(' [DONE]','green'))  
 
-	
+  
 # Safely dump a data to the destination MQs
 # @param {list} of rabbit.Feeder
 # @param {Any} list, iterable, numpy.array, object, etc.
@@ -65,47 +65,47 @@ def pipe_each(src,dests,transform=lambda d:d,title=''):
 # otherwise, feed the bulk data once as a single transaction.
 #
 def safe_feed(mqs,data):
-	feed = rabbit.feed(mqs)
-	# def feed(a):
-	# 	print(colored('Feeding: ','magenta'),a)
-	# 	rabbit.feed(mqs)(a)
+  feed = rabbit.feed(mqs)
+  # def feed(a):
+  #   print(colored('Feeding: ','magenta'),a)
+  #   rabbit.feed(mqs)(a)
 
-	def to_str(el):
-		if isinstance(el,np.ndarray):
-			# Numpy array
-			return json.dumps(list(el))
-		elif type(data).__module__ == 'numpy':
-			# Any numeric numpy types
-			return str(el)
-		elif isinstance(data,float) or isinstance(data,int):
-			return str(el)
-		else:
-			try:
-				return json.dumps(el)
-			except TypeError:
-				return str(el)
-			else:
-				return str(el)
+  def to_str(el):
+    if isinstance(el,np.ndarray):
+      # Numpy array
+      return json.dumps(list(el))
+    elif type(data).__module__ == 'numpy':
+      # Any numeric numpy types
+      return str(el)
+    elif isinstance(data,float) or isinstance(data,int):
+      return str(el)
+    else:
+      try:
+        return json.dumps(el)
+      except TypeError:
+        return str(el)
+      else:
+        return str(el)
 
-	try:
-		iterdata = iter(data)
-	except TypeError:
-		# @data is not iterable
-		if type(data).__module__ == 'numpy':
-			# It could be any numeric numpy types
-			feed(str(data))
-		elif isinstance(data,float) or isinstance(data,int):
-			feed(str(data))
-		else:
-			# It could be any primitive / instance of any class
-			feed(json.dumps(data))
-	else:
-		# @data is iterable
-		if isinstance(data,str):
-			# String does not need any conversion
-			feed(data)
-		else:
-			# Elements of iterable type
-			# will be fed individually
-			[feed(to_str(r)) for r in iterdata]
+  try:
+    iterdata = iter(data)
+  except TypeError:
+    # @data is not iterable
+    if type(data).__module__ == 'numpy':
+      # It could be any numeric numpy types
+      feed(str(data))
+    elif isinstance(data,float) or isinstance(data,int):
+      feed(str(data))
+    else:
+      # It could be any primitive / instance of any class
+      feed(json.dumps(data))
+  else:
+    # @data is iterable
+    if isinstance(data,str):
+      # String does not need any conversion
+      feed(data)
+    else:
+      # Elements of iterable type
+      # will be fed individually
+      [feed(to_str(r)) for r in iterdata]
 

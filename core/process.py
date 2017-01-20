@@ -28,104 +28,104 @@ WORD_BAG_DIR = '{0}/data/words/freq.txt'.format(REPO_DIR)
 
 # DEPRECATED:
 def execute_background_services(commands):
-	workers = []
-	for cmd in commands:
-		print(colored('🚀 Executing...','green') + cmd)
-		sp = subprocess.Popen(cmd, 
-			shell=True, stdout=subprocess.PIPE,
-			preexec_fn=os.setsid)
-		workers.append(sp)
-	return workers
+  workers = []
+  for cmd in commands:
+    print(colored('🚀 Executing...','green') + cmd)
+    sp = subprocess.Popen(cmd, 
+      shell=True, stdout=subprocess.PIPE,
+      preexec_fn=os.setsid)
+    workers.append(sp)
+  return workers
 
 def terminate_background_services(workers):
-	print(colored('Waiting for background services...','green'))
-	q = Queue(maxsize=1)
+  print(colored('Waiting for background services...','green'))
+  q = Queue(maxsize=1)
 
-	# DEPRECATED:
-	def __timeout(signum,frame):
-		signal.alarm(0) # Cancel further timeout
-		print(colored('Ending background services...','green'))
-		for p in workers:
-			subprocess.Popen('kill {0}'.format(p.pid), 
-				shell=True, stdout=subprocess.PIPE)
-		# All done, unlock the queue
-		q.task_done()
+  # DEPRECATED:
+  def __timeout(signum,frame):
+    signal.alarm(0) # Cancel further timeout
+    print(colored('Ending background services...','green'))
+    for p in workers:
+      subprocess.Popen('kill {0}'.format(p.pid), 
+        shell=True, stdout=subprocess.PIPE)
+    # All done, unlock the queue
+    q.task_done()
 
-	# Terminate the first subprocess (ruby server)
-	subprocess.Popen('kill {0}'.format(workers[0].pid),
-		shell=True, stdout=subprocess.PIPE)
-
-
-	# Wait for the rest
-	wait_list  = workers[1:]
-	if len(wait_list)==0: return
-
-	pids       = [str(p.pid) for p in wait_list]
-	print('waiting for : {0}'.format(','.join(pids)))
-	exit_codes = [subp.wait() for subp in wait_list]
+  # Terminate the first subprocess (ruby server)
+  subprocess.Popen('kill {0}'.format(workers[0].pid),
+    shell=True, stdout=subprocess.PIPE)
 
 
-	print(colored('All subprocesses finished! Bye','green'))
+  # Wait for the rest
+  wait_list  = workers[1:]
+  if len(wait_list)==0: return
 
-	# signal.signal(signal.SIGALRM,__timeout)
-	# signal.alarm(10) # seconds
-	# q.put('wait')
-	# q.join() # Block until it timeouts
-	# q.get()
+  pids       = [str(p.pid) for p in wait_list]
+  print('waiting for : {0}'.format(','.join(pids)))
+  exit_codes = [subp.wait() for subp in wait_list]
+
+
+  print(colored('All subprocesses finished! Bye','green'))
+
+  # signal.signal(signal.SIGALRM,__timeout)
+  # signal.alarm(10) # seconds
+  # q.put('wait')
+  # q.join() # Block until it timeouts
+  # q.get()
 
 def print_record(rec):
-	print(rec['tags'])
+  print(rec['tags'])
 
 # Couple the processing pipe with the input
 def process_with(pipe):
-	def f(input0):
-		Pipe.operate(pipe,input0)
-	return f
-	
+  def f(input0):
+    Pipe.operate(pipe,input0)
+  return f
+  
 
 if __name__ == '__main__':
-	# Prepare the database server connection
-	db = couch.connector('pantip')
+  # Prepare the database server connection
+  db = couch.connector('pantip')
 
-	# Prepare word bag
-	bag = wordbag.new()
+  # Prepare word bag
+  bag = wordbag.new()
 
-	# Execute list of required background services
-	services = [
-		'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR),
-		##'python3 {0}/core/textprocess.py'.format(REPO_DIR)
-		]
-	workers  = execute_background_services(services)
+  # Execute list of required background services
+  services = [
+    'ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR),
+    ##'python3 {0}/core/textprocess.py'.format(REPO_DIR)
+    ]
+  workers  = execute_background_services(services)
 
-	# Delayed start
-	time.sleep(1)
+  # Delayed start
+  time.sleep(1)
 
-	# These are MQs we'll push preprocessed records to
-	qs = ['pantip-x1','pantip-x2','pantip-x3','pantip-x0']
-	mqs = [rabbit.create('localhost',q) for q in qs]
+  # These are MQs we'll push preprocessed records to
+  qs = ['pantip-x1','pantip-x2','pantip-x3','pantip-x0']
+  mqs = [rabbit.create('localhost',q) for q in qs]
 
-	# Prepare the processing pipeline (order matters)
-	pipe = Pipe.new('preprocess',[])
-	Pipe.push(pipe,preprocess.take)
-	Pipe.push(pipe,rabbit.feed(mqs))
-	Pipe.push(pipe,wordbag.feed(bag))
-	Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
+  # Prepare the processing pipeline (order matters)
+  pipe = Pipe.new('preprocess',[])
+  Pipe.push(pipe,preprocess.take)
+  Pipe.push(pipe,rabbit.feed(mqs))
+  Pipe.push(pipe,wordbag.feed(bag))
+  Pipe.then(pipe,lambda out: print(colored('[DONE!]','cyan')))
 
-	# Iterate through each record and processing
-	couch.each_do(db,process_with(pipe),limit=7000)
+  # Iterate through each record and processing
+  couch.each_do(db,process_with(pipe),limit=7000)
 
-	# Disconnect from the MQs
-	[rabbit.end(mq) for mq in mqs]
+  # Disconnect from the MQs
+  [rabbit.end(mq) for mq in mqs]
 
-	# Waiting for the background services
-	# and kill `em
-	terminate_background_services(workers)
+  # Waiting for the background services
+  # and kill `em
+  terminate_background_services(workers)
 
-	# Report the collected word bag
-	print(colored('[Word bag]','green'))
-	words = sorted(bag.items(),key=lambda b: -b[1])[:50]
-	pprint(words)
-	# Print most recurring words to file
-	with open(WORD_BAG_DIR,'w+') as txt:
-		txt.writelines([w[0] + "\n" for w in words])
+  # Report the collected word bag
+  print(colored('[Word bag]','green'))
+  words = sorted(bag.items(),key=lambda b: -b[1])[:50]
+  pprint(words)
+  # Print most recurring words to file
+  with open(WORD_BAG_DIR,'w+') as txt:
+    txt.writelines([w[0] + "\n" for w in words])
 

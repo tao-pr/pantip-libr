@@ -36,94 +36,94 @@ topicHasher,taghasher,contentClf,clf = None,None,None,None
 classify = lambda x:x # Eta expansion
 
 def execute_background_services():
-	global workers
-	services = ['ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR)]
+  global workers
+  services = ['ruby {0}/core/tokenizer/tokenizer.rb'.format(REPO_DIR)]
 
-	workers = []
-	for s in services:
-		print('Executing: {0}'.format(s))
-		sp = subprocess.Popen(
-			s,
-			shell=True,
-			stdout=subprocess.PIPE,
-			preexec_fn=os.setsid
-		)
-		workers.append(sp)
+  workers = []
+  for s in services:
+    print('Executing: {0}'.format(s))
+    sp = subprocess.Popen(
+      s,
+      shell=True,
+      stdout=subprocess.PIPE,
+      preexec_fn=os.setsid
+    )
+    workers.append(sp)
 
-	return workers
+  return workers
 
 
 # Event handler: An incoming requested message received
 def on_phone_ring(msg):
-	print(colored('[MSG] ','magenta'), msg)
-	# Preprocess the message (tokenisation)
-	topic  = json.loads(msg)
-	_topic = preprocess.take(topic)
+  print(colored('[MSG] ','magenta'), msg)
+  # Preprocess the message (tokenisation)
+  topic  = json.loads(msg)
+  _topic = preprocess.take(topic)
 
-	# Stringify those JSON first 
-	# TAODEBUG: It shouldn't be JSON stringify now, double effort
-	_topic = json.dumps(_topic,ensure_ascii=False)
+  # Stringify those JSON first 
+  # TAODEBUG: It shouldn't be JSON stringify now, double effort
+  _topic = json.dumps(_topic,ensure_ascii=False)
 
-	# Analyse
-	(y,x) = classify([_topic])
-	
-	#TAODEBUG:
-	print(colored('[ANALYSED]','magenta'))
-	print(colored(y,"red"), " --> ", _topic['title'])
+  # Analyse
+  (y,x) = classify([_topic])
+  
+  #TAODEBUG:
+  print(colored('[ANALYSED]','magenta'))
+  print(colored(y,"red"), " --> ", _topic['title'])
 
-	return y
+  return y
 
 def publish_output(feeders,messageid,output):
-	feed = rabbit.feed([feeders])
-	pack = {
-		id: messageid,
-		out: output
-	}
-	feed(pack)
+  feed = rabbit.feed([feeders])
+  pack = {
+    id: messageid,
+    out: output
+  }
+  feed(pack)
 
 def on_signal(signal,frame):
-	global workers
-	print(colored('--------------------------','yellow'))
-	print(colored(' Signaled to terminate...','yellow'))
-	print(colored('--------------------------','yellow'))
+  global workers
+  print(colored('--------------------------','yellow'))
+  print(colored(' Signaled to terminate...','yellow'))
+  print(colored('--------------------------','yellow'))
 
-	# End all background services
-	for sp in workers:
-		subprocess.Popen(
-			'kill {0}'.format(sp.pid),
-			shell=True, 
-			stdout=subprocess.PIPE
-		)	
+  # End all background services
+  for sp in workers:
+    subprocess.Popen(
+      'kill {0}'.format(sp.pid),
+      shell=True, 
+      stdout=subprocess.PIPE
+    ) 
 
-	# Keep waiting until all subprocess were killed
-	print('Waiting for services to end...')
-	[sp.wait() for sp in workers]
+  # Keep waiting until all subprocess were killed
+  print('Waiting for services to end...')
+  [sp.wait() for sp in workers]
 
-	sys.exit(0)
+  sys.exit(0)
 
 if __name__ == '__main__':
 
-	# Startup message
-	print(colored('--------------------------','cyan'))
-	print(colored(' Analysis service started','cyan'))
-	print(colored('--------------------------','cyan'))
+  # Startup message
+  print(colored('--------------------------','cyan'))
+  print(colored(' Analysis service started','cyan'))
+  print(colored('--------------------------','cyan'))
 
-	# Load classification models
-	# and make a classifer function
-	(topicHasher,taghasher,contentClf,clf) = textprocess.load_models()
-	classify = textprocess.classify_text(topicHasher,taghasher,contentClf,clf)
+  # Load classification models
+  # and make a classifer function
+  (topicHasher,taghasher,contentClf,clf) = textprocess.load_models()
+  classify = textprocess.classify_text(topicHasher,taghasher,contentClf,clf)
 
-	# Start the monitoring process
-	mqinput = rabbit.create('localhost',MQ_INPUT)
+  # Start the monitoring process
+  mqinput = rabbit.create('localhost',MQ_INPUT)
 
-	# Execute all background services
-	workers = execute_background_services()
-
-
-	# Await ...
-	signal.signal(signal.SIGINT, on_signal)
+  # Execute all background services
+  workers = execute_background_services()
 
 
-	print(colored("Monitoring process begins...","cyan"))
-	rabbit.listen(mqinput,on_phone_ring)
-	##signal.pause()
+  # Await ...
+  signal.signal(signal.SIGINT, on_signal)
+
+
+  print(colored("Monitoring process begins...","cyan"))
+  rabbit.listen(mqinput,on_phone_ring)
+  ##signal.pause()

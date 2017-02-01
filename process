@@ -11,12 +11,11 @@ sleep 3
 
 if [ ! -f "$CSV_PATH" ] 
 then
+  # If the CSV report file does not exist,
+  # create a new one with initial CSV header
 	touch "$CSV_PATH"
-else
-	rm "$CSV_PATH"
-	touch "$CSV_PATH"
+  echo "CLUSTER  , DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
 fi
-echo "CLUSTER  , DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
 
 # Tokenise input
 python3 core/process.py

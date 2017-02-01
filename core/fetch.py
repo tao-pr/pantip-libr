@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
   # Fetch the threads in the specified range
   num = 0
-  for _id in range(34808501,34816500):
+  for _id in range(34847792,34847792):
     if scrape_and_store(_id): num += 1
 
   print(colored('=============================','cyan'))

@@ -80,6 +80,7 @@ def analyze(clf,labels=None):
       shuffle = ShuffleSplit(len(matrix), test_size=test_ratio)
       trainlist, testlist = [(a,b) for (a,b) in shuffle][-1]
       X_train = (x for x in map(lambda i: matrix[i], trainlist))
+      Y_train = (y for y in map(lambda i: labels[i], trainlist))
       X_valid = (x for x in map(lambda i: matrix[i], testlist))
       Y_valid = (y for y in map(lambda i: labels[i], testlist))
 
@@ -87,17 +88,29 @@ def analyze(clf,labels=None):
       print(colored(clf[-1],'yellow'))
 
       # Display the dimension of the training elements
-      print(colored('X: {0}'.format(np.shape(X)),'yellow'))
-      print(colored('y: {0}'.format(np.shape(labels)),'yellow'))
+      print(colored('Trainset:','cyan'))
+      print(colored('X: {0}'.format(np.shape(X_train)),'yellow'))
+      print(colored('y: {0}'.format(np.shape(Y_train)),'yellow'))
 
+      # Process trainset
       for opr in clf[:-1]:
         print(colored(opr,'yellow'))
-        X_train = opr.fit_transform(X_train,labels)
-        X_valid = opr.fit_transform(X_valid,labels)
-
+        X_train = opr.fit_transform(X_train,Y_train)
       # NOTE: The last operation of the CLF is always a clustering algo
-      clf[-1].fit(X_train,labels)
-      # Return tuple of [actual], [prediction]
+      clf[-1].fit(X_train,Y_train)
+
+      # Display the dimension of the training elements
+      print(colored('Validation set:','cyan'))
+      print(colored('X: {0}'.format(np.shape(X_valid)),'yellow'))
+      print(colored('y: {0}'.format(np.shape(Y_valid)),'yellow'))
+
+      # Process validation set
+      for opr in clf[:-1]:
+        print(colored(opr,'yellow'))
+        X_valid = opr.transform(X_valid,Y_valid)
+
+      # Return tuple of [actual], [prediction] 
+      # on the validation set
       return (Y_valid, clf[-1].predict(X_valid))
 
     else: # Classification mode

@@ -34,6 +34,7 @@ arguments.add_argument('--decom', type=str, default=None) # Text feature decompo
 arguments.add_argument('--n', type=int, default=None) # Number of decomposed components
 arguments.add_argument('--feat',  type=int, default=None) # Dimension of text feature
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
+arguments.add_argument('--mod', type=int, default=2) # Modulo of the splitting.  
 args = vars(arguments.parse_args(sys.argv[1:]))
 
 def load_stopwords():
@@ -168,8 +169,6 @@ def train_sentiment_capture(stopwords,save=False):
 
   # Train!
   print(colored('Training process started...','cyan'))
-
-
   clf     = cluster.safe_load(CLF_PATH,args['cluster'],args['feat'])
   trainMe = cluster.analyze(clf,labels=Y)
   Y_      = trainMe(X)
@@ -180,6 +179,9 @@ def train_sentiment_capture(stopwords,save=False):
   predict_rate = 100*float(num_correct)/float(len(Y))
   print(colored('=========== RESULTS ========','magenta'))
   print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
+
+  # Cross validation
+  # TAOTODO:
 
   # Report accuracy by each of the labels
   labels = list(set(Y_))

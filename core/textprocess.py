@@ -171,17 +171,14 @@ def train_sentiment_capture(stopwords,save=False):
   print(colored('Training process started...','cyan'))
   clf     = cluster.safe_load(CLF_PATH,args['cluster'],args['feat'])
   trainMe = cluster.analyze(clf,labels=Y)
-  Y_      = trainMe(X)
+  (Yact, Ypred) = trainMe(X)
   print(colored('[DONE]','yellow'))
 
-  # Self-validation
-  num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])
-  predict_rate = 100*float(num_correct)/float(len(Y))
-  print(colored('=========== RESULTS ========','magenta'))
-  print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
-
   # Cross validation
-  # TAOTODO:
+  num_correct  = len([1 for y,y0 in zip(Ypred,Yact) if y==y0])
+  predict_rate = 100*float(num_correct)/float(len(Y))
+  print(colored('=========== CV RESULTS ========','magenta'))
+  print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
 
   # Report accuracy by each of the labels
   labels = list(set(Y_))

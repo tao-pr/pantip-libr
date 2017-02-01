@@ -81,6 +81,7 @@ def analyze(clf,labels=None):
       trainlist, testlist = [(a,b) for (a,b) in shuffle][-1]
       X_train = (x for x in map(lambda i: matrix[i], trainlist))
       X_valid = (x for x in map(lambda i: matrix[i], testlist))
+      Y_valid = (y for y in map(lambda i: labels[i], testlist))
 
       # Display what the underlying classifier is
       print(colored(clf[-1],'yellow'))
@@ -91,11 +92,13 @@ def analyze(clf,labels=None):
 
       for opr in clf[:-1]:
         print(colored(opr,'yellow'))
-        X = opr.fit_transform(X,labels)
+        X_train = opr.fit_transform(X_train,labels)
+        X_valid = opr.fit_transform(X_valid,labels)
 
       # NOTE: The last operation of the CLF is always a clustering algo
-      clf[-1].fit(X,labels)
-      return clf[-1].predict(X)
+      clf[-1].fit(X_train,labels)
+      # Return tuple of [actual], [prediction]
+      return (Y_valid, clf[-1].predict(X_valid))
 
     else: # Classification mode
       X = matrix

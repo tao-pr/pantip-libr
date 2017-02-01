@@ -12,6 +12,9 @@ from sklearn.cluster import KMeans
 from sklearn.feature_selection import SelectKBest, chi2, f_classif
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors.nearest_centroid import NearestCentroid
+# TAOTOREVIEW: [ShuffleSplit] will be deprecated in 0.18
+# and will be moved to [sklearn.model_selection]
+from sklearn.cross_validation import ShuffleSplit
 from sklearn.qda import QDA
 from sklearn.linear_model import SGDClassifier
 
@@ -70,9 +73,14 @@ def safe_load(path,method,n_features):
 # @return {matrix} if {labels} is supplied
 # @return {list} of classification, otherwise
 def analyze(clf,labels=None):
-  def _do(matrix):
+  def _do(matrix, test_ratio=0.0):
     if labels:  # Learning mode
-      X = matrix
+
+      # Split train & test folds
+      shuffle = ShuffleSplit(len(matrix), test_size=test_ratio)
+      trainlist, testlist = [(a,b) for (a,b) in shuffle][-1]
+      X_train = (x for x in map(lambda i: matrix[i], trainlist))
+      X_valid = (x for x in map(lambda i: matrix[i], testlist))
 
       # Display what the underlying classifier is
       print(colored(clf[-1],'yellow'))

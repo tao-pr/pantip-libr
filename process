@@ -14,7 +14,7 @@ then
   # If the CSV report file does not exist,
   # create a new one with initial CSV header
 	touch "$CSV_PATH"
-  echo "CLUSTER  , DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
+  echo "CLUSTER    , DECOM ,  N  , #FT , TAG , % TOT ,  [0]  ,  [1]  ,  [-1]" > "$CSV_PATH"
 fi
 
 # Tokenise input

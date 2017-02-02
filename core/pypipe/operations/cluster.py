@@ -79,10 +79,10 @@ def analyze(clf,labels=None):
       # Split train & test folds
       shuffle = ShuffleSplit(len(matrix), test_size=test_ratio)
       trainlist, testlist = [(a,b) for (a,b) in shuffle][-1]
-      X_train = (x for x in map(lambda i: matrix[i], trainlist))
-      Y_train = (y for y in map(lambda i: labels[i], trainlist))
-      X_valid = (x for x in map(lambda i: matrix[i], testlist))
-      Y_valid = (y for y in map(lambda i: labels[i], testlist))
+      X_train = [x for x in map(lambda i: matrix[i], trainlist)]
+      Y_train = [y for y in map(lambda i: labels[i], trainlist)]
+      X_valid = [x for x in map(lambda i: matrix[i], testlist)]
+      Y_valid = [y for y in map(lambda i: labels[i], testlist)]
 
       # Display what the underlying classifier is
       print(colored(clf[-1],'yellow'))
@@ -107,7 +107,7 @@ def analyze(clf,labels=None):
       # Process validation set
       for opr in clf[:-1]:
         print(colored(opr,'yellow'))
-        X_valid = opr.transform(X_valid,Y_valid)
+        X_valid = opr.transform(X_valid)
 
       # Return tuple of [actual], [prediction] 
       # on the validation set

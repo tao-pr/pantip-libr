@@ -181,10 +181,10 @@ def train_sentiment_capture(stopwords,save=False):
   print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
 
   # Report accuracy by each of the labels
-  labels = list(set(Y_))
+  labels = list(set(Ypred))
   lbl_predict_rate = []
   for lbl in labels:
-    samples = [(y,y0) for y,y0 in zip(Y_,Y) if y0==lbl]
+    samples = [(y,y0) for y,y0 in zip(Ypred,Yact) if y0==lbl]
     num_correct = len([1 for y,y0 in samples if y==y0])
     num_all     = len(samples)
     accuracy    = 100*float(num_correct)/float(num_all)
@@ -221,7 +221,7 @@ def train_sentiment_capture(stopwords,save=False):
 #   return (topicHasher,taghasher,contentClf,clf)
 
 # @param {iterable} topics
-def classify_text(topicHasher,tagHasher,contentClf,clf):
+def classifYpredtext(topicHasher,tagHasher,contentClf,clf):
   def _classify(textsrc):
     print(colored('[Classifying]...','green'))
     # Prepare operations
@@ -261,10 +261,10 @@ def classify_text(topicHasher,tagHasher,contentClf,clf):
     X = [list(a) + list(b) + list(c) for a,b,c in XS]
 
     # Analyse 
-    Y_ = classifyMe(X)
+    Ypred = classifyMe(X)
 
     # Returns the results as tuples
-    return zip(Y_,X)
+    return zip(Ypred,X)
   return _classify
 
 

@@ -176,7 +176,6 @@ def train_sentiment_capture(stopwords,save=False):
 
   # Cross validation
   num_correct_all = 0
-  num_all = len(Yact)
 
   # Report accuracy by each of the labels
   labels = list(set(Yact))
@@ -192,7 +191,7 @@ def train_sentiment_capture(stopwords,save=False):
     lbl_predict_rate.append('{0:.2f}'.format(accuracy).center(7))
   
   # Report overall performance
-  predict_rate = 100*float(num_correct_all)/float(num_all)
+  predict_rate = 100*float(num_correct_all)/float(len(Yact))
   print(colored('=========== CV PERFORMANCE ========','magenta'))
   print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
   

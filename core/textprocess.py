@@ -175,23 +175,27 @@ def train_sentiment_capture(stopwords,save=False):
   print(colored('[DONE]','yellow'))
 
   # Cross validation
-  num_correct  = len([1 for y,y0 in zip(Ypred,Yact) if y==y0])
-  predict_rate = 100*float(num_correct)/float(len(Y))
-  print(colored('=========== CV RESULTS ========','magenta'))
-  print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
+  num_correct_all = 0
+  num_all = len(Yact)
 
   # Report accuracy by each of the labels
-  labels = list(set(Ypred))
+  labels = list(set(Yact))
   lbl_predict_rate = []
   for lbl in labels:
     samples = [(y,y0) for y,y0 in zip(Ypred,Yact) if y0==lbl]
     num_correct = len([1 for y,y0 in samples if y==y0])
     num_all     = len(samples)
     accuracy    = 100*float(num_correct)/float(num_all)
+    num_correct_all += num_correct
     
     print('    accuracy class #{0} :    {1:.2f} % (out of {2} cases)'.format(lbl,accuracy,num_all))
     lbl_predict_rate.append('{0:.2f}'.format(accuracy).center(7))
   
+  # Report overall performance
+  print(colored('=========== CV PERFORMANCE ========','magenta'))
+  print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
+  predict_rate = 100*float(num_correct_all)/float(num_all)
+
   
   # Record the training accuracy to the CSV
   with open(CSV_REPORT_PATH,'a') as csv:

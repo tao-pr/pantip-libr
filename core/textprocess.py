@@ -192,10 +192,9 @@ def train_sentiment_capture(stopwords,save=False):
     lbl_predict_rate.append('{0:.2f}'.format(accuracy).center(7))
   
   # Report overall performance
+  predict_rate = 100*float(num_correct_all)/float(num_all)
   print(colored('=========== CV PERFORMANCE ========','magenta'))
   print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
-  predict_rate = 100*float(num_correct_all)/float(num_all)
-
   
   # Record the training accuracy to the CSV
   with open(CSV_REPORT_PATH,'a') as csv:

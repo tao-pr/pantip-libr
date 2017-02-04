@@ -40,7 +40,7 @@ rm data/hasher/*
 # [SGD] tends to stress CPU most especially on larger dataset.
 
 # CLUSTER="centroid --save"
-CLUSTERS=("qda","svm","knn","centroid","sgd")
+declare -a CLUSTERS=("qda" "svm" "knn" "centroid" "sgd")
 
 # Batch trainings
 for CLUSTER in "${CLUSTERS[@]}"

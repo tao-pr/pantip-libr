@@ -1,5 +1,5 @@
 """
-Report charting renderer
+Report radaring renderer
 @starcolon projects
 """
 
@@ -13,7 +13,7 @@ from pprint import pprint
 
 arguments = argparse.ArgumentParser()
 arguments.add_argument('--from', type=str, default='data/report.csv') # CSV file input of the report
-arguments.add_argument('--to', type=str, default='data/') # Where to save graphical charts
+arguments.add_argument('--to', type=str, default='data/') # Where to save graphical radars
 args = vars(arguments.parse_args(sys.argv[1:]))
 
 def read_csv(path):
@@ -56,14 +56,14 @@ if __name__ == '__main__':
   csv = read_csv(args['from'])
   data_1, data_2, data_3 = tee(gen_csv(csv),3)
 
-  # Make a renderable chart
+  # Make a renderable radar
   # where the `decomposition algorithms` are plotted on X (corners of Radar)
   # and `variations of parameters` are plotted on Y (contour lines)
-  print(colored('Preparing chart ...','cyan'))
+  print(colored('Preparing radar ...','cyan'))
   cfg      = Config()
   cfg.fill = True
-  chart    = pygal.Radar(cfg)
-  chart.title = 'Clustering/Feature Comparison'
+  radar    = pygal.Radar(cfg)
+  radar.title = 'Clustering/Feature Comparison'
 
   # NOTE: Need to do the loop, not the `set` conversion
   # otherwise the list gets sorted which becomes out of sync
@@ -71,25 +71,25 @@ if __name__ == '__main__':
   for n in data_1:
     if label(n) not in labels:
       labels.append(label(n))
-  chart.x_labels = labels
+  radar.x_labels = labels
 
   params = []
   for n in data_2:
     if param(n) not in params:
       params.append(param(n))
 
-  # Aggregate chart input vectors
-  chart_input = {par:[] for par in params}
+  # Aggregate radar input vectors
+  radar_input = {par:[] for par in params}
   prev_label = None
   for d in data_3:
     lbl = label(d)
     par = param(d)
-    chart_input[par].append(d['#total'])
+    radar_input[par].append(d['#total'])
 
   # Render now!
-  print(colored('Drawing chart...','cyan'))
-  for par,vec in chart_input.items():
-    chart.add(par, vec)
+  print(colored('Drawing radar...','cyan'))
+  for par,vec in radar_input.items():
+    radar.add(par, vec)
 
-  chart.render_to_file(args['to'] + '/radar.svg')
+  radar.render_to_file(args['to'] + '/radar.svg')
   print(colored('Done!','green'))

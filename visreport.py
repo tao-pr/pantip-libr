@@ -64,6 +64,7 @@ if __name__ == '__main__':
   cfg.fill  = True
   radar     = pygal.Radar(cfg, range=(70,85))
   radar.title = 'Clustering/Feature Comparison'
+  bar       = {} # Bar charts, indexed by cluster type
 
   # NOTE: Need to do the loop, not the `set` conversion
   # otherwise the list gets sorted which becomes out of sync
@@ -75,7 +76,6 @@ if __name__ == '__main__':
       bar[label(n)] = pygal.HorizontalBar(cfg, range=(70,90))
       bar[label(n)].title = 'Cluster with ' + label(n).upper()
   radar.x_labels = labels
-  line.x_labels = labels
 
   params = []
   for n in data_2:

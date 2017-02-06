@@ -171,7 +171,7 @@ def train_sentiment_capture(stopwords,save=False):
   print(colored('Training process started...','cyan'))
   clf     = cluster.safe_load(CLF_PATH,args['cluster'],args['feat'])
   trainMe = cluster.analyze(clf,labels=Y)
-  (Yact, Ypred) = trainMe(X, test_ratio=0.125)
+  (Yact, Ypred) = trainMe(X, test_ratio=0.33)
   print(colored('[DONE]','yellow'))
 
   # Cross validation

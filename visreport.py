@@ -60,9 +60,9 @@ if __name__ == '__main__':
   # where the `decomposition algorithms` are plotted on X (corners of Radar)
   # and `variations of parameters` are plotted on Y (contour lines)
   print(colored('Preparing radar ...','cyan'))
-  cfg      = Config()
-  cfg.fill = True
-  radar    = pygal.Radar(cfg)
+  cfg       = Config()
+  cfg.fill  = True
+  radar     = pygal.Radar(cfg, range=(70,85))
   radar.title = 'Clustering/Feature Comparison'
 
   # NOTE: Need to do the loop, not the `set` conversion
@@ -71,25 +71,35 @@ if __name__ == '__main__':
   for n in data_1:
     if label(n) not in labels:
       labels.append(label(n))
+      # Create a bar chart for each of the cluster type
+      bar[label(n)] = pygal.HorizontalBar(cfg, range=(70,90))
+      bar[label(n)].title = 'Cluster with ' + label(n).upper()
   radar.x_labels = labels
+  line.x_labels = labels
 
   params = []
   for n in data_2:
     if param(n) not in params:
       params.append(param(n))
 
-  # Aggregate radar input vectors
+  # Aggregate input vectors for charting
   radar_input = {par:[] for par in params}
   prev_label = None
   for d in data_3:
     lbl = label(d)
     par = param(d)
     radar_input[par].append(d['#total'])
+    bar[lbl].add(par, d['#total'])
 
-  # Render now!
+  # Render radar chart
   print(colored('Drawing radar...','cyan'))
   for par,vec in radar_input.items():
     radar.add(par, vec)
 
   radar.render_to_file(args['to'] + '/radar.svg')
+
+  # Render bar charts
+  for lbl in labels:
+    bar[lbl].render_to_file(args['to'] + '/bar-' + lbl +'.svg')
+
   print(colored('Done!','green'))

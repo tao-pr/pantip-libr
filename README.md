@@ -122,54 +122,76 @@ input <--- [X1:X2]
 input => [feature selection] => [centroid] => clusters
 ```
 
-**Training with:** 10,000 Samples
+## Dataset & Performance
 
-|CLUSTER  | DECOM |  N  | #FT | TAG | % TOT |  [0]  |  [1]  |  [-1]
-|---------|-------|-----|-----|-----|-------|-------|-------|-------
-|  svm    |  SVD  | 400 | None|  16 | 98.04 | 100.00|  3.98 | 0
-|  svm    |  SVD  | 200 | None|  16 | 97.98 | 100.00|  1.00 | 0
-|  svm    |  SVD  | 100 | None|  16 | 97.96 | 100.00|  0    | 0
-|  svm    |  SVD  |  50 | None|  16 | 97.96 | 100.00|  0    | 0
-|  svm    |  LDA  |  50 | None|  16 | 98.17 | 100.00| 10.45 | 0
-|  svm    |  LDA  |  25 | None|  16 | 98.90 | 100.00| 46.27 | 33.33 
-|  svm    |  LDA  |  10 | None|  16 | 98.23 | 100.00| 13.43 | 0
-|  svm    |  LDA  |  5  | None|  16 | 98.12 | 100.00|  7.96 | 0
-|---------|-------|-----|-----|-----|-------|-------|-------|-------
-|  knn    |  SVD  | 400 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  SVD  | 200 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  SVD  | 100 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  SVD  |  50 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  LDA  |  50 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  LDA  |  25 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  LDA  |  10 | None|  16 | 100.00| 100.00| 100.00| 100.00
-|  knn    |  LDA  |  5  | None|  16 | 100.00| 100.00| 100.00| 100.00
-|---------|-------|-----|-----|-----|-------|-------|-------|-------
-|centroid |  SVD  | 400 | None|  16 | 81.99 | 82.28 | 67.66 | 100.00
-|centroid |  SVD  | 200 | None|  16 | 79.56 | 79.81 | 67.16 | 100.00
-|centroid |  SVD  | 100 | None|  16 | 79.94 | 80.23 | 65.67 | 100.00
-|centroid |  SVD  |  50 | None|  16 | 77.82 | 78.31 | 53.73 | 100.00
-|centroid |  LDA  |  50 | None|  16 | 72.76 | 73.91 | 16.92 | 66.67 
-|centroid |  LDA  |  25 | None|  16 | 75.27 | 76.36 | 22.39 | 66.67 
-|centroid |  LDA  |  10 | None|  16 | 74.73 | 75.73 | 25.87 | 66.67 
-|centroid |  LDA  |  5  | None|  16 | 75.67 | 76.86 | 17.91 | 66.67 
-|---------|-------|-----|-----|-----|-------|-------|-------|-------
-|  qda    |  SVD  | 400 | None|  16 | 98.22 | 100.00| 12.94 | 0
-|  qda    |  SVD  | 200 | None|  16 | 99.97 | 100.00| 100.00| 0
-|  qda    |  SVD  | 100 | None|  16 | 72.92 | 72.39 | 100.00| 0
-|  qda    |  SVD  |  50 | None|  16 | 71.93 | 71.51 | 93.53 | 0
-|  qda    |  LDA  |  50 | None|  16 | 35.31 | 33.98 | 100.00| 33.33 
-|  qda    |  LDA  |  25 | None|  16 | 82.57 | 83.04 | 59.20 | 100.00
-|  qda    |  LDA  |  10 | None|  16 | 15.30 | 13.60 | 98.01 | 33.33 
-|  qda    |  LDA  |  5  | None|  16 | 72.58 | 73.30 | 37.81 | 66.67 
-|---------|-------|-----|-----|-----|-------|-------|-------|-------
-|  sgd    |  SVD  | 400 | None|  16 | 24.76 | 24.08 | 57.21 | 66.67 
-|  sgd    |  SVD  | 200 | None|  16 | 53.13 | 53.92 | 14.93 | 33.33 
-|  sgd    |  SVD  | 100 | None|  16 | 36.97 | 36.50 | 59.20 | 66.67 
-|  sgd    |  SVD  |  50 | None|  16 | 26.04 | 25.65 | 43.78 | 100.00
-|  sgd    |  LDA  |  50 | None|  16 |  0.65 |  0.62 |  0.50 | 100.00
-|  sgd    |  LDA  |  25 | None|  16 |  5.63 |  5.30 | 20.40 | 100.00
-|  sgd    |  LDA  |  10 | None|  16 |  0.92 |  0.37 | 26.37 | 100.00
-|  sgd    |  LDA  |  5  | None|  16 | 85.62 | 87.32 |  3.98 |  0.00 
+The dataset of 40,000 records is collected from Pantip.com. 
+33.3% of the dataset is splitted as validation. 
+Following is the accuracy distribution over the various 
+clustering and decomposition parameters we've conducted.
+
+|-----------|-------|-----|-----|-----|-------|-------|-------|--------|
+|CLUSTER    | DECOM |  N  | #FT | TAG | % TOT |  [0]  |  [1]  |  [-1]|
+|-----------|-------|-----|-----|-----|-------|-------|-------|--------    |
+|    qda    |  SVD  | 400 | None|  16 | 76.51 | 76.92 | 60.20 | 14.29 |
+|    qda    |  SVD  | 200 | None|  16 | 72.65 | 73.10 | 50.00 | 50.00 |
+|    qda    |  SVD  | 100 | None|  16 | 72.59 | 73.06 | 50.94 |  0.00 |
+|    qda    |  SVD  |  50 | None|  16 | 75.81 | 76.31 | 51.54 | 40.00 |
+|    qda    |  LDA  |  50 | None|  16 | 75.87 | 76.22 | 60.07 |  0.00 |
+|    qda    |  LDA  |  25 | None|  16 | 74.03 | 74.35 | 58.94 | 25.00 |
+|    qda    |  LDA  |  10 | None|  16 | 74.37 | 74.72 | 57.53 | 25.00 |
+|    qda    |  LDA  |  5  | None|  16 | 73.72 | 73.97 | 63.70 |  0.00 |
+|    qda    |  PCA  | 400 | None|  16 | 76.42 | 76.75 | 60.47 | 20.00 |
+|    qda    |  PCA  | 200 | None|  16 | 75.81 | 76.32 | 52.59 | 28.57 |
+|    qda    |  PCA  | 100 | None|  16 | 78.78 | 79.20 | 61.05 |  0.00 |
+|    qda    |  PCA  |  50 | None|  16 | 75.95 | 76.18 | 64.04 | 16.67 |
+|    svm    |  SVD  | 400 | None|  16 | 77.56 | 78.01 | 58.19 | 25.00 |
+|    svm    |  SVD  | 200 | None|  16 | 69.02 | 69.49 | 47.04 |  0.00 |
+|    svm    |  SVD  | 100 | None|  16 | 76.27 | 76.75 | 53.58 | 25.00 |
+|    svm    |  SVD  |  50 | None|  16 | 76.09 | 76.43 | 60.94 |  0.00 |
+|    svm    |  LDA  |  50 | None|  16 | 74.33 | 74.56 | 64.66 |  0.00 |
+|    svm    |  LDA  |  25 | None|  16 | 70.98 | 71.41 | 51.61 | 33.33 |
+|    svm    |  LDA  |  10 | None|  16 | 76.67 | 77.00 | 63.48 |  0.00 |
+|    svm    |  LDA  |  5  | None|  16 | 77.78 | 78.26 | 56.06 | 14.29 |
+|    svm    |  PCA  | 400 | None|  16 | 79.93 | 80.27 | 66.67 |  0.00 |
+|    svm    |  PCA  | 200 | None|  16 | 77.26 | 77.46 | 69.71 | 12.50 |
+|    svm    |  PCA  | 100 | None|  16 | 75.67 | 76.13 | 55.79 |  0.00 |
+|    svm    |  PCA  |  50 | None|  16 | 73.35 | 73.65 | 59.69 |  0.00 |
+|    knn    |  SVD  | 400 | None|  16 | 75.45 | 75.89 | 56.10 | 25.00 |
+|    knn    |  SVD  | 200 | None|  16 | 77.49 | 77.98 | 53.72 |  0.00 |
+|    knn    |  SVD  | 100 | None|  16 | 75.98 | 76.46 | 53.31 |  0.00 |
+|    knn    |  SVD  |  50 | None|  16 | 76.73 | 77.11 | 60.00 |  0.00 |
+|    knn    |  LDA  |  50 | None|  16 | 73.99 | 74.37 | 57.25 |  0.00 |
+|    knn    |  LDA  |  25 | None|  16 | 77.46 | 78.09 | 49.46 |  0.00 |
+|    knn    |  LDA  |  10 | None|  16 | 76.10 | 76.64 | 51.16 | 12.50 |
+|    knn    |  LDA  |  5  | None|  16 | 78.60 | 79.00 | 59.38 | 20.00 |
+|    knn    |  PCA  | 400 | None|  16 | 77.83 | 78.27 | 58.21 | 42.86 |
+|    knn    |  PCA  | 200 | None|  16 | 76.61 | 76.83 | 68.23 |  0.00 |
+|    knn    |  PCA  | 100 | None|  16 | 74.71 | 74.98 | 63.77 | 12.50 |
+|    knn    |  PCA  |  50 | None|  16 | 73.40 | 73.84 | 55.29 | 28.57 |
+|  centroid |  SVD  | 400 | None|  16 | 76.82 | 77.13 | 61.63 | 33.33 |
+|  centroid |  SVD  | 200 | None|  16 | 77.93 | 78.36 | 58.24 | 14.29 |
+|  centroid |  SVD  | 100 | None|  16 | 73.79 | 74.10 | 60.00 | 25.00 |
+|  centroid |  SVD  |  50 | None|  16 | 76.70 | 77.30 | 51.08 | 12.50 |
+|  centroid |  LDA  |  50 | None|  16 | 77.56 | 78.16 | 50.00 |  0.00 |
+|  centroid |  LDA  |  25 | None|  16 | 76.54 | 77.00 | 54.79 | 33.33 |
+|  centroid |  LDA  |  10 | None|  16 | 75.76 | 76.01 | 64.73 |  0.00 |
+|  centroid |  LDA  |  5  | None|  16 | 78.06 | 78.52 | 59.03 | 25.00 |
+|  centroid |  PCA  | 400 | None|  16 | 75.98 | 76.63 | 45.80 | 14.29 |
+|  centroid |  PCA  | 200 | None|  16 | 75.56 | 76.12 | 50.18 | 50.00 |
+|  centroid |  PCA  | 100 | None|  16 | 77.90 | 78.26 | 61.96 |  0.00 |
+|  centroid |  PCA  |  50 | None|  16 | 76.74 | 77.09 | 60.82 | 25.00 |
+|    sgd    |  SVD  | 400 | None|  16 | 76.22 | 76.62 | 58.02 |  0.00 |
+|    sgd    |  SVD  | 200 | None|  16 | 75.48 | 75.73 | 64.20 | 28.57 |
+|    sgd    |  SVD  | 100 | None|  16 | 76.12 | 76.41 | 63.79 |  0.00 |
+|    sgd    |  SVD  |  50 | None|  16 | 78.59 | 79.06 | 58.78 | 22.22 |
+|    sgd    |  LDA  |  50 | None|  16 | 74.05 | 74.65 | 45.38 | 33.33 |
+|    sgd    |  LDA  |  25 | None|  16 | 76.52 | 76.78 | 66.43 | 12.50 |
+|    sgd    |  LDA  |  10 | None|  16 | 75.90 | 76.26 | 59.55 | 37.50 |
+|    sgd    |  LDA  |  5  | None|  16 | 77.67 | 78.09 | 57.74 | 25.00 |
+|    sgd    |  PCA  | 400 | None|  16 | 73.13 | 73.59 | 51.71 | 28.57 |
+|    sgd    |  PCA  | 200 | None|  16 | 62.54 | 62.67 | 56.90 | 14.29 |
+|    sgd    |  PCA  | 100 | None|  16 | 77.74 | 78.17 | 59.56 | 12.50 |
+|    sgd    |  PCA  |  50 | None|  16 | 80.26 | 80.67 | 61.02 | 14.29 |
 
 
 > PCA has also been tested but it requires too large amount 
@@ -179,7 +201,7 @@ of memory footprint to produce a proper dense matrix as its input.
 
 ```text
 CLUSTER : Clustering algorithm
-DECOM   : TFIDF to dense matrix decomposition
+DECOM   : TFIDF to dense matrix decomposition method
 N       : Dimension of feature matrix (after reduction)
 FT      : Number of selection of best features
 TAG     : Dimension of the target dense matrix of topic tags
@@ -189,7 +211,31 @@ TAG     : Dimension of the target dense matrix of topic tags
 [-1]    : Accuracy of the class [-1] : Negative responses
 ```
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/radar.svg?v=3)
+## Overall performance
+
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/radar.svg?v=4)
+
+## Best performance of QDA clustering
+
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-qda.svg?v=4)
+
+## Best performance of SVM clustering
+
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-svm.svg?v=4)
+
+## Best performance of K-Nearest Neighbours clustering
+
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-knn.svg?v=4)
+
+## Best performance of Nearest Centroid clustering
+
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-centroid.svg?v=4)
+
+## Best performance of SGD clustering
+
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-sgd.svg?v=4)
+
+
 ---
 
 

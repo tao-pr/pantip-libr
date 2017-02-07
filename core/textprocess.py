@@ -34,6 +34,7 @@ arguments.add_argument('--decom', type=str, default=None) # Text feature decompo
 arguments.add_argument('--n', type=int, default=None) # Number of decomposed components
 arguments.add_argument('--feat',  type=int, default=None) # Dimension of text feature
 arguments.add_argument('--tagdim', type=int, default=16) # Dimension of tag after hash
+arguments.add_argument('--mod', type=int, default=2) # Modulo of the splitting.  
 args = vars(arguments.parse_args(sys.argv[1:]))
 
 def load_stopwords():
@@ -168,31 +169,31 @@ def train_sentiment_capture(stopwords,save=False):
 
   # Train!
   print(colored('Training process started...','cyan'))
-
-
   clf     = cluster.safe_load(CLF_PATH,args['cluster'],args['feat'])
   trainMe = cluster.analyze(clf,labels=Y)
-  Y_      = trainMe(X)
+  (Yact, Ypred) = trainMe(X, test_ratio=0.33)
   print(colored('[DONE]','yellow'))
 
-  # Self-validation
-  num_correct  = len([1 for y,y0 in zip(Y_,Y) if y==y0])
-  predict_rate = 100*float(num_correct)/float(len(Y))
-  print(colored('=========== RESULTS ========','magenta'))
-  print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
+  # Cross validation
+  num_correct_all = 0
 
   # Report accuracy by each of the labels
-  labels = list(set(Y_))
+  labels = list(set(Yact))
   lbl_predict_rate = []
   for lbl in labels:
-    samples = [(y,y0) for y,y0 in zip(Y_,Y) if y0==lbl]
+    samples = [(y,y0) for y,y0 in zip(Ypred,Yact) if y0==lbl]
     num_correct = len([1 for y,y0 in samples if y==y0])
     num_all     = len(samples)
     accuracy    = 100*float(num_correct)/float(num_all)
+    num_correct_all += num_correct
     
     print('    accuracy class #{0} :    {1:.2f} % (out of {2} cases)'.format(lbl,accuracy,num_all))
     lbl_predict_rate.append('{0:.2f}'.format(accuracy).center(7))
   
+  # Report overall performance
+  predict_rate = 100*float(num_correct_all)/float(len(Yact))
+  print(colored('=========== CV PERFORMANCE ========','magenta'))
+  print('    overall accuracy:   {0:.2f} %'.format(predict_rate))
   
   # Record the training accuracy to the CSV
   with open(CSV_REPORT_PATH,'a') as csv:
@@ -222,7 +223,7 @@ def train_sentiment_capture(stopwords,save=False):
 #   return (topicHasher,taghasher,contentClf,clf)
 
 # @param {iterable} topics
-def classify_text(topicHasher,tagHasher,contentClf,clf):
+def classifYpredtext(topicHasher,tagHasher,contentClf,clf):
   def _classify(textsrc):
     print(colored('[Classifying]...','green'))
     # Prepare operations
@@ -262,10 +263,10 @@ def classify_text(topicHasher,tagHasher,contentClf,clf):
     X = [list(a) + list(b) + list(c) for a,b,c in XS]
 
     # Analyse 
-    Y_ = classifyMe(X)
+    Ypred = classifyMe(X)
 
     # Returns the results as tuples
-    return zip(Y_,X)
+    return zip(Ypred,X)
   return _classify
 
 

@@ -50,6 +50,9 @@ def label(rec):
 def param(rec):
   return rec['decom'] + '-' + str(rec['N'])
 
+def decom(rec):
+  return rec['decom'].upper()
+
 if __name__ == '__main__':
   # Read in CSV report, strip the headers, blank lines
   print(colored('Reading CSV report ...','cyan'))
@@ -84,12 +87,20 @@ if __name__ == '__main__':
 
   # Aggregate input vectors for charting
   radar_input = {par:[] for par in params}
+  bar_input = {lbl: {} for lbl in labels}
   prev_label = None
   for d in data_3:
     lbl = label(d)
     par = param(d)
+    dec = decom(d)
     radar_input[par].append(d['#total'])
-    bar[lbl].add(par, d['#total'])
+    if dec not in bar_input[lbl]:
+      bar_input[lbl][dec] = d['#total']
+    else:
+      # Alway collect the best performance 
+      bar_input[lbl][dec] = bar_input[lbl][dec] if \
+        bar_input[lbl][dec] > d['#total'] else \
+        d['#total']
 
   # Render radar chart
   print(colored('Drawing radar...','cyan'))
@@ -100,6 +111,8 @@ if __name__ == '__main__':
 
   # Render bar charts
   for lbl in labels:
+    for dec in bar_input[lbl]:
+      bar[lbl].add('Best ' + dec, bar_input[lbl][dec])
     bar[lbl].render_to_file(args['to'] + '/bar-' + lbl +'.svg')
 
   print(colored('Done!','green'))

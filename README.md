@@ -216,23 +216,23 @@ TAG     : Dimension of the target dense matrix of topic tags
 
 ## Best performance of QDA clustering
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-qda.svg?v=4)
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-QDA.svg?v=4)
 
 ## Best performance of SVM clustering
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-svm.svg?v=4)
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-SVM.svg?v=4)
 
 ## Best performance of K-Nearest Neighbours clustering
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-knn.svg?v=4)
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-KNN.svg?v=4)
 
 ## Best performance of Nearest Centroid clustering
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-centroid.svg?v=4)
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-CENTROID.svg?v=4)
 
 ## Best performance of SGD clustering
 
-![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-sgd.svg?v=4)
+![CHART](https://cdn.rawgit.com/starcolon/pantip-libr/master/data/bar-SGD.svg?v=4)
 
 
 ---
